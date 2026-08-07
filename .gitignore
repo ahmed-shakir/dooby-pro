@@ -1,0 +1,28 @@
+*.iml
+.kotlin
+.gradle
+.fleet
+.idea
+**/build/
+captures
+local.properties
+.artifacts
+.externalNativeBuild
+.cxx
+.DS_Store
+node_modules/
+
+# KMP Specific
+!src/**/build/
+xcuserdata
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/project.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
+**/xcshareddata/WorkspaceSettings.xcsettings
+
+# Project Specific
+*.preferences_pb
+schemas/
+shared/${user.home}/
