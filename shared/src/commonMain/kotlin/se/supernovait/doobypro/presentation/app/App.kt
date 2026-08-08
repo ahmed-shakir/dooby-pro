@@ -1,15 +1,21 @@
 package se.supernovait.doobypro.presentation.app
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.app_icon
+import org.jetbrains.compose.resources.painterResource
 import se.supernovait.doobypro.presentation.app.theme.DoobyTheme
+import se.supernovait.doobypro.presentation.app.theme.spacing
 
 @Composable
 fun App() {
@@ -22,6 +28,10 @@ fun App() {
                     .padding(innerPadding)
             ) {
                 Text("Welcome to Dooby Pro")
+                Image(
+                    painter = painterResource(Res.drawable.app_icon),
+                    contentDescription = null,
+                    modifier = Modifier.padding(MaterialTheme.spacing.large))
             }
         }
     }
