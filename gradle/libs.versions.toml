@@ -6,6 +6,8 @@ android-targetSdk = "37"
 ###########################
 agp-version = "9.3.1"
 ksp-version = "2.3.10"
+supernova-version = "1.0.1"
+# KOTLIN
 kotlin-version = "2.4.10"
 kotlinx-datetime-version = "0.8.0"
 kotlinx-coroutines-version = "1.11.0"
@@ -33,6 +35,8 @@ compose-test-version = "1.7.0"
 compose-multiplatform-test-version = "1.11.1"
 
 [libraries]
+supernova-app-core = { group = "se.supernovait.app", name = "app-core", version.ref = "supernova-version" }
+
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime-version" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-version" }

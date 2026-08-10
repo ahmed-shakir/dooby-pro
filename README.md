@@ -2,7 +2,7 @@
 Streamline your laundry and dry cleaning business with an all-in-one management solution. Create and track orders efficiently, keep customers informed with real-time status notifications, and print professional receipts instantly. Designed for laundry companies to enhance operations and improve customer satisfaction.
 
 This is a Supernova project targeting Android and iOS with KMP (Kotlin Multiplatform) using Kotlin and Jetpack Compose.
-This source code and every resource included in this package is licensed under [Supernova Technology License v1.0](http://www.supernovait.se/stl1.txt)
+This source code and every resource included in this package is licensed under [Supernova Technology License v1.0](https://www.supernovait.se/stl1.txt)
 
 ### Running the apps
 

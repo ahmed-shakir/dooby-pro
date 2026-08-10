@@ -63,6 +63,8 @@ kotlin {
             api(libs.androidx.room.runtime)
             api(libs.koin.core)
 
+            implementation(libs.supernova.app.core)
+
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.navigation.compose)

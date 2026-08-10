@@ -31,7 +31,8 @@ fun App() {
                 Image(
                     painter = painterResource(Res.drawable.app_icon),
                     contentDescription = null,
-                    modifier = Modifier.padding(MaterialTheme.spacing.large))
+                    modifier = Modifier.padding(MaterialTheme.spacing.large)
+                )
             }
         }
     }
