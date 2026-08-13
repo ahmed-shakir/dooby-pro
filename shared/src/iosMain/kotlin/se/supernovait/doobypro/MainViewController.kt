@@ -1,8 +1,13 @@
 package se.supernovait.doobypro
 
 import androidx.compose.ui.window.ComposeUIViewController
+import se.supernovait.doobypro.di.initKoin
 import se.supernovait.doobypro.presentation.app.App
 
-fun MainViewController() = ComposeUIViewController {
+fun MainViewController() = ComposeUIViewController(
+    configure = {
+        initKoin()
+    }
+) {
     App()
 }

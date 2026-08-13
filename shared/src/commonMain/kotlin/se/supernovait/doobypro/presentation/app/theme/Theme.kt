@@ -7,6 +7,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import se.supernovait.app.core.ui.theme.shapes
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,

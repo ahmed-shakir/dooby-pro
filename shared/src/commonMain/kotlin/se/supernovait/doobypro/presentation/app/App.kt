@@ -14,8 +14,9 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.app_icon
 import org.jetbrains.compose.resources.painterResource
+import se.supernovait.app.core.ui.component.preview.ScreenPreviewContainer
+import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.presentation.app.theme.DoobyTheme
-import se.supernovait.doobypro.presentation.app.theme.spacing
 
 @Composable
 fun App() {
@@ -41,6 +42,7 @@ fun App() {
 @Composable
 @PreviewLightDark
 private fun Preview() {
-    // TODO: add ScreenPreviewContainer {}
-    App()
+    ScreenPreviewContainer {
+        App()
+    }
 }
