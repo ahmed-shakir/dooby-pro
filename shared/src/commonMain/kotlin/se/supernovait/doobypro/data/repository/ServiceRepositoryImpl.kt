@@ -9,13 +9,16 @@ import se.supernovait.doobypro.data.local.dao.ServiceDao
 import se.supernovait.doobypro.data.local.mapper.toDomain
 import se.supernovait.doobypro.data.local.mapper.toEntity
 import se.supernovait.doobypro.domain.model.Service
-import se.supernovait.doobypro.domain.repository.DoobyRepository
+import se.supernovait.doobypro.domain.repository.ServiceRepository
 import kotlin.coroutines.CoroutineContext
 
-class DoobyRepositoryImpl(
+/**
+ * Implementation of [ServiceRepository] using [ServiceDao].
+ */
+class ServiceRepositoryImpl(
     private val serviceDao: ServiceDao,
     private val ioContext: CoroutineContext = Dispatchers.IO
-) : DoobyRepository {
+) : ServiceRepository {
 
     override fun getServices(): Flow<List<Service>> {
         return serviceDao.getAll().map { services -> services.map { it.toDomain() } }

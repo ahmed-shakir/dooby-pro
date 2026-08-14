@@ -14,28 +14,25 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 /**
- * Unit tests for [DoobyRepositoryImpl].
- *
- * Verifies that the repository correctly interacts with the DAO and performs
- * mapping between domain models and data entities.
+ * Unit tests for [ServiceRepositoryImpl].
  */
-class DoobyRepositoryImplTest {
+class ServiceRepositoryImplTest {
 
     private lateinit var fakeServiceDao: FakeServiceDao
-    private lateinit var repository: DoobyRepositoryImpl
+    private lateinit var repository: ServiceRepositoryImpl
     private val testDispatcher = StandardTestDispatcher()
 
     private val testService = Service(
         id = SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix),
         title = "Haircut",
         description = "Basic haircut service",
-        price = Amount(250, "AED")
+        price = Amount(2500, "AED")
     )
 
     @BeforeTest
     fun setUp() {
         fakeServiceDao = FakeServiceDao()
-        repository = DoobyRepositoryImpl(
+        repository = ServiceRepositoryImpl(
             serviceDao = fakeServiceDao,
             ioContext = testDispatcher
         )

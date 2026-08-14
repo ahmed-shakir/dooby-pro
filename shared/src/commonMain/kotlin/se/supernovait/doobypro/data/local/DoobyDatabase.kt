@@ -10,14 +10,17 @@ import androidx.room.useWriterConnection
 import se.supernovait.app.core.data.persistence.RoomConverters
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.data.persistence.entity.UserEntity
+import se.supernovait.doobypro.data.local.dao.CompanyDao
 import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
+import se.supernovait.doobypro.data.local.entity.CompanyEntity
 import se.supernovait.doobypro.data.local.entity.OrderEntity
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
 
 @Database(
     entities = [
         UserEntity::class,
+        CompanyEntity::class,
         OrderEntity::class,
         ServiceEntity::class
     ], version = 1
@@ -26,6 +29,7 @@ import se.supernovait.doobypro.data.local.entity.ServiceEntity
 @ConstructedBy(DoobyDatabaseConstructor::class)
 abstract class DoobyDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
+    abstract fun companyDao(): CompanyDao
     abstract fun orderDao(): OrderDao
     abstract fun serviceDao(): ServiceDao
 
@@ -40,6 +44,7 @@ abstract class DoobyDatabase : RoomDatabase() {
 suspend fun DoobyDatabase.clearAllTablesKmp() {
     useWriterConnection { connection ->
         connection.execSQL("DELETE FROM users")
+        connection.execSQL("DELETE FROM companies")
         connection.execSQL("DELETE FROM orders")
         connection.execSQL("DELETE FROM services")
     }

@@ -1,0 +1,93 @@
+package se.supernovait.doobypro.data.repository
+
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
+import se.supernovait.app.core.domain.id.SupernovaIdGenerator
+import se.supernovait.app.core.domain.model.location.Address
+import se.supernovait.doobypro.data.local.dao.FakeCompanyDao
+import se.supernovait.doobypro.domain.model.Company
+import se.supernovait.doobypro.domain.model.DoobyIdType
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+
+/**
+ * Unit tests for [CompanyRepositoryImpl].
+ */
+class CompanyRepositoryImplTest {
+
+    private lateinit var fakeCompanyDao: FakeCompanyDao
+    private lateinit var repository: CompanyRepositoryImpl
+    private val testDispatcher = StandardTestDispatcher()
+
+    private val testCompany = Company(
+        id = SupernovaIdGenerator.generateId(DoobyIdType.COMPANY.prefix),
+        legalName = "Legal Name",
+        displayName = "Display Name",
+        licenseNumber = "LIC-123",
+        phoneNumber = "123456789",
+        email = "info@company.com",
+        address = Address(
+            id = SupernovaIdGenerator.generateId(),
+            street = "Main",
+            city = "Dubai",
+            country = "UAE"
+        ),
+        logoUrl = null
+    )
+
+    @BeforeTest
+    fun setUp() {
+        fakeCompanyDao = FakeCompanyDao()
+        repository = CompanyRepositoryImpl(
+            companyDao = fakeCompanyDao,
+            ioContext = testDispatcher
+        )
+    }
+
+    @Test
+    fun `getCompanies should return all companies mapped to models`() = runTest(testDispatcher) {
+        repository.upsertCompany(testCompany)
+
+        val companies = repository.getCompanies().first()
+
+        assertEquals(1, companies.size)
+        assertEquals(testCompany, companies[0])
+    }
+
+    @Test
+    fun `getCompanyById should return mapped model if found`() = runTest(testDispatcher) {
+        repository.upsertCompany(testCompany)
+
+        val result = repository.getCompanyById(testCompany.id!!)
+
+        assertEquals(testCompany, result)
+    }
+
+    @Test
+    fun `getCompanyById should return null if not found`() = runTest(testDispatcher) {
+        val result = repository.getCompanyById("non-existent")
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `upsertCompany should call dao upsert`() = runTest(testDispatcher) {
+        repository.upsertCompany(testCompany)
+
+        val savedEntity = fakeCompanyDao.getById(testCompany.id!!)
+        assertEquals(testCompany.id, savedEntity?.id)
+    }
+
+    @Test
+    fun `deleteCompany should call dao delete`() = runTest(testDispatcher) {
+        repository.upsertCompany(testCompany)
+        assertEquals(1, repository.getCompanies().first().size)
+
+        repository.deleteCompany(testCompany)
+
+        assertEquals(0, repository.getCompanies().first().size)
+    }
+}

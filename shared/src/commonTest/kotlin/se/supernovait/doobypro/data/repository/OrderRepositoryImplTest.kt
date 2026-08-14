@@ -137,7 +137,7 @@ class OrderRepositoryImplTest {
         // Upsert order but don't seed service
         val orderWithMissingService = testOrder.copy(
             id = SupernovaIdGenerator.generateId(DoobyIdType.ORDER.prefix), 
-            service = testService.copy(id = "MISSING")
+            service = testService.copy(id = SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix))
         )
         repository.upsertOrder(orderWithMissingService)
 
