@@ -1,7 +1,7 @@
 package se.supernovait.doobypro.data.local
 
 import androidx.room.TypeConverter
-import se.supernovait.doobypro.domain.model.AgreementStatus
+import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 

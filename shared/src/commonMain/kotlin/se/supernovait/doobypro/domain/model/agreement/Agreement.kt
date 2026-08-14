@@ -1,4 +1,4 @@
-package se.supernovait.doobypro.domain.model
+package se.supernovait.doobypro.domain.model.agreement
 
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.model.billing.Amount

@@ -4,8 +4,8 @@ import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.entity.AgreementEntity
-import se.supernovait.doobypro.domain.model.Agreement
 import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.agreement.Agreement
 
 /**
  * Extension function to map [AgreementEntity] to [Agreement] domain model.

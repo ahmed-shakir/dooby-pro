@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 import se.supernovait.doobypro.data.local.dao.AgreementDao
 import se.supernovait.doobypro.data.local.mapper.toDomain
 import se.supernovait.doobypro.data.local.mapper.toEntity
-import se.supernovait.doobypro.domain.model.Agreement
+import se.supernovait.doobypro.domain.model.agreement.Agreement
 import se.supernovait.doobypro.domain.repository.AgreementRepository
 import kotlin.coroutines.CoroutineContext
 

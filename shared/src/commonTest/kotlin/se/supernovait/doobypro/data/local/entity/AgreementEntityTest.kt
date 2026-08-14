@@ -3,8 +3,8 @@ package se.supernovait.doobypro.data.local.entity
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
-import se.supernovait.doobypro.domain.model.AgreementStatus
 import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import kotlin.test.Test
 import kotlin.test.assertTrue
 

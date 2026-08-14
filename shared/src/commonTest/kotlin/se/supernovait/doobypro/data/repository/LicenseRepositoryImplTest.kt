@@ -1,0 +1,97 @@
+package se.supernovait.doobypro.data.repository
+
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.LocalDate
+import se.supernovait.app.core.domain.id.SupernovaIdGenerator
+import se.supernovait.app.core.domain.model.license.License
+import se.supernovait.app.core.domain.model.license.LicenseStatus
+import se.supernovait.app.core.domain.model.license.Tier
+import se.supernovait.doobypro.data.local.dao.FakeLicenseDao
+import se.supernovait.doobypro.domain.model.DoobyIdType
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+
+/**
+ * Unit tests for [LicenseRepositoryImpl].
+ */
+class LicenseRepositoryImplTest {
+
+    private lateinit var fakeLicenseDao: FakeLicenseDao
+    private lateinit var repository: LicenseRepositoryImpl
+    private val testDispatcher = StandardTestDispatcher()
+
+    private val licenseId = SupernovaIdGenerator.generateId(DoobyIdType.LICENSE.prefix)
+    private val accountId = SupernovaIdGenerator.generateId(DoobyIdType.COMPANY.prefix)
+
+    private val testLicense = License(
+        id = licenseId,
+        accountId = accountId,
+        licenseStatus = LicenseStatus.ACTIVE,
+        tier = Tier.PRO,
+        title = "Professional License",
+        description = "Full access to pro features",
+        issueDate = LocalDate(2026, 8, 15),
+        expiryDate = LocalDate(2027, 8, 15)
+    )
+
+    @BeforeTest
+    fun setUp() {
+        fakeLicenseDao = FakeLicenseDao()
+        repository = LicenseRepositoryImpl(
+            licenseDao = fakeLicenseDao,
+            ioContext = testDispatcher
+        )
+    }
+
+    @Test
+    fun `getLicenses should return all licenses for account mapped to models`() = runTest(testDispatcher) {
+        repository.upsertLicense(testLicense)
+        repository.upsertLicense(testLicense.copy(
+            id = SupernovaIdGenerator.generateId(DoobyIdType.LICENSE.prefix), 
+            accountId = SupernovaIdGenerator.generateId(DoobyIdType.COMPANY.prefix)
+        ))
+
+        val licenses = repository.getLicenses(accountId)
+
+        assertEquals(1, licenses.size)
+        assertEquals(testLicense, licenses[0])
+    }
+
+    @Test
+    fun `getLicenseById should return mapped model if found`() = runTest(testDispatcher) {
+        repository.upsertLicense(testLicense)
+
+        val result = repository.getLicenseById(testLicense.id)
+
+        assertEquals(testLicense, result)
+    }
+
+    @Test
+    fun `getLicenseById should return null if not found`() = runTest(testDispatcher) {
+        val result = repository.getLicenseById("non-existent")
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `upsertLicense should call dao upsert`() = runTest(testDispatcher) {
+        repository.upsertLicense(testLicense)
+
+        val savedEntity = fakeLicenseDao.getById(testLicense.id)
+        assertEquals(testLicense.id, savedEntity?.id)
+        assertEquals(testLicense.title, savedEntity?.title)
+    }
+
+    @Test
+    fun `deleteLicense should call dao delete`() = runTest(testDispatcher) {
+        repository.upsertLicense(testLicense)
+        assertEquals(1, repository.getLicenses(accountId).size)
+
+        repository.deleteLicense(testLicense)
+
+        assertEquals(0, repository.getLicenses(accountId).size)
+    }
+}

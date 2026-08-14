@@ -8,9 +8,9 @@ import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
 import se.supernovait.doobypro.data.local.dao.FakeAgreementDao
-import se.supernovait.doobypro.domain.model.Agreement
-import se.supernovait.doobypro.domain.model.AgreementStatus
 import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.agreement.Agreement
+import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,8 +25,10 @@ class AgreementRepositoryImplTest {
     private lateinit var repository: AgreementRepositoryImpl
     private val testDispatcher = StandardTestDispatcher()
 
+    private val agreementId = SupernovaIdGenerator.generateId(DoobyIdType.AGREEMENT.prefix)
+
     private val testAgreement = Agreement(
-        id = SupernovaIdGenerator.generateId(DoobyIdType.AGREEMENT.prefix),
+        id = agreementId,
         status = AgreementStatus.ACTIVE,
         equipmentId = "SN-123",
         equipmentModel = "Model X",

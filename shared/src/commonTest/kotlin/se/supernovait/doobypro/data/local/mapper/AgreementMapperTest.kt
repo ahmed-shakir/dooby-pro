@@ -6,9 +6,9 @@ import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
 import se.supernovait.doobypro.data.local.entity.AgreementEntity
-import se.supernovait.doobypro.domain.model.Agreement
-import se.supernovait.doobypro.domain.model.AgreementStatus
 import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.agreement.Agreement
+import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

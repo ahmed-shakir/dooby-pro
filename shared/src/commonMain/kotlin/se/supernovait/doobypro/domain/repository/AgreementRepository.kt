@@ -1,7 +1,7 @@
 package se.supernovait.doobypro.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import se.supernovait.doobypro.domain.model.Agreement
+import se.supernovait.doobypro.domain.model.agreement.Agreement
 
 /**
  * Repository for managing equipment lease agreements.

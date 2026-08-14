@@ -1,4 +1,4 @@
-package se.supernovait.doobypro.domain.model
+package se.supernovait.doobypro.domain.model.agreement
 
 /**
  * Defines the possible states of an equipment lease agreement.
