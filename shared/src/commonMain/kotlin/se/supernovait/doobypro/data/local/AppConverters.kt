@@ -1,6 +1,7 @@
 package se.supernovait.doobypro.data.local
 
 import androidx.room.TypeConverter
+import se.supernovait.doobypro.domain.model.AgreementStatus
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 
@@ -8,9 +9,21 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
  * Room type converters for capturing custom data types in the database.
  *
  * This class provides methods to convert enums related to delivery
- * to and from their string representations for database storage.
+ * and agreements to and from their string representations for database storage.
  */
 object AppConverters {
+
+    /**
+     * Converts a string to an [AgreementStatus].
+     */
+    @TypeConverter
+    fun toAgreementStatus(value: String?): AgreementStatus? = value?.let { AgreementStatus.valueOf(it) }
+
+    /**
+     * Converts an [AgreementStatus] to a string.
+     */
+    @TypeConverter
+    fun fromAgreementStatus(status: AgreementStatus?): String? = status?.name
 
     /**
      * Converts a string to a [DeliveryOption].

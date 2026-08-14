@@ -10,13 +10,16 @@ import se.supernovait.app.core.di.coreModule
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.doobypro.data.local.DoobyDatabase
+import se.supernovait.doobypro.data.local.dao.AgreementDao
 import se.supernovait.doobypro.data.local.dao.CompanyDao
 import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
+import se.supernovait.doobypro.data.repository.AgreementRepositoryImpl
 import se.supernovait.doobypro.data.repository.AuthRepositoryImpl
 import se.supernovait.doobypro.data.repository.CompanyRepositoryImpl
 import se.supernovait.doobypro.data.repository.OrderRepositoryImpl
 import se.supernovait.doobypro.data.repository.ServiceRepositoryImpl
+import se.supernovait.doobypro.domain.repository.AgreementRepository
 import se.supernovait.doobypro.domain.repository.CompanyRepository
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
@@ -29,6 +32,7 @@ val sharedModule = module {
     singleOf(::AuthenticationManager)
     singleOf(::AuthRepositoryImpl).bind<AuthRepository>()
     singleOf(::CompanyRepositoryImpl).bind<CompanyRepository>()
+    singleOf(::AgreementRepositoryImpl).bind<AgreementRepository>()
     singleOf(::ServiceRepositoryImpl).bind<ServiceRepository>()
     singleOf(::OrderRepositoryImpl).bind<OrderRepository>()
 
@@ -42,6 +46,10 @@ val sharedModule = module {
 
     single<CompanyDao> {
         get<DoobyDatabase>().companyDao()
+    }
+
+    single<AgreementDao> {
+        get<DoobyDatabase>().agreementDao()
     }
 
     single<OrderDao> {
