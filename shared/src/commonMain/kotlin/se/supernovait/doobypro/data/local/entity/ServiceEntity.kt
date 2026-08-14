@@ -1,0 +1,18 @@
+package se.supernovait.doobypro.data.local.entity
+
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import se.supernovait.app.core.domain.id.SupernovaIdGenerator
+import se.supernovait.doobypro.data.local.entity.embedded.AmountEntity
+import se.supernovait.doobypro.domain.model.DoobyIdType
+
+@Entity(tableName = "services")
+data class ServiceEntity(
+    @PrimaryKey
+    val id: String = SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix),
+    val title: String,
+    val description: String,
+    @Embedded
+    val price: AmountEntity
+)
