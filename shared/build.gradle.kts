@@ -20,28 +20,23 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     android {
-       namespace = "se.supernovait.doobypro.shared"
-       compileSdk = libs.versions.android.compileSdk.get().toInt()
-       minSdk = libs.versions.android.minSdk.get().toInt()
-    
-       compilerOptions {
-           jvmTarget = JvmTarget.JVM_21
-       }
-       androidResources {
-           enable = true
-       }
-       withHostTest {
-           isIncludeAndroidResources = true
-       }
-       withDeviceTestBuilder {
-           sourceSetTreeName = "test"
-       }.configure {
-           instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-       }
+        namespace = "se.supernovait.doobypro.shared"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_21
+        }
+        androidResources {
+            enable = true
+        }
+        withHostTest {
+            isIncludeAndroidResources = true
+        }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             api(libs.androidx.startup)
@@ -89,6 +84,13 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.ktor.client.mock)
             implementation(libs.koin.test)
+        }
+        val androidHostTest by getting {
+            dependencies {
+                implementation(libs.androidx.test.core)
+                implementation(libs.compose.ui.test.junit4)
+                runtimeOnly(libs.compose.ui.test.manifest)
+            }
         }
     }
 }

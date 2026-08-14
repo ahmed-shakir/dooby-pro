@@ -1,6 +1,6 @@
 package se.supernovait.doobypro.data.local.entity
 
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -21,7 +21,7 @@ class CompanyEntityTest {
             logoUrl = null
         )
 
-        assertTrue(entity.id.startsWith(DoobyIdType.COMPANY.prefix), "ID should start with ${DoobyIdType.COMPANY.prefix}")
-        assertTrue(entity.id.length > DoobyIdType.COMPANY.prefix.length, "ID should have more characters after prefix")
+        assertTrue(entity.id.startsWith(IdType.COMPANY.prefix), "ID should start with ${IdType.COMPANY.prefix}")
+        assertTrue(entity.id.length > IdType.COMPANY.prefix.length, "ID should have more characters after prefix")
     }
 }

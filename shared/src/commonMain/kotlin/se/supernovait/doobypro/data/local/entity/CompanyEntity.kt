@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import se.supernovait.app.core.data.persistence.entity.AddressEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 
 /**
  * Database entity representing a company profile for Room persistence.
@@ -22,7 +22,7 @@ import se.supernovait.doobypro.domain.model.DoobyIdType
 @Entity(tableName = "companies")
 data class CompanyEntity(
     @PrimaryKey
-    val id: String = SupernovaIdGenerator.generateId(DoobyIdType.COMPANY.prefix),
+    val id: String = SupernovaIdGenerator.generateId(IdType.COMPANY.prefix),
     val legalName: String,
     val displayName: String,
     val licenseNumber: String,

@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.dao.FakeServiceDao
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Service
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -23,7 +23,7 @@ class ServiceRepositoryImplTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private val testService = Service(
-        id = SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix),
+        id = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix),
         title = "Haircut",
         description = "Basic haircut service",
         price = Amount(2500, "AED")

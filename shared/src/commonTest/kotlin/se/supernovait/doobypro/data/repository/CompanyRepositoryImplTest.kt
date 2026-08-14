@@ -7,7 +7,7 @@ import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.location.Address
 import se.supernovait.doobypro.data.local.dao.FakeCompanyDao
 import se.supernovait.doobypro.domain.model.Company
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -23,7 +23,7 @@ class CompanyRepositoryImplTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private val testCompany = Company(
-        id = SupernovaIdGenerator.generateId(DoobyIdType.COMPANY.prefix),
+        id = SupernovaIdGenerator.generateId(IdType.COMPANY.prefix),
         legalName = "Legal Name",
         displayName = "Display Name",
         licenseNumber = "LIC-123",

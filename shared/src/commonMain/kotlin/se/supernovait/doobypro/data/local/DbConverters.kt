@@ -11,7 +11,7 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
  * This class provides methods to convert enums related to delivery
  * and agreements to and from their string representations for database storage.
  */
-object AppConverters {
+object DbConverters {
 
     /**
      * Converts a string to an [AgreementStatus].

@@ -6,7 +6,7 @@ import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Service
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,7 +17,7 @@ import kotlin.test.assertEquals
  * Ensures correct data transformation between local entities and domain models.
  */
 class ServiceMapperTest {
-    private val serviceId = SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix)
+    private val serviceId = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix)
 
     private val testAmountEntity = AmountEntity(
         raw = 1000,

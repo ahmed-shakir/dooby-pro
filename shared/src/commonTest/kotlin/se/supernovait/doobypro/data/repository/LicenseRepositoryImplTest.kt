@@ -8,7 +8,7 @@ import se.supernovait.app.core.domain.model.license.License
 import se.supernovait.app.core.domain.model.license.LicenseStatus
 import se.supernovait.app.core.domain.model.license.Tier
 import se.supernovait.doobypro.data.local.dao.FakeLicenseDao
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -23,8 +23,8 @@ class LicenseRepositoryImplTest {
     private lateinit var repository: LicenseRepositoryImpl
     private val testDispatcher = StandardTestDispatcher()
 
-    private val licenseId = SupernovaIdGenerator.generateId(DoobyIdType.LICENSE.prefix)
-    private val accountId = SupernovaIdGenerator.generateId(DoobyIdType.COMPANY.prefix)
+    private val licenseId = SupernovaIdGenerator.generateId(IdType.LICENSE.prefix)
+    private val accountId = SupernovaIdGenerator.generateId(IdType.COMPANY.prefix)
 
     private val testLicense = License(
         id = licenseId,
@@ -50,8 +50,8 @@ class LicenseRepositoryImplTest {
     fun `getLicenses should return all licenses for account mapped to models`() = runTest(testDispatcher) {
         repository.upsertLicense(testLicense)
         repository.upsertLicense(testLicense.copy(
-            id = SupernovaIdGenerator.generateId(DoobyIdType.LICENSE.prefix), 
-            accountId = SupernovaIdGenerator.generateId(DoobyIdType.COMPANY.prefix)
+            id = SupernovaIdGenerator.generateId(IdType.LICENSE.prefix), 
+            accountId = SupernovaIdGenerator.generateId(IdType.COMPANY.prefix)
         ))
 
         val licenses = repository.getLicenses(accountId)

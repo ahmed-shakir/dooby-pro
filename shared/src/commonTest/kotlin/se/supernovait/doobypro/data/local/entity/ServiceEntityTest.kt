@@ -1,7 +1,7 @@
 package se.supernovait.doobypro.data.local.entity
 
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -18,7 +18,7 @@ class ServiceEntityTest {
             price = AmountEntity(100, "AED")
         )
 
-        assertTrue(entity.id.startsWith(DoobyIdType.SERVICE.prefix), "ID should start with ${DoobyIdType.SERVICE.prefix}")
-        assertTrue(entity.id.length > DoobyIdType.SERVICE.prefix.length, "ID should have more characters after prefix")
+        assertTrue(entity.id.startsWith(IdType.SERVICE.prefix), "ID should start with ${IdType.SERVICE.prefix}")
+        assertTrue(entity.id.length > IdType.SERVICE.prefix.length, "ID should have more characters after prefix")
     }
 }

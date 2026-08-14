@@ -5,7 +5,7 @@ import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.entity.CompanyEntity
 import se.supernovait.doobypro.domain.model.Company
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 
 /**
  * Extension function to map [CompanyEntity] to [Company] domain model.
@@ -32,7 +32,7 @@ fun CompanyEntity.toDomain(): Company {
  */
 fun Company.toEntity(): CompanyEntity {
     return CompanyEntity(
-        id = id ?: SupernovaIdGenerator.generateId(DoobyIdType.COMPANY.prefix),
+        id = id ?: SupernovaIdGenerator.generateId(IdType.COMPANY.prefix),
         legalName = legalName,
         displayName = displayName,
         licenseNumber = licenseNumber,

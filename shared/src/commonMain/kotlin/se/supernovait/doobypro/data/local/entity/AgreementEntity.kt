@@ -7,7 +7,7 @@ import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 
 /**
@@ -28,7 +28,7 @@ import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 @Entity(tableName = "agreements")
 data class AgreementEntity(
     @PrimaryKey
-    val id: String = SupernovaIdGenerator.generateId(DoobyIdType.AGREEMENT.prefix),
+    val id: String = SupernovaIdGenerator.generateId(IdType.AGREEMENT.prefix),
     val status: AgreementStatus,
     val equipmentId: String,
     val equipmentModel: String,

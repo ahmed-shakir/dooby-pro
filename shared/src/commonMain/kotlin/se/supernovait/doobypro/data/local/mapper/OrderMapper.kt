@@ -3,7 +3,7 @@ package se.supernovait.doobypro.data.local.mapper
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.entity.OrderEntity
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Order
 import se.supernovait.doobypro.domain.model.Service
 
@@ -34,7 +34,7 @@ fun OrderEntity.toDomain(customer: User, service: Service): Order {
  */
 fun Order.toEntity(): OrderEntity {
     return OrderEntity(
-        id = id ?: SupernovaIdGenerator.generateId(DoobyIdType.ORDER.prefix),
+        id = id ?: SupernovaIdGenerator.generateId(IdType.ORDER.prefix),
         customerId = customer.id!!,
         serviceId = service.id!!,
         deliveryOption = deliveryOption,

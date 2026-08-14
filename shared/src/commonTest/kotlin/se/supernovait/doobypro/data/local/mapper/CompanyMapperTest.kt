@@ -5,7 +5,7 @@ import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.location.Address
 import se.supernovait.doobypro.data.local.entity.CompanyEntity
 import se.supernovait.doobypro.domain.model.Company
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
  * Unit tests for [CompanyMapper].
  */
 class CompanyMapperTest {
-    private val companyId = SupernovaIdGenerator.generateId(DoobyIdType.COMPANY.prefix)
+    private val companyId = SupernovaIdGenerator.generateId(IdType.COMPANY.prefix)
     private val addressId = SupernovaIdGenerator.generateId()
 
     private val testAddress = Address(

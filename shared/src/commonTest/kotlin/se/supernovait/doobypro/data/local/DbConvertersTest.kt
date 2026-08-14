@@ -7,23 +7,23 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 /**
- * Unit tests for [AppConverters].
+ * Unit tests for [DbConverters].
  */
-class AppConvertersTest {
+class DbConvertersTest {
 
     @Test
     fun `DeliveryOption converters should work bidirectional`() {
         val option = DeliveryOption.EXPRESS
         val string = "EXPRESS"
 
-        assertEquals(string, AppConverters.fromDeliveryOption(option))
-        assertEquals(option, AppConverters.toDeliveryOption(string))
+        assertEquals(string, DbConverters.fromDeliveryOption(option))
+        assertEquals(option, DbConverters.toDeliveryOption(string))
     }
 
     @Test
     fun `DeliveryOption converters should handle nulls`() {
-        assertNull(AppConverters.fromDeliveryOption(null))
-        assertNull(AppConverters.toDeliveryOption(null))
+        assertNull(DbConverters.fromDeliveryOption(null))
+        assertNull(DbConverters.toDeliveryOption(null))
     }
 
     @Test
@@ -31,13 +31,13 @@ class AppConvertersTest {
         val method = DeliveryMethod.HOME_DELIVERY
         val string = "HOME_DELIVERY"
 
-        assertEquals(string, AppConverters.fromDeliveryMethod(method))
-        assertEquals(method, AppConverters.toDeliveryMethod(string))
+        assertEquals(string, DbConverters.fromDeliveryMethod(method))
+        assertEquals(method, DbConverters.toDeliveryMethod(string))
     }
 
     @Test
     fun `DeliveryMethod converters should handle nulls`() {
-        assertNull(AppConverters.fromDeliveryMethod(null))
-        assertNull(AppConverters.toDeliveryMethod(null))
+        assertNull(DbConverters.fromDeliveryMethod(null))
+        assertNull(DbConverters.toDeliveryMethod(null))
     }
 }

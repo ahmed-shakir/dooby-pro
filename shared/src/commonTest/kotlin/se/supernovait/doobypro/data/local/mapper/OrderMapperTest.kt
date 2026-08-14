@@ -6,7 +6,7 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.entity.OrderEntity
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Order
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
@@ -18,9 +18,9 @@ import kotlin.test.assertEquals
  * Unit tests for order mappers.
  */
 class OrderMapperTest {
-    private val orderId = SupernovaIdGenerator.generateId(DoobyIdType.ORDER.prefix)
-    private val userId = SupernovaIdGenerator.generateId(DoobyIdType.USER.prefix)
-    private val serviceId = SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix)
+    private val orderId = SupernovaIdGenerator.generateId(IdType.ORDER.prefix)
+    private val userId = SupernovaIdGenerator.generateId(IdType.USER.prefix)
+    private val serviceId = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix)
 
     private val testDateTime = LocalDateTime(2026, 8, 14, 20, 0, 0)
     

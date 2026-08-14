@@ -3,7 +3,7 @@ package se.supernovait.doobypro.data.local.entity
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -28,7 +28,7 @@ class AgreementEntityTest {
             cancellationDate = null
         )
 
-        assertTrue(entity.id.startsWith(DoobyIdType.AGREEMENT.prefix), "ID should start with ${DoobyIdType.AGREEMENT.prefix}")
-        assertTrue(entity.id.length > DoobyIdType.AGREEMENT.prefix.length, "ID should have more characters after prefix")
+        assertTrue(entity.id.startsWith(IdType.AGREEMENT.prefix), "ID should start with ${IdType.AGREEMENT.prefix}")
+        assertTrue(entity.id.length > IdType.AGREEMENT.prefix.length, "ID should have more characters after prefix")
     }
 }

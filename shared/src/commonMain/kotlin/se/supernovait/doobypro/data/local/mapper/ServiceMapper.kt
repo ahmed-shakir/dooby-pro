@@ -4,7 +4,7 @@ import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Service
 
 /**
@@ -28,7 +28,7 @@ fun ServiceEntity.toDomain(): Service {
  */
 fun Service.toEntity(): ServiceEntity {
     return ServiceEntity(
-        id = id ?: SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix),
+        id = id ?: SupernovaIdGenerator.generateId(IdType.SERVICE.prefix),
         title = title,
         description = description,
         price = price.toEntity()

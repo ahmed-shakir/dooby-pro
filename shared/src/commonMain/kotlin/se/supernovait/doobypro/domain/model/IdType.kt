@@ -5,7 +5,7 @@ package se.supernovait.doobypro.domain.model
  *
  * @property prefix The 2-character prefix used for generating IDs.
  */
-enum class DoobyIdType(val prefix: String) {
+enum class IdType(val prefix: String) {
     AGREEMENT("DA"),
     COMPANY("DC"),
     LICENSE("DL"),

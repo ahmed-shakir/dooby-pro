@@ -14,7 +14,7 @@ import se.supernovait.doobypro.data.local.dao.FakeOrderDao
 import se.supernovait.doobypro.data.local.dao.FakeServiceDao
 import se.supernovait.doobypro.data.local.dao.FakeUserDao
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Order
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
@@ -31,9 +31,9 @@ import kotlin.test.assertNull
  * Verifies the assembly logic and batch hydration of [Order] domain models.
  */
 class OrderRepositoryImplTest {
-    private val orderId = SupernovaIdGenerator.generateId(DoobyIdType.ORDER.prefix)
-    private val userId = SupernovaIdGenerator.generateId(DoobyIdType.USER.prefix)
-    private val serviceId = SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix)
+    private val orderId = SupernovaIdGenerator.generateId(IdType.ORDER.prefix)
+    private val userId = SupernovaIdGenerator.generateId(IdType.USER.prefix)
+    private val serviceId = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix)
 
     private lateinit var fakeOrderDao: FakeOrderDao
     private lateinit var fakeServiceDao: FakeServiceDao
@@ -136,8 +136,8 @@ class OrderRepositoryImplTest {
     fun `getOrderById should return null if related data is missing`() = runTest(testDispatcher) {
         // Upsert order but don't seed service
         val orderWithMissingService = testOrder.copy(
-            id = SupernovaIdGenerator.generateId(DoobyIdType.ORDER.prefix), 
-            service = testService.copy(id = SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix))
+            id = SupernovaIdGenerator.generateId(IdType.ORDER.prefix), 
+            service = testService.copy(id = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix))
         )
         repository.upsertOrder(orderWithMissingService)
 
@@ -150,12 +150,12 @@ class OrderRepositoryImplTest {
     fun `getOrdersByCustomerId should return filtered assembled orders`() = runTest(testDispatcher) {
         repository.upsertOrder(testOrder)
         
-        val anotherUserId = SupernovaIdGenerator.generateId(DoobyIdType.USER.prefix)
+        val anotherUserId = SupernovaIdGenerator.generateId(IdType.USER.prefix)
         val anotherUser = testUser.copy(id = anotherUserId, username = "jane")
         val anotherUserEntity = testUserEntity.copy(id = anotherUserId, username = "jane")
         fakeUserDao.upsert(anotherUserEntity)
         
-        repository.upsertOrder(testOrder.copy(id = SupernovaIdGenerator.generateId(DoobyIdType.ORDER.prefix), customer = anotherUser))
+        repository.upsertOrder(testOrder.copy(id = SupernovaIdGenerator.generateId(IdType.ORDER.prefix), customer = anotherUser))
 
         val orders = repository.getOrdersByCustomerId(testUser.id!!).first()
 

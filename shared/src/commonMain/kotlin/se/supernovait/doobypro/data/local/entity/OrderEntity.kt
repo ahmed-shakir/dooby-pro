@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.datetime.LocalDateTime
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 
@@ -23,7 +23,7 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 @Entity(tableName = "orders")
 data class OrderEntity(
     @PrimaryKey
-    val id: String = SupernovaIdGenerator.generateId(DoobyIdType.ORDER.prefix),
+    val id: String = SupernovaIdGenerator.generateId(IdType.ORDER.prefix),
     val customerId: String,
     val serviceId: String,
     val deliveryOption: DeliveryOption,

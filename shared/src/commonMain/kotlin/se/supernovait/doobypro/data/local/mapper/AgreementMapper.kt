@@ -4,7 +4,7 @@ import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.entity.AgreementEntity
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.agreement.Agreement
 
 /**
@@ -35,7 +35,7 @@ fun AgreementEntity.toDomain(): Agreement {
  */
 fun Agreement.toEntity(): AgreementEntity {
     return AgreementEntity(
-        id = id ?: SupernovaIdGenerator.generateId(DoobyIdType.AGREEMENT.prefix),
+        id = id ?: SupernovaIdGenerator.generateId(IdType.AGREEMENT.prefix),
         status = status,
         equipmentId = equipmentId,
         equipmentModel = equipmentModel,

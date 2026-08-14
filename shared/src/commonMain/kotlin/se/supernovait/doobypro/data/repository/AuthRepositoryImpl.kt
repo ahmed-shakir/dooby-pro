@@ -17,7 +17,7 @@ import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthRepository.Companion.APP_USER_IDENTITY_KEY
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
-import se.supernovait.doobypro.domain.model.DoobyIdType
+import se.supernovait.doobypro.domain.model.IdType
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -62,7 +62,7 @@ class AuthRepositoryImpl(
     override suspend fun signUp(user: User): Result<User> {
         return withContext(ioContext) {
             try {
-                val id = SupernovaIdGenerator.generateId(DoobyIdType.USER.prefix)
+                val id = SupernovaIdGenerator.generateId(IdType.USER.prefix)
                 userDao.upsert(user.toEntity().copy(id = id))
                 val savedUser = userDao.getById(id)
                 if (savedUser != null) {
