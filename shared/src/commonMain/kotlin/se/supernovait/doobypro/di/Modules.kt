@@ -10,10 +10,13 @@ import se.supernovait.app.core.di.coreModule
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.doobypro.data.local.DoobyDatabase
+import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
 import se.supernovait.doobypro.data.repository.AuthRepositoryImpl
 import se.supernovait.doobypro.data.repository.DoobyRepositoryImpl
+import se.supernovait.doobypro.data.repository.OrderRepositoryImpl
 import se.supernovait.doobypro.domain.repository.DoobyRepository
+import se.supernovait.doobypro.domain.repository.OrderRepository
 
 expect val platformModule: Module
 
@@ -23,6 +26,7 @@ val sharedModule = module {
     singleOf(::AuthenticationManager)
     singleOf(::AuthRepositoryImpl).bind<AuthRepository>()
     singleOf(::DoobyRepositoryImpl).bind<DoobyRepository>()
+    singleOf(::OrderRepositoryImpl).bind<OrderRepository>()
 
     single<DoobyDatabase> {
         DatabaseFactory.create(get())
@@ -30,6 +34,10 @@ val sharedModule = module {
 
     single<UserDao> {
         get<DoobyDatabase>().userDao()
+    }
+
+    single<OrderDao> {
+        get<DoobyDatabase>().orderDao()
     }
 
     single<ServiceDao> {

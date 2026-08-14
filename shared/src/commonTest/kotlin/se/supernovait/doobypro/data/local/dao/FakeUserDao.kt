@@ -12,7 +12,7 @@ import se.supernovait.app.core.data.persistence.entity.UserEntity
 class FakeUserDao : UserDao {
     private val usersState = MutableStateFlow<Map<String, UserEntity>>(emptyMap())
 
-    override suspend fun getUsersCount(): Long {
+    override suspend fun getCount(): Long {
         return usersState.value.size.toLong()
     }
 
@@ -22,6 +22,10 @@ class FakeUserDao : UserDao {
 
     override fun getAll(): Flow<List<UserEntity>> {
         return usersState.map { it.values.toList() }
+    }
+
+    override suspend fun getAllByIds(ids: List<String>): List<UserEntity> {
+        return ids.mapNotNull { usersState.value[it] }
     }
 
     override suspend fun getById(id: String): UserEntity? {

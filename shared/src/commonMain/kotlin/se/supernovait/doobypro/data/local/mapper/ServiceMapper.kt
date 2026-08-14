@@ -1,22 +1,36 @@
 package se.supernovait.doobypro.data.local.mapper
 
+import se.supernovait.app.core.data.persistence.mapper.toDomain
+import se.supernovait.app.core.data.persistence.mapper.toEntity
+import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
+import se.supernovait.doobypro.domain.model.DoobyIdType
 import se.supernovait.doobypro.domain.model.Service
 
-fun ServiceEntity.mapToModel(): Service {
+/**
+ * Extension function to map [ServiceEntity] to [Service] domain model.
+ *
+ * @return The mapped [Service] model.
+ */
+fun ServiceEntity.toDomain(): Service {
     return Service(
         id = id,
         title = title,
         description = description,
-        price = price.mapToModel()
+        price = price.toDomain()
     )
 }
 
-fun Service.mapToEntity(): ServiceEntity {
+/**
+ * Extension function to map [Service] domain model to [ServiceEntity].
+ *
+ * @return The mapped [ServiceEntity].
+ */
+fun Service.toEntity(): ServiceEntity {
     return ServiceEntity(
-        id = id,
+        id = id ?: SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix),
         title = title,
         description = description,
-        price = price.mapToEntity()
+        price = price.toEntity()
     )
 }

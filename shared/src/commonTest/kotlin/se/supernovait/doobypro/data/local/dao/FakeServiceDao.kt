@@ -7,8 +7,6 @@ import se.supernovait.doobypro.data.local.entity.ServiceEntity
 
 /**
  * A fake implementation of [ServiceDao] for unit testing purposes.
- *
- * Uses an in-memory map to simulate database operations.
  */
 class FakeServiceDao : ServiceDao {
     private val servicesState = MutableStateFlow<Map<String, ServiceEntity>>(emptyMap())
@@ -19,6 +17,10 @@ class FakeServiceDao : ServiceDao {
 
     override suspend fun getById(id: String): ServiceEntity? {
         return servicesState.value[id]
+    }
+
+    override suspend fun getAllByIds(ids: List<String>): List<ServiceEntity> {
+        return ids.mapNotNull { servicesState.value[it] }
     }
 
     override suspend fun upsert(service: ServiceEntity) {

@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import se.supernovait.app.core.data.persistence.dao.UserDao
-import se.supernovait.app.core.data.persistence.mapper.mapToEntity
-import se.supernovait.app.core.data.persistence.mapper.mapToModel
+import se.supernovait.app.core.data.persistence.mapper.toDomain
+import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthRepository.Companion.APP_USER_IDENTITY_KEY
 import se.supernovait.app.core.domain.auth.User
@@ -44,7 +44,7 @@ class AuthRepositoryImpl(
     }
 
     override fun observeUserById(id: String): Flow<User?> {
-        return userDao.observeUserById(id).map { it?.mapToModel() }
+        return userDao.observeUserById(id).map { it?.toDomain() }
     }
 
     override suspend fun getCurrentUserId(): String? {
@@ -55,7 +55,7 @@ class AuthRepositoryImpl(
 
     override suspend fun getUserById(id: String): User? {
         return withContext(ioContext) {
-            userDao.getById(id)?.mapToModel()
+            userDao.getById(id)?.toDomain()
         }
     }
 
@@ -63,11 +63,11 @@ class AuthRepositoryImpl(
         return withContext(ioContext) {
             try {
                 val id = SupernovaIdGenerator.generateId(DoobyIdType.USER.prefix)
-                userDao.upsert(user.mapToEntity().copy(id = id))
+                userDao.upsert(user.toEntity().copy(id = id))
                 val savedUser = userDao.getById(id)
                 if (savedUser != null) {
                     saveUserToPrefs(id)
-                    Result.success(savedUser.mapToModel())
+                    Result.success(savedUser.toDomain())
                 } else {
                     Result.failure(Exception("Failed to retrieve saved user"))
                 }
@@ -82,7 +82,7 @@ class AuthRepositoryImpl(
             val user = userDao.getByUsername(username)
             return@withContext if (user != null) {
                 saveUserToPrefs(user.id)
-                Result.success(user.mapToModel())
+                Result.success(user.toDomain())
             } else {
                 Result.failure(Exception("User not found"))
             }

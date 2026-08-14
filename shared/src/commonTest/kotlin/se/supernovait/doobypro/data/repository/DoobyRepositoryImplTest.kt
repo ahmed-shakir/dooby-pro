@@ -4,8 +4,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
+import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.dao.FakeServiceDao
-import se.supernovait.doobypro.domain.model.Amount
 import se.supernovait.doobypro.domain.model.DoobyIdType
 import se.supernovait.doobypro.domain.model.Service
 import kotlin.test.BeforeTest
@@ -29,7 +29,7 @@ class DoobyRepositoryImplTest {
         id = SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix),
         title = "Haircut",
         description = "Basic haircut service",
-        price = Amount(25.0, "AED")
+        price = Amount(250, "AED")
     )
 
     @BeforeTest
@@ -55,7 +55,7 @@ class DoobyRepositoryImplTest {
     fun `getServiceById should return mapped model if found`() = runTest(testDispatcher) {
         repository.upsertService(testService)
 
-        val result = repository.getServiceById(testService.id)
+        val result = repository.getServiceById(testService.id!!)
 
         assertEquals(testService, result)
     }
@@ -71,7 +71,7 @@ class DoobyRepositoryImplTest {
     fun `upsertService should call dao upsert with mapped entity`() = runTest(testDispatcher) {
         repository.upsertService(testService)
 
-        val savedEntity = fakeServiceDao.getById(testService.id)
+        val savedEntity = fakeServiceDao.getById(testService.id!!)
         assertEquals(testService.id, savedEntity?.id)
         assertEquals(testService.title, savedEntity?.title)
     }

@@ -30,7 +30,8 @@ class AuthRepositoryImplTest {
         username = "johndoe",
         firstname = "John",
         lastname = "Doe",
-        birthdate = LocalDate(1990, 1, 1)
+        birthdate = LocalDate(1990, 1, 1),
+        email = "john@example.com"
     )
 
     @BeforeTest

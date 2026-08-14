@@ -1,9 +1,11 @@
 package se.supernovait.doobypro.data.local.mapper
 
+import se.supernovait.app.core.data.persistence.entity.AmountEntity
+import se.supernovait.app.core.data.persistence.mapper.toDomain
+import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
+import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
-import se.supernovait.doobypro.data.local.entity.embedded.AmountEntity
-import se.supernovait.doobypro.domain.model.Amount
 import se.supernovait.doobypro.domain.model.DoobyIdType
 import se.supernovait.doobypro.domain.model.Service
 import kotlin.test.Test
@@ -18,12 +20,12 @@ class ServiceMapperTest {
     private val serviceId = SupernovaIdGenerator.generateId(DoobyIdType.SERVICE.prefix)
 
     private val testAmountEntity = AmountEntity(
-        value = 100.0,
+        raw = 1000,
         currency = "AED"
     )
 
     private val testAmount = Amount(
-        value = 100.0,
+        raw = 1000,
         currency = "AED"
     )
 
@@ -42,40 +44,41 @@ class ServiceMapperTest {
     )
 
     @Test
-    fun `mapToModel should correctly transform ServiceEntity to Service model`() {
-        val result = testServiceEntity.mapToModel()
+    fun `toDomain should correctly transform ServiceEntity to Service model`() {
+        val result = testServiceEntity.toDomain()
 
         assertEquals(testService.id, result.id)
         assertEquals(testService.title, result.title)
         assertEquals(testService.description, result.description)
-        assertEquals(testService.price.value, result.price.value)
+        assertEquals(testService.price.raw, result.price.raw)
         assertEquals(testService.price.currency, result.price.currency)
     }
 
     @Test
-    fun `mapToEntity should correctly transform Service model to ServiceEntity`() {
-        val result = testService.mapToEntity()
+    fun `toEntity should correctly transform Service model to ServiceEntity`() {
+        val result = testService.toEntity()
 
         assertEquals(testServiceEntity.id, result.id)
         assertEquals(testServiceEntity.title, result.title)
         assertEquals(testServiceEntity.description, result.description)
-        assertEquals(testServiceEntity.price.value, result.price.value)
+        assertEquals(testServiceEntity.price.raw, result.price.raw)
         assertEquals(testServiceEntity.price.currency, result.price.currency)
     }
 
     @Test
-    fun `AmountEntity_mapToModel should correctly transform AmountEntity to Amount model`() {
-        val result = testAmountEntity.mapToModel()
+    fun `AmountEntity_toDomain should correctly transform AmountEntity to Amount model`() {
+        val result = testAmountEntity.toDomain()
 
-        assertEquals(testAmount.value, result.value)
+        assertEquals(testAmount.raw, result.raw)
         assertEquals(testAmount.currency, result.currency)
+        assertEquals("10.00", result.value)
     }
 
     @Test
-    fun `Amount_mapToEntity should correctly transform Amount model to AmountEntity`() {
-        val result = testAmount.mapToEntity()
+    fun `Amount_toEntity should correctly transform Amount model to AmountEntity`() {
+        val result = testAmount.toEntity()
 
-        assertEquals(testAmountEntity.value, result.value)
+        assertEquals(testAmountEntity.raw, result.raw)
         assertEquals(testAmountEntity.currency, result.currency)
     }
 }

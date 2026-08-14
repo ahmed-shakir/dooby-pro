@@ -3,8 +3,8 @@ package se.supernovait.doobypro.data.local.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import se.supernovait.app.core.data.persistence.entity.AmountEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
-import se.supernovait.doobypro.data.local.entity.embedded.AmountEntity
 import se.supernovait.doobypro.domain.model.DoobyIdType
 
 @Entity(tableName = "services")
