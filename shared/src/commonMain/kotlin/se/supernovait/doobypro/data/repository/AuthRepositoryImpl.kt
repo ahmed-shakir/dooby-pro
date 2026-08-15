@@ -28,13 +28,12 @@ import kotlin.coroutines.CoroutineContext
  *
  * @param userDao The data access object for user entities.
  * @param prefs The data store for local preferences and session state.
- * @param ioContext The coroutine context for performing I/O operations. Defaults to [Dispatchers.IO].
  */
 class AuthRepositoryImpl(
     private val userDao: UserDao,
-    private val prefs: DataStore<Preferences>,
-    private val ioContext: CoroutineContext = Dispatchers.IO
+    private val prefs: DataStore<Preferences>
 ) : AuthRepository {
+    private val ioContext: CoroutineContext = Dispatchers.IO
     private val userKey = stringPreferencesKey(APP_USER_IDENTITY_KEY)
 
     override fun observeCurrentUserId(): Flow<String?> {

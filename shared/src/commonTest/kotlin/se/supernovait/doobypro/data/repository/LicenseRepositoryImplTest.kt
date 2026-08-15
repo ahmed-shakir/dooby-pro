@@ -18,7 +18,6 @@ import kotlin.test.assertNull
  * Unit tests for [LicenseRepositoryImpl].
  */
 class LicenseRepositoryImplTest {
-
     private lateinit var fakeLicenseDao: FakeLicenseDao
     private lateinit var repository: LicenseRepositoryImpl
     private val testDispatcher = StandardTestDispatcher()
@@ -41,8 +40,7 @@ class LicenseRepositoryImplTest {
     fun setUp() {
         fakeLicenseDao = FakeLicenseDao()
         repository = LicenseRepositoryImpl(
-            licenseDao = fakeLicenseDao,
-            ioContext = testDispatcher
+            licenseDao = fakeLicenseDao
         )
     }
 

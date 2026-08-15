@@ -12,6 +12,7 @@ import se.supernovait.app.core.data.persistence.dao.LicenseDao
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.data.persistence.entity.LicenseEntity
 import se.supernovait.app.core.data.persistence.entity.UserEntity
+import se.supernovait.app.core.domain.initialization.InitializableDatabase
 import se.supernovait.doobypro.data.local.dao.AccountDao
 import se.supernovait.doobypro.data.local.dao.AgreementDao
 import se.supernovait.doobypro.data.local.dao.CompanyDao
@@ -36,7 +37,7 @@ import se.supernovait.doobypro.data.local.entity.ServiceEntity
 )
 @TypeConverters(RoomConverters::class, DbConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
-abstract class AppDatabase : RoomDatabase() {
+abstract class AppDatabase : RoomDatabase(), InitializableDatabase {
     abstract fun userDao(): UserDao
     abstract fun companyDao(): CompanyDao
     abstract fun licenseDao(): LicenseDao
@@ -44,6 +45,14 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun accountDao(): AccountDao
     abstract fun orderDao(): OrderDao
     abstract fun serviceDao(): ServiceDao
+
+    override suspend fun verify() {
+        userDao().getCount()
+    }
+
+    override suspend fun clearTables() {
+        clearAllTablesKmp()
+    }
 
     companion object {
         const val DATABASE_FILENAME = "app.db"

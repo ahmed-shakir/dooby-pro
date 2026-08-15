@@ -20,7 +20,6 @@ import kotlin.test.assertTrue
  * Verifies authentication flows, user persistence, and session management.
  */
 class AuthRepositoryImplTest {
-
     private lateinit var fakeUserDao: FakeUserDao
     private lateinit var fakeDataStore: FakeDataStore
     private lateinit var repository: AuthRepositoryImpl
@@ -40,8 +39,7 @@ class AuthRepositoryImplTest {
         fakeDataStore = FakeDataStore()
         repository = AuthRepositoryImpl(
             userDao = fakeUserDao,
-            prefs = fakeDataStore,
-            ioContext = testDispatcher
+            prefs = fakeDataStore
         )
     }
 

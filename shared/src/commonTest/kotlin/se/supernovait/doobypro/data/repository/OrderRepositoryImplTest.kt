@@ -97,8 +97,7 @@ class OrderRepositoryImplTest {
         repository = OrderRepositoryImpl(
             userDao = fakeUserDao,
             orderDao = fakeOrderDao,
-            serviceDao = fakeServiceDao,
-            ioContext = testDispatcher
+            serviceDao = fakeServiceDao
         )
 
         // Seed fakes

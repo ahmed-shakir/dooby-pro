@@ -24,9 +24,9 @@ class AccountRepositoryImpl(
     private val userDao: UserDao,
     private val companyDao: CompanyDao,
     private val licenseDao: LicenseDao,
-    private val agreementDao: AgreementDao,
-    private val ioContext: CoroutineContext = Dispatchers.IO
+    private val agreementDao: AgreementDao
 ) : AccountRepository {
+    private val ioContext: CoroutineContext = Dispatchers.IO
 
     override suspend fun getAccount(id: String): Account? {
         return withContext(ioContext) {

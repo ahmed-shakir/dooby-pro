@@ -16,9 +16,9 @@ import kotlin.coroutines.CoroutineContext
  * Implementation of [ServiceRepository] using [ServiceDao].
  */
 class ServiceRepositoryImpl(
-    private val serviceDao: ServiceDao,
-    private val ioContext: CoroutineContext = Dispatchers.IO
+    private val serviceDao: ServiceDao
 ) : ServiceRepository {
+    private val ioContext: CoroutineContext = Dispatchers.IO
 
     override fun getServices(): Flow<List<Service>> {
         return serviceDao.getAll().map { services -> services.map { it.toDomain() } }

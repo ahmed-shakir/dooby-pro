@@ -6,6 +6,7 @@ import org.koin.android.ext.koin.androidLogger
 import se.supernovait.doobypro.di.initKoin
 
 class DoobyApplication : Application() {
+
     override fun onCreate() {
         super.onCreate()
         initKoin {

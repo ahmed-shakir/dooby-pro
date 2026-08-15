@@ -20,7 +20,6 @@ import kotlin.test.assertNull
  * Unit tests for [AgreementRepositoryImpl].
  */
 class AgreementRepositoryImplTest {
-
     private lateinit var fakeAgreementDao: FakeAgreementDao
     private lateinit var repository: AgreementRepositoryImpl
     private val testDispatcher = StandardTestDispatcher()
@@ -45,8 +44,7 @@ class AgreementRepositoryImplTest {
     fun setUp() {
         fakeAgreementDao = FakeAgreementDao()
         repository = AgreementRepositoryImpl(
-            agreementDao = fakeAgreementDao,
-            ioContext = testDispatcher
+            agreementDao = fakeAgreementDao
         )
     }
 

@@ -17,7 +17,6 @@ import kotlin.test.assertNull
  * Unit tests for [CompanyRepositoryImpl].
  */
 class CompanyRepositoryImplTest {
-
     private lateinit var fakeCompanyDao: FakeCompanyDao
     private lateinit var repository: CompanyRepositoryImpl
     private val testDispatcher = StandardTestDispatcher()
@@ -42,8 +41,7 @@ class CompanyRepositoryImplTest {
     fun setUp() {
         fakeCompanyDao = FakeCompanyDao()
         repository = CompanyRepositoryImpl(
-            companyDao = fakeCompanyDao,
-            ioContext = testDispatcher
+            companyDao = fakeCompanyDao
         )
     }
 

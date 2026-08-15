@@ -17,7 +17,6 @@ import kotlin.test.assertNull
  * Unit tests for [ServiceRepositoryImpl].
  */
 class ServiceRepositoryImplTest {
-
     private lateinit var fakeServiceDao: FakeServiceDao
     private lateinit var repository: ServiceRepositoryImpl
     private val testDispatcher = StandardTestDispatcher()
@@ -33,8 +32,7 @@ class ServiceRepositoryImplTest {
     fun setUp() {
         fakeServiceDao = FakeServiceDao()
         repository = ServiceRepositoryImpl(
-            serviceDao = fakeServiceDao,
-            ioContext = testDispatcher
+            serviceDao = fakeServiceDao
         )
     }
 

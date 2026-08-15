@@ -14,12 +14,11 @@ import kotlin.coroutines.CoroutineContext
  * Implementation of [LicenseRepository] using [LicenseDao].
  *
  * @param licenseDao The data access object for license entities.
- * @param ioContext The coroutine context for performing I/O operations. Defaults to [Dispatchers.IO].
  */
 class LicenseRepositoryImpl(
-    private val licenseDao: LicenseDao,
-    private val ioContext: CoroutineContext = Dispatchers.IO
+    private val licenseDao: LicenseDao
 ) : LicenseRepository {
+    private val ioContext: CoroutineContext = Dispatchers.IO
 
     override suspend fun getLicenses(accountId: String): List<License> {
         return withContext(ioContext) {

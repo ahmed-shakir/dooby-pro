@@ -16,9 +16,9 @@ import kotlin.coroutines.CoroutineContext
  * Implementation of [CompanyRepository] using [CompanyDao].
  */
 class CompanyRepositoryImpl(
-    private val companyDao: CompanyDao,
-    private val ioContext: CoroutineContext = Dispatchers.IO
+    private val companyDao: CompanyDao
 ) : CompanyRepository {
+    private val ioContext: CoroutineContext = Dispatchers.IO
 
     override fun getCompanies(): Flow<List<Company>> {
         return companyDao.getAll().map { entities ->

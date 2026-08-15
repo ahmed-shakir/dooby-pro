@@ -78,8 +78,7 @@ class AccountRepositoryImplTest {
             userDao = fakeUserDao,
             companyDao = fakeCompanyDao,
             licenseDao = fakeLicenseDao,
-            agreementDao = fakeAgreementDao,
-            ioContext = testDispatcher
+            agreementDao = fakeAgreementDao
         )
 
         // Seed component data

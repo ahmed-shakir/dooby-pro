@@ -16,9 +16,9 @@ import kotlin.coroutines.CoroutineContext
  * Implementation of [AgreementRepository] using [AgreementDao].
  */
 class AgreementRepositoryImpl(
-    private val agreementDao: AgreementDao,
-    private val ioContext: CoroutineContext = Dispatchers.IO
+    private val agreementDao: AgreementDao
 ) : AgreementRepository {
+    private val ioContext: CoroutineContext = Dispatchers.IO
 
     override fun getAgreements(): Flow<List<Agreement>> {
         return agreementDao.getAll().map { entities ->

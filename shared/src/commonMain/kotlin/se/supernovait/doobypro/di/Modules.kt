@@ -9,7 +9,7 @@ import se.supernovait.app.core.data.persistence.dao.LicenseDao
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.di.coreModule
 import se.supernovait.app.core.domain.auth.AuthRepository
-import se.supernovait.app.core.domain.auth.AuthenticationManager
+import se.supernovait.app.core.domain.initialization.InitializableDatabase
 import se.supernovait.doobypro.data.local.AppDatabase
 import se.supernovait.doobypro.data.local.dao.AccountDao
 import se.supernovait.doobypro.data.local.dao.AgreementDao
@@ -35,7 +35,6 @@ expect val platformModule: Module
 val sharedModule = module {
     includes(coreModule)
 
-    singleOf(::AuthenticationManager)
     singleOf(::AuthRepositoryImpl).bind<AuthRepository>()
     singleOf(::AccountRepositoryImpl).bind<AccountRepository>()
     singleOf(::CompanyRepositoryImpl).bind<CompanyRepository>()
@@ -46,6 +45,10 @@ val sharedModule = module {
 
     single<AppDatabase> {
         DatabaseFactory.create(get())
+    }
+
+    single<InitializableDatabase> {
+        get<AppDatabase>()
     }
 
     single<AccountDao> {

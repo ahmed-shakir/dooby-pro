@@ -28,9 +28,9 @@ import kotlin.coroutines.CoroutineContext
 class OrderRepositoryImpl(
     private val userDao: UserDao,
     private val orderDao: OrderDao,
-    private val serviceDao: ServiceDao,
-    private val ioContext: CoroutineContext = Dispatchers.IO
+    private val serviceDao: ServiceDao
 ) : OrderRepository {
+    private val ioContext: CoroutineContext = Dispatchers.IO
 
     override fun getOrders(): Flow<List<Order>> {
         return orderDao.getAll().flatMapLatest { entities ->
