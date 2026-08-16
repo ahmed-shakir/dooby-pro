@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		BB73DAE56013887BA82A7CC7 /* DoobyPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DoobyPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB73DAE56013887BA82A7CC7 /* Dooby Pro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Dooby Pro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		CBB64B442DA3189D6799699A /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		CBB64B442DA3189D6799699A /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -24,7 +24,7 @@
 		6E3BD2D05049AD8813F57A4F /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				CBB64B442DA3189D6799699A /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+				CBB64B442DA3189D6799699A /* Exceptions for "iosApp" folder in "iosApp" target */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -57,7 +57,7 @@
 		710ECF28782F390B4495E527 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BB73DAE56013887BA82A7CC7 /* DoobyPro.app */,
+				BB73DAE56013887BA82A7CC7 /* Dooby Pro.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -81,7 +81,7 @@
 			);
 			name = iosApp;
 			productName = iosApp;
-			productReference = BB73DAE56013887BA82A7CC7 /* DoobyPro.app */;
+			productReference = BB73DAE56013887BA82A7CC7 /* Dooby Pro.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -137,7 +137,7 @@
 				"if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then",
 				"  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"",
 				"  exit 0",
-				fi,
+				"fi",
 				"cd \"$SRCROOT/..\"",
 				"./gradlew :shared:embedAndSignAppleFrameworkForXcode",
 				"",
@@ -154,7 +154,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		564C4227929FFB4D8A6253EE /* Debug */ = {
+		564C4227929FFB4D8A6253EE /* Debug configuration for PBXNativeTarget "iosApp" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
@@ -184,7 +184,7 @@
 			};
 			name = Debug;
 		};
-		565E7927ABC4E7CD1192D59A /* Release */ = {
+		565E7927ABC4E7CD1192D59A /* Release configuration for PBXNativeTarget "iosApp" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
@@ -214,7 +214,7 @@
 			};
 			name = Release;
 		};
-		AD615B54758F72844BD93853 /* Release */ = {
+		AD615B54758F72844BD93853 /* Release configuration for PBXProject "iosApp" */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = B02D2A63B26958974D14C7CA /* Configuration */;
 			baseConfigurationReferenceRelativePath = Config.xcconfig;
@@ -272,7 +272,7 @@
 			};
 			name = Release;
 		};
-		FEEC12B5B72C3E5A388483F4 /* Debug */ = {
+		FEEC12B5B72C3E5A388483F4 /* Debug configuration for PBXProject "iosApp" */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = B02D2A63B26958974D14C7CA /* Configuration */;
 			baseConfigurationReferenceRelativePath = Config.xcconfig;
@@ -343,16 +343,16 @@
 		4E73F8875FD703BD585DBD67 /* Build configuration list for PBXNativeTarget "iosApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				564C4227929FFB4D8A6253EE /* Debug */,
-				565E7927ABC4E7CD1192D59A /* Release */,
+				564C4227929FFB4D8A6253EE /* Debug configuration for PBXNativeTarget "iosApp" */,
+				565E7927ABC4E7CD1192D59A /* Release configuration for PBXNativeTarget "iosApp" */,
 			);
 			defaultConfigurationName = Release;
 		};
 		85BEEB8871492D696D85FCF3 /* Build configuration list for PBXProject "iosApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FEEC12B5B72C3E5A388483F4 /* Debug */,
-				AD615B54758F72844BD93853 /* Release */,
+				FEEC12B5B72C3E5A388483F4 /* Debug configuration for PBXProject "iosApp" */,
+				AD615B54758F72844BD93853 /* Release configuration for PBXProject "iosApp" */,
 			);
 			defaultConfigurationName = Release;
 		};

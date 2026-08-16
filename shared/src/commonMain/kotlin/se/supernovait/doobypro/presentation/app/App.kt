@@ -1,11 +1,11 @@
 package se.supernovait.doobypro.presentation.app
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -13,9 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.app_icon
+import doobypro.shared.generated.resources.app_name
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import se.supernovait.app.core.domain.connectivity.ConnectivityManager
 import se.supernovait.app.core.domain.extension.toErrorState
 import se.supernovait.app.core.domain.initialization.AppInitializationState
 import se.supernovait.app.core.domain.initialization.AppInitializer
@@ -24,7 +25,7 @@ import se.supernovait.app.core.ui.component.error.SupernovaErrorEvent
 import se.supernovait.app.core.ui.component.error.SupernovaErrorScreen
 import se.supernovait.app.core.ui.component.preview.ScreenPreviewContainer
 import se.supernovait.app.core.ui.component.scaffold.SupernovaScaffold
-import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.app.core.ui.component.topbar.LocalTopBarState
 import se.supernovait.doobypro.presentation.app.theme.DoobyTheme
 
 /**
@@ -85,14 +86,20 @@ fun App() {
 
 @Composable
 private fun AppContent() {
-    SupernovaScaffold { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            Text("Welcome to Dooby Pro")
-            Image(
-                painter = painterResource(Res.drawable.app_icon),
-                contentDescription = null,
-                modifier = Modifier.padding(MaterialTheme.spacing.large)
-            )
+    SupernovaScaffold(
+        showDrawer = true,
+        connectivityManager = koinInject<ConnectivityManager>()
+    ) { innerPadding ->
+        val topBarState = LocalTopBarState.current
+
+        LaunchedEffect(topBarState) {
+            topBarState.icon(Res.drawable.app_icon)
+            topBarState.title(Res.string.app_name)
+            topBarState.actions(canNavigateBack = false)
+        }
+
+        Column(modifier = Modifier.padding(innerPadding).verticalScroll(state = rememberScrollState())) {
+            // TODO: add content
         }
     }
 }
