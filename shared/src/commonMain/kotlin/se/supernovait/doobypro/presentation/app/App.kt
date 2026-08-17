@@ -14,8 +14,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.app_icon
 import doobypro.shared.generated.resources.app_name
+import doobypro.shared.generated.resources.ic_app_icon
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import se.supernovait.app.core.domain.auth.AuthenticationManager
@@ -93,9 +93,11 @@ private fun AppContent() {
         }
 
         LaunchedEffect(topBarState) {
-            topBarState.icon(Res.drawable.app_icon)
+            topBarState.icon(Res.drawable.ic_app_icon)
             topBarState.title(Res.string.app_name)
             topBarState.actions(canNavigateBack = false)
+
+            if (currentScreen.showTopBar) topBarState.show() else topBarState.hide()
         }
 
         NavHost(

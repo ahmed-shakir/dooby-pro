@@ -1,4 +1,13 @@
 <resources>
     <!-- App texts -->
     <string name="app_name">Dooby Pro</string>
+
+    <string name="app_logo_content_description">App logo</string>
+
+    <!-- Welcome Screen -->
+    <string name="screen_Welcome_title">Welcome to Dooby Pro</string>
+    <string name="screen_Welcome_subtitle">Manage your laundry orders and staff operations</string>
+    <string name="screen_Welcome_action_sign_in_label">Sign in</string>
+    <string name="screen_Welcome_action_sign_up_label">Create account</string>
+    <string name="screen_Welcome_action_app_info_label">About Dooby Pro</string>
 </resources>
