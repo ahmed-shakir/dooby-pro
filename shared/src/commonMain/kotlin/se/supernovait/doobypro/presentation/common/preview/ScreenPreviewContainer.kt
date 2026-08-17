@@ -6,14 +6,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 import se.supernovait.doobypro.presentation.app.theme.DoobyTheme
 
 @Composable
 fun ScreenPreviewContainer(content: @Composable () -> Unit) {
-    DoobyTheme {
-        Scaffold {
-            Column(Modifier.padding(it).fillMaxWidth()) {
-                content()
+    KoinApplication(
+        configuration = koinConfiguration {
+            modules(PreviewKoinConfig.previewModule)
+        }
+    ) {
+        DoobyTheme {
+            Scaffold {
+                Column(Modifier.padding(it).fillMaxWidth()) {
+                    content()
+                }
             }
         }
     }

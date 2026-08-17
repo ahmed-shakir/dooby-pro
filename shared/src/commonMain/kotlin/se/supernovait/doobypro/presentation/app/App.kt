@@ -23,10 +23,10 @@ import se.supernovait.app.core.domain.initialization.AppInitializer
 import se.supernovait.app.core.domain.initialization.RecoveryOption
 import se.supernovait.app.core.ui.component.error.SupernovaErrorEvent
 import se.supernovait.app.core.ui.component.error.SupernovaErrorScreen
-import se.supernovait.app.core.ui.component.preview.ScreenPreviewContainer
 import se.supernovait.app.core.ui.component.scaffold.SupernovaScaffold
 import se.supernovait.app.core.ui.component.topbar.LocalTopBarState
 import se.supernovait.doobypro.presentation.app.theme.DoobyTheme
+import se.supernovait.doobypro.presentation.common.preview.ScreenPreviewContainer
 
 /**
  * Displays either the main app or an error screen based on initialization state.
@@ -108,6 +108,6 @@ private fun AppContent() {
 @Composable
 private fun Preview() {
     ScreenPreviewContainer {
-        App()
+        AppContent()
     }
 }
