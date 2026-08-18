@@ -15,6 +15,13 @@
     <string name="screen_Welcome_action_sign_up_label">Create account</string>
     <string name="screen_Welcome_action_app_info_label">About Dooby Pro</string>
 
+    <!-- Sign In Bottom Sheet -->
+    <string name="sheet_SignIn_title">Sign in</string>
+    <string name="sheet_SignIn_subtitle">Enter your username to access your account.</string>
+    <string name="sheet_SignIn_field_username">Username</string>
+    <string name="sheet_SignIn_action_sign_in">Sign in</string>
+    <string name="sheet_SignIn_error_empty_username">Username cannot be empty</string>
+
     <!-- Account Setup Wizard -->
     <string name="screen_AccountSetup_step_indicator">Step %1$d of %2$d</string>
     <string name="screen_AccountSetup_title_step1">Tell us about yourself</string>

@@ -158,8 +158,8 @@ private fun WizardBottomBar(
         SupernovaButton(
             label = if (currentStep == 4) stringResource(Res.string.screen_AccountSetup_action_create_account)
             else stringResource(Res.string.screen_AccountSetup_action_continue),
-            shape = MaterialTheme.shapes.extraSmall,
             textStyle = MaterialTheme.typography.bodyMedium,
+            shape = MaterialTheme.shapes.extraSmall,
             onClick = onNext,
             enabled = !isCreatingAccount,
             loading = isCreatingAccount,

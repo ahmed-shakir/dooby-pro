@@ -60,7 +60,7 @@ private fun BrandingSection() {
         SupernovaIcon(
             icon = Res.drawable.ic_app_icon,
             contentDescription = Res.string.app_logo_content_description,
-            size = MaterialTheme.sizing.icon.x3Large,
+            size = MaterialTheme.sizing.icon.x4Large,
             modifier = Modifier.padding(vertical = MaterialTheme.spacing.extraLarge)
         )
         SupernovaTitle(text = Res.string.screen_Welcome_title)
@@ -80,7 +80,7 @@ private fun ActionButtons(onEvent: (WelcomeScreenEvent) -> Unit) {
         label = stringResource(Res.string.screen_Welcome_action_sign_in_label),
         textStyle = MaterialTheme.typography.titleLarge,
         shape = MaterialTheme.shapes.small,
-        onClick = { /* TODO: add action */ },
+        onClick = { onEvent(WelcomeScreenEvent.ShowSignInForm) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = MaterialTheme.spacing.small)

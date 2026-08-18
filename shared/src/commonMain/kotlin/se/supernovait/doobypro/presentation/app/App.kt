@@ -121,7 +121,7 @@ private fun AppError(appInitializer: AppInitializer, initState: AppInitializatio
         state = errorState,
         isRefreshing = initState.isInitializing(),
         onEvent = { event ->
-            when(event) {
+            when (event) {
                 SupernovaErrorEvent.OnPrimaryAction -> {
                     coroutineScope.launch {
                         appInitializer.retryWithRecovery(RecoveryOption.RETRY)

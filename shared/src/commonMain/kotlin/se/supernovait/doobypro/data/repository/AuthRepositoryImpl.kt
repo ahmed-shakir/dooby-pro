@@ -13,12 +13,12 @@ import kotlinx.coroutines.withContext
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
-import se.supernovait.app.core.domain.auth.AuthError
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthRepository.Companion.APP_USER_IDENTITY_KEY
 import se.supernovait.app.core.domain.auth.User
-import se.supernovait.app.core.domain.common.DataError
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.error.AuthError
+import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.domain.model.IdType
 import kotlin.coroutines.CoroutineContext

@@ -30,6 +30,7 @@ import se.supernovait.doobypro.domain.repository.CompanyRepository
 import se.supernovait.doobypro.domain.repository.LicenseRepository
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
+import se.supernovait.doobypro.presentation.welcome.WelcomeViewModel
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 
 expect val platformModule: Module
@@ -45,6 +46,7 @@ val sharedModule = module {
     singleOf(::ServiceRepositoryImpl).bind<ServiceRepository>()
     singleOf(::OrderRepositoryImpl).bind<OrderRepository>()
 
+    viewModelOf(::WelcomeViewModel)
     viewModelOf(::AccountSetupWizardViewModel)
 
     single<AppDatabase> {

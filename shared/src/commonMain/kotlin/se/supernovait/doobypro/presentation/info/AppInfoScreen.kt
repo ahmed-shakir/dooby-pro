@@ -245,8 +245,8 @@ private fun SupportNote(onFeedbackClick: () -> Unit) {
             )
             SupernovaButton(
                 label = stringResource(Res.string.screen_AppInfo_support_action_label),
-                onClick = onFeedbackClick,
                 shape = MaterialTheme.shapes.extraSmall,
+                onClick = onFeedbackClick,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
