@@ -85,7 +85,7 @@ class OrderRepositoryImplTest {
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
         orderDate = testDateTime,
         deliveryDate = testDateTime,
-        note = "Test note"
+        notes = "Test note"
     )
 
     @BeforeTest
@@ -109,7 +109,7 @@ class OrderRepositoryImplTest {
 
     @Test
     fun `getOrders should return assembled orders`() = runTest(testDispatcher) {
-        repository.upsertOrder(testOrder)
+        repository.saveOrder(testOrder)
 
         val orders = repository.getOrders().first()
 
@@ -122,7 +122,7 @@ class OrderRepositoryImplTest {
 
     @Test
     fun `getOrderById should return assembled order if found`() = runTest(testDispatcher) {
-        repository.upsertOrder(testOrder)
+        repository.saveOrder(testOrder)
 
         val result = repository.getOrderById(testOrder.id!!)
 
@@ -138,7 +138,7 @@ class OrderRepositoryImplTest {
             id = SupernovaIdGenerator.generateId(IdType.ORDER.prefix), 
             service = testService.copy(id = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix))
         )
-        repository.upsertOrder(orderWithMissingService)
+        repository.saveOrder(orderWithMissingService)
 
         val result = repository.getOrderById(orderWithMissingService.id!!)
 
@@ -147,14 +147,14 @@ class OrderRepositoryImplTest {
 
     @Test
     fun `getOrdersByCustomerId should return filtered assembled orders`() = runTest(testDispatcher) {
-        repository.upsertOrder(testOrder)
+        repository.saveOrder(testOrder)
         
         val anotherUserId = SupernovaIdGenerator.generateId(IdType.USER.prefix)
         val anotherUser = testUser.copy(id = anotherUserId, username = "jane")
         val anotherUserEntity = testUserEntity.copy(id = anotherUserId, username = "jane")
         fakeUserDao.upsert(anotherUserEntity)
         
-        repository.upsertOrder(testOrder.copy(id = SupernovaIdGenerator.generateId(IdType.ORDER.prefix), customer = anotherUser))
+        repository.saveOrder(testOrder.copy(id = SupernovaIdGenerator.generateId(IdType.ORDER.prefix), customer = anotherUser))
 
         val orders = repository.getOrdersByCustomerId(testUser.id!!).first()
 

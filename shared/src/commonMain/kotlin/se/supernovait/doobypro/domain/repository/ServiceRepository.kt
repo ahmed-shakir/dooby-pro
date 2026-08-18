@@ -21,7 +21,7 @@ interface ServiceRepository {
     /**
      * Inserts or updates a service.
      */
-    suspend fun upsertService(service: Service)
+    suspend fun saveService(service: Service)
 
     /**
      * Deletes a service.

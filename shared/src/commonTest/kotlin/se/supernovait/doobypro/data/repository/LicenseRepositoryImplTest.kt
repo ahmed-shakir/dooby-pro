@@ -46,8 +46,8 @@ class LicenseRepositoryImplTest {
 
     @Test
     fun `getLicenses should return all licenses for account mapped to models`() = runTest(testDispatcher) {
-        repository.upsertLicense(testLicense)
-        repository.upsertLicense(testLicense.copy(
+        repository.saveLicense(testLicense)
+        repository.saveLicense(testLicense.copy(
             id = SupernovaIdGenerator.generateId(IdType.LICENSE.prefix), 
             accountId = SupernovaIdGenerator.generateId(IdType.COMPANY.prefix)
         ))
@@ -60,7 +60,7 @@ class LicenseRepositoryImplTest {
 
     @Test
     fun `getLicenseById should return mapped model if found`() = runTest(testDispatcher) {
-        repository.upsertLicense(testLicense)
+        repository.saveLicense(testLicense)
 
         val result = repository.getLicenseById(testLicense.id)
 
@@ -76,7 +76,7 @@ class LicenseRepositoryImplTest {
 
     @Test
     fun `upsertLicense should call dao upsert`() = runTest(testDispatcher) {
-        repository.upsertLicense(testLicense)
+        repository.saveLicense(testLicense)
 
         val savedEntity = fakeLicenseDao.getById(testLicense.id)
         assertEquals(testLicense.id, savedEntity?.id)
@@ -85,7 +85,7 @@ class LicenseRepositoryImplTest {
 
     @Test
     fun `deleteLicense should call dao delete`() = runTest(testDispatcher) {
-        repository.upsertLicense(testLicense)
+        repository.saveLicense(testLicense)
         assertEquals(1, repository.getLicenses(accountId).size)
 
         repository.deleteLicense(testLicense)

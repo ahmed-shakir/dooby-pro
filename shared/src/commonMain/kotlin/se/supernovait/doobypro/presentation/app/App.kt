@@ -105,7 +105,7 @@ private fun AppContent() {
             startDestination = startScreen,
             modifier = Modifier.padding(innerPadding)
         ) {
-            welcomeGraph()
+            welcomeGraph(navController)
             // TODO: add nav graphs
         }
     }

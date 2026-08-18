@@ -30,7 +30,7 @@ class ServiceRepositoryImpl(
         }
     }
 
-    override suspend fun upsertService(service: Service) {
+    override suspend fun saveService(service: Service) {
         withContext(ioContext) {
             serviceDao.upsert(service.toEntity())
         }

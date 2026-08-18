@@ -32,7 +32,7 @@ class AgreementRepositoryImpl(
         }
     }
 
-    override suspend fun upsertAgreement(agreement: Agreement) {
+    override suspend fun saveAgreement(agreement: Agreement) {
         withContext(ioContext) {
             agreementDao.upsert(agreement.toEntity())
         }

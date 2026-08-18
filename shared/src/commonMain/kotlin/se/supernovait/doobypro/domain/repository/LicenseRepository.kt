@@ -28,7 +28,7 @@ interface LicenseRepository {
      *
      * @param license The domain license model to upsert.
      */
-    suspend fun upsertLicense(license: License)
+    suspend fun saveLicense(license: License)
 
     /**
      * Deletes a license.

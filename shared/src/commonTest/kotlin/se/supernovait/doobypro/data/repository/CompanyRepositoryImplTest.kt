@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
-import se.supernovait.app.core.domain.model.location.Address
+import se.supernovait.app.core.domain.location.Address
 import se.supernovait.doobypro.data.local.dao.FakeCompanyDao
 import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.domain.model.IdType
@@ -47,7 +47,7 @@ class CompanyRepositoryImplTest {
 
     @Test
     fun `getCompanies should return all companies mapped to models`() = runTest(testDispatcher) {
-        repository.upsertCompany(testCompany)
+        repository.saveCompany(testCompany)
 
         val companies = repository.getCompanies().first()
 
@@ -57,7 +57,7 @@ class CompanyRepositoryImplTest {
 
     @Test
     fun `getCompanyById should return mapped model if found`() = runTest(testDispatcher) {
-        repository.upsertCompany(testCompany)
+        repository.saveCompany(testCompany)
 
         val result = repository.getCompanyById(testCompany.id!!)
 
@@ -73,7 +73,7 @@ class CompanyRepositoryImplTest {
 
     @Test
     fun `upsertCompany should call dao upsert`() = runTest(testDispatcher) {
-        repository.upsertCompany(testCompany)
+        repository.saveCompany(testCompany)
 
         val savedEntity = fakeCompanyDao.getById(testCompany.id!!)
         assertEquals(testCompany.id, savedEntity?.id)
@@ -81,7 +81,7 @@ class CompanyRepositoryImplTest {
 
     @Test
     fun `deleteCompany should call dao delete`() = runTest(testDispatcher) {
-        repository.upsertCompany(testCompany)
+        repository.saveCompany(testCompany)
         assertEquals(1, repository.getCompanies().first().size)
 
         repository.deleteCompany(testCompany)

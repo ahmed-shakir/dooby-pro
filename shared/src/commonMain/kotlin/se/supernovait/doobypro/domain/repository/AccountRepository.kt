@@ -23,7 +23,7 @@ interface AccountRepository {
      *
      * @param account The domain account model to upsert.
      */
-    suspend fun upsertAccount(account: Account)
+    suspend fun saveAccount(account: Account)
 
     /**
      * Deletes a account.

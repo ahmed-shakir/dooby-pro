@@ -83,7 +83,7 @@ class OrderRepositoryImpl(
         }
     }
 
-    override suspend fun upsertOrder(order: Order) {
+    override suspend fun saveOrder(order: Order) {
         withContext(ioContext) {
             orderDao.upsert(order.toEntity())
         }

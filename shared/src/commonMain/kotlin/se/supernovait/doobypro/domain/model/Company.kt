@@ -1,6 +1,6 @@
 package se.supernovait.doobypro.domain.model
 
-import se.supernovait.app.core.domain.model.location.Address
+import se.supernovait.app.core.domain.location.Address
 
 /**
  * Domain model representing a company profile.

@@ -23,7 +23,7 @@ class OrderEntityTest {
             deliveryMethod = DeliveryMethod.PICKUP,
             orderDate = now,
             deliveryDate = now,
-            note = ""
+            notes = ""
         )
 
         assertTrue(entity.id.startsWith(IdType.ORDER.prefix), "ID should start with ${IdType.ORDER.prefix}")

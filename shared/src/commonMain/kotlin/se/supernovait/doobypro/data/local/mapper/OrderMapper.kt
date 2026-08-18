@@ -23,7 +23,7 @@ fun OrderEntity.toDomain(customer: User, service: Service): Order {
         deliveryMethod = deliveryMethod,
         orderDate = orderDate,
         deliveryDate = deliveryDate,
-        note = note
+        notes = notes
     )
 }
 
@@ -41,6 +41,6 @@ fun Order.toEntity(): OrderEntity {
         deliveryMethod = deliveryMethod,
         orderDate = orderDate,
         deliveryDate = deliveryDate,
-        note = note
+        notes = notes
     )
 }

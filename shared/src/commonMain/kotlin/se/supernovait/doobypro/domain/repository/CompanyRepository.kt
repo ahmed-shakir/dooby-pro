@@ -21,7 +21,7 @@ interface CompanyRepository {
     /**
      * Inserts or updates a company profile.
      */
-    suspend fun upsertCompany(company: Company)
+    suspend fun saveCompany(company: Company)
 
     /**
      * Deletes a company profile.

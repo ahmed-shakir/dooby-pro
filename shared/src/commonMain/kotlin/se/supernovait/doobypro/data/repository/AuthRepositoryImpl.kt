@@ -13,9 +13,12 @@ import kotlinx.coroutines.withContext
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
+import se.supernovait.app.core.domain.auth.AuthError
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthRepository.Companion.APP_USER_IDENTITY_KEY
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.common.DataError
+import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.domain.model.IdType
 import kotlin.coroutines.CoroutineContext
@@ -46,19 +49,29 @@ class AuthRepositoryImpl(
         return userDao.observeUserById(id).map { it?.toDomain() }
     }
 
-    override suspend fun getCurrentUserId(): String? {
+    override suspend fun getCurrentUserId(): Result<String, AuthError> {
         return withContext(ioContext) {
-            observeCurrentUserId().firstOrNull()
+            val userId = observeCurrentUserId().firstOrNull()
+            if (userId != null) {
+                Result.Success(userId)
+            } else {
+                Result.Failure(AuthError.NOT_AUTHENTICATED)
+            }
         }
     }
 
-    override suspend fun getUserById(id: String): User? {
+    override suspend fun getUserById(id: String): Result<User, DataError> {
         return withContext(ioContext) {
-            userDao.getById(id)?.toDomain()
+            val user = userDao.getById(id)
+            if (user != null) {
+                Result.Success(user.toDomain())
+            } else {
+                Result.Failure(DataError.NOT_FOUND)
+            }
         }
     }
 
-    override suspend fun signUp(user: User): Result<User> {
+    override suspend fun signUp(user: User): Result<User, AuthError> {
         return withContext(ioContext) {
             try {
                 val id = SupernovaIdGenerator.generateId(IdType.USER.prefix)
@@ -66,24 +79,24 @@ class AuthRepositoryImpl(
                 val savedUser = userDao.getById(id)
                 if (savedUser != null) {
                     saveUserToPrefs(id)
-                    Result.success(savedUser.toDomain())
+                    Result.Success(savedUser.toDomain())
                 } else {
-                    Result.failure(Exception("Failed to retrieve saved user"))
+                    Result.Failure(AuthError.USER_NOT_FOUND)
                 }
             } catch (e: Exception) {
-                Result.failure(e)
+                Result.Failure(AuthError.UNKNOWN)
             }
         }
     }
 
-    override suspend fun signIn(username: String): Result<User> {
+    override suspend fun signIn(username: String): Result<User, AuthError> {
         return withContext(ioContext) {
             val user = userDao.getByUsername(username)
             return@withContext if (user != null) {
                 saveUserToPrefs(user.id)
-                Result.success(user.toDomain())
+                Result.Success(user.toDomain())
             } else {
-                Result.failure(Exception("User not found"))
+                Result.Failure(AuthError.USER_NOT_FOUND)
             }
         }
     }

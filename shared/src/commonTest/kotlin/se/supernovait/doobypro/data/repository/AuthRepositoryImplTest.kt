@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.doobypro.data.local.dao.FakeUserDao
 import se.supernovait.doobypro.data.local.preferences.FakeDataStore
 import kotlin.test.BeforeTest
@@ -58,7 +59,7 @@ class AuthRepositoryImplTest {
         assertEquals(testUser.username, dbUser.username)
 
         // Verify Session
-        assertEquals(savedUser.id, repository.getCurrentUserId())
+        assertEquals(savedUser.id, repository.getCurrentUserId().getOrNull())
     }
 
     @Test
@@ -69,14 +70,14 @@ class AuthRepositoryImplTest {
         
         // Clear session
         repository.signOut()
-        assertNull(repository.getCurrentUserId())
+        assertTrue(repository.getCurrentUserId().isFailure)
 
         // Action: Sign in
         val result = repository.signIn(testUser.username)
 
         assertTrue(result.isSuccess)
         assertEquals(userId, result.getOrNull()?.id)
-        assertEquals(userId, repository.getCurrentUserId())
+        assertEquals(userId, repository.getCurrentUserId().getOrNull())
     }
 
     @Test
@@ -84,7 +85,7 @@ class AuthRepositoryImplTest {
         val result = repository.signIn("unknown")
 
         assertTrue(result.isFailure)
-        assertNull(repository.getCurrentUserId())
+        assertTrue(repository.getCurrentUserId().isFailure)
     }
 
     @Test
@@ -94,7 +95,7 @@ class AuthRepositoryImplTest {
 
         repository.signOut()
 
-        assertNull(repository.getCurrentUserId())
+        assertTrue(repository.getCurrentUserId().isFailure)
         assertNotNull(fakeUserDao.getById(userId))
     }
 
@@ -115,6 +116,6 @@ class AuthRepositoryImplTest {
         val result = repository.getUserById(userId)
 
         assertNotNull(result)
-        assertEquals(testUser.username, result.username)
+        assertEquals(testUser.username, result.getOrNull()?.username)
     }
 }

@@ -3,7 +3,7 @@ package se.supernovait.doobypro.data.local.mapper
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
-import se.supernovait.app.core.domain.model.location.Address
+import se.supernovait.app.core.domain.location.Address
 import se.supernovait.doobypro.data.local.entity.AccountEntity
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.Company

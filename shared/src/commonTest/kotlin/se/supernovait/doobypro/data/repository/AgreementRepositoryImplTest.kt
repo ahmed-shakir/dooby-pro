@@ -50,7 +50,7 @@ class AgreementRepositoryImplTest {
 
     @Test
     fun `getAgreements should return all agreements mapped to models`() = runTest(testDispatcher) {
-        repository.upsertAgreement(testAgreement)
+        repository.saveAgreement(testAgreement)
 
         val agreements = repository.getAgreements().first()
 
@@ -60,7 +60,7 @@ class AgreementRepositoryImplTest {
 
     @Test
     fun `getAgreementById should return mapped model if found`() = runTest(testDispatcher) {
-        repository.upsertAgreement(testAgreement)
+        repository.saveAgreement(testAgreement)
 
         val result = repository.getAgreementById(testAgreement.id!!)
 
@@ -76,7 +76,7 @@ class AgreementRepositoryImplTest {
 
     @Test
     fun `upsertAgreement should call dao upsert`() = runTest(testDispatcher) {
-        repository.upsertAgreement(testAgreement)
+        repository.saveAgreement(testAgreement)
 
         val savedEntity = fakeAgreementDao.getById(testAgreement.id!!)
         assertEquals(testAgreement.id, savedEntity?.id)
@@ -84,7 +84,7 @@ class AgreementRepositoryImplTest {
 
     @Test
     fun `deleteAgreement should call dao delete`() = runTest(testDispatcher) {
-        repository.upsertAgreement(testAgreement)
+        repository.saveAgreement(testAgreement)
         assertEquals(1, repository.getAgreements().first().size)
 
         repository.deleteAgreement(testAgreement)

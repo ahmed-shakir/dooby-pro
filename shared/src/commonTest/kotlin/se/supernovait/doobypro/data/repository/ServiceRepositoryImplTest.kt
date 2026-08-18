@@ -38,7 +38,7 @@ class ServiceRepositoryImplTest {
 
     @Test
     fun `getServices should return all services from dao mapped to models`() = runTest(testDispatcher) {
-        repository.upsertService(testService)
+        repository.saveService(testService)
 
         val services = repository.getServices().first()
 
@@ -48,7 +48,7 @@ class ServiceRepositoryImplTest {
 
     @Test
     fun `getServiceById should return mapped model if found`() = runTest(testDispatcher) {
-        repository.upsertService(testService)
+        repository.saveService(testService)
 
         val result = repository.getServiceById(testService.id!!)
 
@@ -64,7 +64,7 @@ class ServiceRepositoryImplTest {
 
     @Test
     fun `upsertService should call dao upsert with mapped entity`() = runTest(testDispatcher) {
-        repository.upsertService(testService)
+        repository.saveService(testService)
 
         val savedEntity = fakeServiceDao.getById(testService.id!!)
         assertEquals(testService.id, savedEntity?.id)
@@ -73,7 +73,7 @@ class ServiceRepositoryImplTest {
 
     @Test
     fun `deleteService should call dao delete with mapped entity`() = runTest(testDispatcher) {
-        repository.upsertService(testService)
+        repository.saveService(testService)
         assertEquals(1, repository.getServices().first().size)
 
         repository.deleteService(testService)

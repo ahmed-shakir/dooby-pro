@@ -36,6 +36,7 @@ import se.supernovait.doobypro.presentation.common.preview.ScreenPreviewContaine
 
 @Composable
 fun WelcomeScreen(
+    onEvent: (WelcomeScreenEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -47,7 +48,7 @@ fun WelcomeScreen(
         ) {
             BrandingSection()
             Spacer(modifier = Modifier.weight(1f))
-            ActionButtons()
+            ActionButtons(onEvent)
             InfoFooter()
         }
     }
@@ -74,7 +75,7 @@ private fun BrandingSection() {
 }
 
 @Composable
-private fun ActionButtons() {
+private fun ActionButtons(onEvent: (WelcomeScreenEvent) -> Unit) {
     SupernovaButton(
         label = stringResource(Res.string.screen_Welcome_action_sign_in_label),
         textStyle = MaterialTheme.typography.titleLarge,
@@ -89,7 +90,7 @@ private fun ActionButtons() {
         label = stringResource(Res.string.screen_Welcome_action_sign_up_label),
         textStyle = MaterialTheme.typography.titleLarge,
         shape = MaterialTheme.shapes.extraSmall,
-        onClick = { /* TODO: add action */ },
+        onClick = { onEvent(WelcomeScreenEvent.NavigateToAccountSetupWizard) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = MaterialTheme.spacing.small)
@@ -116,6 +117,6 @@ private fun InfoFooter() {
 @Composable
 private fun Preview() {
     ScreenPreviewContainer {
-        WelcomeScreen()
+        WelcomeScreen(onEvent = { })
     }
 }

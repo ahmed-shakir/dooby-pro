@@ -21,7 +21,7 @@ interface AgreementRepository {
     /**
      * Inserts or updates an agreement.
      */
-    suspend fun upsertAgreement(agreement: Agreement)
+    suspend fun saveAgreement(agreement: Agreement)
 
     /**
      * Deletes an agreement.

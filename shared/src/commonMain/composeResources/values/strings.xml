@@ -10,4 +10,44 @@
     <string name="screen_Welcome_action_sign_in_label">Sign in</string>
     <string name="screen_Welcome_action_sign_up_label">Create account</string>
     <string name="screen_Welcome_action_app_info_label">About Dooby Pro</string>
+
+    <!-- Account Setup Wizard -->
+    <string name="screen_AccountSetup_step_indicator">Step %1$d of %2$d</string>
+    <string name="screen_AccountSetup_title_step1">Tell us about yourself</string>
+    <string name="screen_AccountSetup_subtitle_step1">We'll use this to set up your account.</string>
+    <string name="screen_AccountSetup_title_step2">Company information</string>
+    <string name="screen_AccountSetup_subtitle_step2">Tell us about your business.</string>
+    <string name="screen_AccountSetup_title_step3">Business address</string>
+    <string name="screen_AccountSetup_subtitle_step3">Where is your laundry located?</string>
+    <string name="screen_AccountSetup_title_step4">You're all set!</string>
+    <string name="screen_AccountSetup_subtitle_step4">Review your information before we create your account.</string>
+
+    <string name="screen_AccountSetup_field_first_name">First name</string>
+    <string name="screen_AccountSetup_field_last_name">Last name</string>
+    <string name="screen_AccountSetup_field_dob">Date of birth</string>
+    <string name="screen_AccountSetup_field_email">Email</string>
+    <string name="screen_AccountSetup_field_phone">Phone number</string>
+
+    <string name="screen_AccountSetup_field_company_legal_name">Legal company name</string>
+    <string name="screen_AccountSetup_field_company_display_name">Display name</string>
+    <string name="screen_AccountSetup_field_license_number">License number</string>
+    <string name="screen_AccountSetup_field_company_phone">Company phone</string>
+    <string name="screen_AccountSetup_field_company_email">Company email</string>
+
+    <string name="screen_AccountSetup_field_street">Street address</string>
+    <string name="screen_AccountSetup_field_city">City</string>
+    <string name="screen_AccountSetup_field_emirate">Emirate</string>
+    <string name="screen_AccountSetup_field_postal_code">Postal code</string>
+    <string name="screen_AccountSetup_field_location_note">Location note</string>
+
+    <string name="screen_AccountSetup_action_continue">Continue</string>
+    <string name="screen_AccountSetup_action_back">Back</string>
+    <string name="screen_AccountSetup_action_create_account">Create account</string>
+    <string name="screen_AccountSetup_confirmation_note">You can update this information anytime in account settings.</string>
+
+    <string name="screen_AccountSetup_summary_user">User</string>
+    <string name="screen_AccountSetup_summary_company">Company</string>
+    <string name="screen_AccountSetup_summary_phone">Phone</string>
+    <string name="screen_AccountSetup_summary_email">Email</string>
+    <string name="screen_AccountSetup_summary_location">Location</string>
 </resources>

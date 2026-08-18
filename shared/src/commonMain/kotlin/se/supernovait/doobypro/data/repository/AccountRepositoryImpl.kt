@@ -40,7 +40,7 @@ class AccountRepositoryImpl(
         }
     }
 
-    override suspend fun upsertAccount(account: Account) {
+    override suspend fun saveAccount(account: Account) {
         withContext(ioContext) {
             accountDao.upsert(account.toEntity())
         }

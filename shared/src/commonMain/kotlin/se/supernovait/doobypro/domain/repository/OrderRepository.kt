@@ -38,7 +38,7 @@ interface OrderRepository {
      *
      * @param order The domain order model to upsert.
      */
-    suspend fun upsertOrder(order: Order)
+    suspend fun saveOrder(order: Order)
 
     /**
      * Deletes an order.

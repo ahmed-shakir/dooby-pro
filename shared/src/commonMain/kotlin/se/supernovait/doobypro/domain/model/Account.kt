@@ -17,7 +17,7 @@ import se.supernovait.doobypro.domain.model.agreement.Agreement
  * @property agreement The equipment lease [Agreement] associated with this account, if any.
  */
 data class Account(
-    val id: String,
+    val id: String? = null,
     val user: User,
     val company: Company,
     val license: License? = null,

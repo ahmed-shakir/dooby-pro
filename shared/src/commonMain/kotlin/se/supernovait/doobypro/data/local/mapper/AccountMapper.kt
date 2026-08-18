@@ -32,7 +32,7 @@ fun AccountEntity.toDomain(
  */
 fun Account.toEntity(): AccountEntity {
     return AccountEntity(
-        id = id,
+        id = id ?: company.id ?: throw IllegalArgumentException("Account company ID cannot be null"),
         userId = user.id ?: throw IllegalArgumentException("Account user ID cannot be null"),
         licenseId = license?.id,
         agreementId = agreement?.id

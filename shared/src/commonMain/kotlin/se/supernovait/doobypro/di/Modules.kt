@@ -2,6 +2,7 @@ package se.supernovait.doobypro.di
 
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import se.supernovait.app.core.data.persistence.DatabaseFactory
@@ -29,6 +30,7 @@ import se.supernovait.doobypro.domain.repository.CompanyRepository
 import se.supernovait.doobypro.domain.repository.LicenseRepository
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
+import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 
 expect val platformModule: Module
 
@@ -42,6 +44,8 @@ val sharedModule = module {
     singleOf(::AgreementRepositoryImpl).bind<AgreementRepository>()
     singleOf(::ServiceRepositoryImpl).bind<ServiceRepository>()
     singleOf(::OrderRepositoryImpl).bind<OrderRepository>()
+
+    viewModelOf(::AccountSetupWizardViewModel)
 
     single<AppDatabase> {
         DatabaseFactory.create(get())

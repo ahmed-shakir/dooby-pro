@@ -32,7 +32,7 @@ class CompanyRepositoryImpl(
         }
     }
 
-    override suspend fun upsertCompany(company: Company) {
+    override suspend fun saveCompany(company: Company) {
         withContext(ioContext) {
             companyDao.upsert(company.toEntity())
         }

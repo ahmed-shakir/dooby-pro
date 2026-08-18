@@ -17,7 +17,7 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
  * @property deliveryMethod The chosen delivery method.
  * @property orderDate The date and time the order was placed.
  * @property deliveryDate The scheduled delivery date and time.
- * @property note An optional note from the customer.
+ * @property notes Optional notes from the customer.
  */
 data class Order(
     val id: String? = null,
@@ -27,5 +27,5 @@ data class Order(
     val deliveryMethod: DeliveryMethod,
     val orderDate: LocalDateTime,
     val deliveryDate: LocalDateTime,
-    val note: String
+    val notes: String?
 )

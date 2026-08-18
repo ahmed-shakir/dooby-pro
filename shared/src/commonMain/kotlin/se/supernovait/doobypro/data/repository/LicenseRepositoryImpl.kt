@@ -32,7 +32,7 @@ class LicenseRepositoryImpl(
         }
     }
 
-    override suspend fun upsertLicense(license: License) {
+    override suspend fun saveLicense(license: License) {
         withContext(ioContext) {
             licenseDao.upsert(license.toEntity())
         }

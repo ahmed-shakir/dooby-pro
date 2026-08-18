@@ -2,7 +2,8 @@ package se.supernovait.doobypro.data.local.mapper
 
 import se.supernovait.app.core.data.persistence.entity.AddressEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
-import se.supernovait.app.core.domain.model.location.Address
+import se.supernovait.app.core.domain.location.Address
+import se.supernovait.app.core.domain.location.AddressType
 import se.supernovait.doobypro.data.local.entity.CompanyEntity
 import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.domain.model.IdType
@@ -25,10 +26,13 @@ class CompanyMapperTest {
 
     private val testAddressEntity = AddressEntity(
         id = addressId,
+        type = AddressType.RESIDENTIAL,
         street = "Main St",
         city = "Dubai",
-        zipCode = null,
+        subdivision = "Dubai",
+        postalCode = null,
         country = "UAE",
+        notes = null,
         coordinates = null
     )
 

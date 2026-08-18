@@ -48,7 +48,7 @@ class OrderMapperTest {
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
         orderDate = testDateTime,
         deliveryDate = testDateTime,
-        note = "Handle with care"
+        notes = "Handle with care"
     )
 
     private val testOrder = Order(
@@ -59,7 +59,7 @@ class OrderMapperTest {
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
         orderDate = testDateTime,
         deliveryDate = testDateTime,
-        note = "Handle with care"
+        notes = "Handle with care"
     )
 
     @Test
@@ -73,7 +73,7 @@ class OrderMapperTest {
         assertEquals(testOrder.deliveryMethod, result.deliveryMethod)
         assertEquals(testOrder.orderDate, result.orderDate)
         assertEquals(testOrder.deliveryDate, result.deliveryDate)
-        assertEquals(testOrder.note, result.note)
+        assertEquals(testOrder.notes, result.notes)
     }
 
     @Test
@@ -87,6 +87,6 @@ class OrderMapperTest {
         assertEquals(testOrderEntity.deliveryMethod, result.deliveryMethod)
         assertEquals(testOrderEntity.orderDate, result.orderDate)
         assertEquals(testOrderEntity.deliveryDate, result.deliveryDate)
-        assertEquals(testOrderEntity.note, result.note)
+        assertEquals(testOrderEntity.notes, result.notes)
     }
 }

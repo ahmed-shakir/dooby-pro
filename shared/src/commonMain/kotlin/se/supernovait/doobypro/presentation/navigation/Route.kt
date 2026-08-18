@@ -14,6 +14,12 @@ sealed interface Route : NavigationRoute {
     }
 
     @Serializable
+    data object AccountSetup : Route {
+        override val showTopBar = false
+        override val showBottomBar = false
+    }
+
+    @Serializable
     data object AppInfo : Route {
         override val showBottomBar = false
     }
@@ -68,6 +74,7 @@ sealed interface Route : NavigationRoute {
         fun parse(route: String?, defaultRoute: Route = Welcome): Route {
             return when (route?.substringBefore("/")?.substringBefore("?")) {
                 Welcome::class.qualifiedName -> Welcome
+                AccountSetup::class.qualifiedName -> AccountSetup
                 AppInfo::class.qualifiedName -> AppInfo
                 Support::class.qualifiedName -> Support
                 Settings::class.qualifiedName -> Settings

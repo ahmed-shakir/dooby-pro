@@ -5,7 +5,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
-import se.supernovait.app.core.domain.model.location.Address
+import se.supernovait.app.core.domain.location.Address
 import se.supernovait.doobypro.data.local.dao.FakeAccountDao
 import se.supernovait.doobypro.data.local.dao.FakeAgreementDao
 import se.supernovait.doobypro.data.local.dao.FakeCompanyDao
@@ -90,7 +90,7 @@ class AccountRepositoryImplTest {
 
     @Test
     fun `getAccount should return assembled account if found`() = runTest(testDispatcher) {
-        repository.upsertAccount(testAccount)
+        repository.saveAccount(testAccount)
 
         val result = repository.getAccount(accountId)
 
@@ -109,7 +109,7 @@ class AccountRepositoryImplTest {
 
     @Test
     fun `upsertAccount should call dao upsert`() = runTest(testDispatcher) {
-        repository.upsertAccount(testAccount)
+        repository.saveAccount(testAccount)
 
         val savedEntity = fakeAccountDao.getById(accountId)
         assertNotNull(savedEntity)
@@ -119,7 +119,7 @@ class AccountRepositoryImplTest {
 
     @Test
     fun `deleteAccount should call dao delete`() = runTest(testDispatcher) {
-        repository.upsertAccount(testAccount)
+        repository.saveAccount(testAccount)
         assertNotNull(repository.getAccount(accountId))
 
         repository.deleteAccount(testAccount)

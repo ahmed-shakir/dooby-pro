@@ -6,16 +6,21 @@ import androidx.datastore.preferences.core.emptyPreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
+import se.supernovait.app.core.domain.auth.AuthError
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.common.DataError
+import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.connectivity.ConnectivityManager
 import se.supernovait.app.core.domain.connectivity.ConnectivityPolicy
 import se.supernovait.app.core.domain.connectivity.ConnectivityStatus
 import se.supernovait.app.core.domain.connectivity.ConnectivityStatusType
 import se.supernovait.app.core.domain.connectivity.NetworkType
 import se.supernovait.app.core.domain.initialization.AppInitializer
+import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
 object PreviewKoinConfig {
@@ -26,6 +31,8 @@ object PreviewKoinConfig {
         single<DataStore<Preferences>> { fakeDataStore }
         single { AuthenticationManager(get()) }
         single { AppInitializer(get(), get(), get(), minSplashDuration = 0.milliseconds) }
+
+        viewModelOf(::AccountSetupWizardViewModel)
     }
 
     /* *** DEPENDENCIES *** */
@@ -69,10 +76,10 @@ object PreviewKoinConfig {
     val authRepository = object : AuthRepository {
         override fun observeCurrentUserId(): Flow<String?> = flowOf(null)
         override fun observeUserById(id: String): Flow<User?> = flowOf(null)
-        override suspend fun getCurrentUserId(): String? = null
-        override suspend fun getUserById(id: String): User? = null
-        override suspend fun signIn(username: String): Result<User> = Result.failure(Exception("Mock"))
-        override suspend fun signUp(user: User): Result<User> = Result.failure(Exception("Mock"))
+        override suspend fun getCurrentUserId(): Result<String, AuthError> = Result.Failure(AuthError.USER_NOT_FOUND)
+        override suspend fun getUserById(id: String): Result<User, DataError> = Result.Failure(DataError.NOT_FOUND)
+        override suspend fun signIn(username: String): Result<User, AuthError> = Result.Failure(AuthError.USER_NOT_FOUND)
+        override suspend fun signUp(user: User): Result<User, AuthError> = Result.Failure(AuthError.USER_NOT_FOUND)
         override suspend fun signOut() {}
     }
 
