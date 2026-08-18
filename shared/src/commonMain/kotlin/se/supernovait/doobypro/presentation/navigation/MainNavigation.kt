@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import org.koin.compose.viewmodel.koinViewModel
+import se.supernovait.doobypro.presentation.info.AppInfoScreen
 import se.supernovait.doobypro.presentation.welcome.WelcomeScreen
 import se.supernovait.doobypro.presentation.welcome.WelcomeScreenEvent
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardScreen
@@ -33,6 +34,12 @@ fun NavGraphBuilder.welcomeGraph(navController: NavController) {
         AccountSetupWizardScreen(
             uiState = uiState,
             onEvent = viewModel::onEvent
+        )
+    }
+
+    composable<Route.AppInfo> {
+        AppInfoScreen(
+            onBack = { navController.popBackStack() }
         )
     }
 }

@@ -4,4 +4,6 @@ package se.supernovait.doobypro
 object AppConfig {
     const val VERSION_CODE = 1
     const val VERSION_NAME = "1.0.0"
+    const val WEBSITE_URL = "https://www.supernovait.se"
+    const val LICENSE_URL = "https://www.supernovait.se/stl1.txt"
 }

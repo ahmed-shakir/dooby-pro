@@ -21,6 +21,7 @@ sealed interface Route : NavigationRoute {
 
     @Serializable
     data object AppInfo : Route {
+        override val showTopBar = false
         override val showBottomBar = false
     }
 

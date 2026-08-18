@@ -49,7 +49,7 @@ fun WelcomeScreen(
             BrandingSection()
             Spacer(modifier = Modifier.weight(1f))
             ActionButtons(onEvent)
-            InfoFooter()
+            InfoFooter(onEvent)
         }
     }
 }
@@ -98,7 +98,7 @@ private fun ActionButtons(onEvent: (WelcomeScreenEvent) -> Unit) {
 }
 
 @Composable
-private fun InfoFooter() {
+private fun InfoFooter(onEvent: (WelcomeScreenEvent) -> Unit) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -108,7 +108,7 @@ private fun InfoFooter() {
 
         SupernovaTextButton(
             label = stringResource(Res.string.screen_Welcome_action_app_info_label),
-            onClick = { /* TODO: add action */ }
+            onClick = { onEvent(WelcomeScreenEvent.NavigateToAppInfo) }
         )
     }
 }
