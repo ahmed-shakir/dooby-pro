@@ -24,5 +24,8 @@ fun NavGraphBuilder.mainGraph(
         ) {
             SupernovaTitle(text = "My Dashboard")
         }
+        // TODO: add navigation bar
+        // TODO: add navigation drawer
+        // TODO: add settings screen
     }
 }

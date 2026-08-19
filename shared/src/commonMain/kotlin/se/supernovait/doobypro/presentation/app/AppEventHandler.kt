@@ -8,6 +8,7 @@ import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.app.core.ui.util.HandleAppEvents
 import se.supernovait.doobypro.presentation.navigation.Route
+import se.supernovait.doobypro.presentation.navigation.navigateWithRules
 
 @Composable
 fun AppEventHandler(
@@ -25,11 +26,7 @@ fun AppEventHandler(
                     true
                 }
                 AppEvent.SignIn -> {
-                    navController?.let { navigator ->
-                        navigator.navigate(Route.Dashboard) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    navController?.navigateWithRules(Route.Dashboard)
                     true
                 }
                 AppEvent.SignOut -> {

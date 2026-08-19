@@ -4,15 +4,15 @@ import kotlinx.serialization.Serializable
 
 sealed interface Route : NavigationRoute {
 
-    /**
-     * First-time setup screen
-     */
     @Serializable
     data object Welcome : Route {
         override val showTopBar = false
         override val showBottomBar = false
     }
 
+    /**
+     * First-time setup screen
+     */
     @Serializable
     data object AccountSetup : Route {
         override val showTopBar = false
@@ -42,13 +42,17 @@ sealed interface Route : NavigationRoute {
     data object Orders : Route
 
     @Serializable
-    data class OrderDetails(val id: String) : Route
+    data class OrderDetails(val id: String) : Route {
+        override val isTopLevel = false
+    }
 
     @Serializable
     data object Services : Route
 
     @Serializable
-    data class ServiceDetails(val id: String) : Route
+    data class ServiceDetails(val id: String) : Route {
+        override val isTopLevel = false
+    }
 
     @Serializable
     data object Account : Route
@@ -67,30 +71,20 @@ sealed interface Route : NavigationRoute {
 
 
     companion object {
+        private val routes = listOf(
+            Welcome, AccountSetup, AppInfo, Support, Settings,
+            Dashboard, Orders, OrderDetails(""), Services, ServiceDetails(""),
+            Account, UserProfile, CompanyProfile, License, EquipmentLeaseAgreement
+        ).associateBy { it.name }
+
         fun startScreen(isAuthenticated: Boolean): Route {
             println("Navigation route - isAuthenticated: $isAuthenticated")
             return if (isAuthenticated) Dashboard else Welcome
         }
 
         fun parse(route: String?, defaultRoute: Route = Welcome): Route {
-            return when (route?.substringBefore("/")?.substringBefore("?")) {
-                Welcome::class.qualifiedName -> Welcome
-                AccountSetup::class.qualifiedName -> AccountSetup
-                AppInfo::class.qualifiedName -> AppInfo
-                Support::class.qualifiedName -> Support
-                Settings::class.qualifiedName -> Settings
-                Dashboard::class.qualifiedName -> Dashboard
-                Orders::class.qualifiedName -> Orders
-                OrderDetails::class.qualifiedName -> OrderDetails(id = "")
-                Services::class.qualifiedName -> Services
-                ServiceDetails::class.qualifiedName -> ServiceDetails(id = "")
-                Account::class.qualifiedName -> Account
-                UserProfile::class.qualifiedName -> UserProfile
-                CompanyProfile::class.qualifiedName -> CompanyProfile
-                License::class.qualifiedName -> License
-                EquipmentLeaseAgreement::class.qualifiedName -> EquipmentLeaseAgreement
-                else -> defaultRoute
-            }
+            val routeName = route?.substringBefore("/")?.substringBefore("?")
+            return routes[routeName] ?: defaultRoute
         }
     }
 }

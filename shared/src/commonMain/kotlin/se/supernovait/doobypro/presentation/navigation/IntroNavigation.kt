@@ -36,10 +36,10 @@ fun NavGraphBuilder.welcomeGraph(
             onEvent = { event ->
                 when (event) {
                     WelcomeScreenEvent.NavigateToAccountSetupWizard -> {
-                        navController.navigate(Route.AccountSetup)
+                        navController.navigateWithRules(Route.AccountSetup)
                     }
                     WelcomeScreenEvent.NavigateToAppInfo -> {
-                        navController.navigate(Route.AppInfo)
+                        navController.navigateWithRules(Route.AppInfo)
                     }
                     else -> viewModel.onEvent(event)
                 }
