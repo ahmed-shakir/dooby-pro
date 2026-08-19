@@ -2,9 +2,9 @@ package se.supernovait.doobypro.data.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.data.local.dao.AgreementDao
 import se.supernovait.doobypro.data.local.mapper.toDomain
 import se.supernovait.doobypro.data.local.mapper.toEntity
@@ -20,27 +20,43 @@ class AgreementRepositoryImpl(
 ) : AgreementRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
-    override fun getAgreements(): Flow<List<Agreement>> {
-        return agreementDao.getAll().map { entities ->
-            entities.map { it.toDomain() }
-        }
-    }
-
-    override suspend fun getAgreementById(id: String): Agreement? {
+    override suspend fun getAgreements(accountId: String): List<Agreement> {
         return withContext(ioContext) {
-            agreementDao.getById(id)?.toDomain()
+            agreementDao.getByAccountId(accountId).map { it.toDomain() }
         }
     }
 
-    override suspend fun saveAgreement(agreement: Agreement) {
-        withContext(ioContext) {
-            agreementDao.upsert(agreement.toEntity())
+    override suspend fun getAgreementById(id: String): Result<Agreement, DataError> {
+        return withContext(ioContext) {
+            val agreement = agreementDao.getById(id)
+            if (agreement != null) {
+                Result.Success(agreement.toDomain())
+            } else {
+                Result.Failure(DataError.NOT_FOUND)
+            }
         }
     }
 
-    override suspend fun deleteAgreement(agreement: Agreement) {
-        withContext(ioContext) {
-            agreementDao.delete(agreement.toEntity())
+    override suspend fun saveAgreement(agreement: Agreement): Result<String, DataError> {
+        return withContext(ioContext) {
+            try {
+                val entityToSave = agreement.toEntity()
+                agreementDao.upsert(entityToSave)
+                Result.Success(entityToSave.id)
+            } catch (_: Exception) {
+                Result.Failure(DataError.DATABASE_ERROR)
+            }
+        }
+    }
+
+    override suspend fun deleteAgreement(agreement: Agreement): Result<Unit, DataError> {
+        return withContext(ioContext) {
+            try {
+                agreementDao.delete(agreement.toEntity())
+                Result.Success(Unit)
+            } catch (_: Exception) {
+                Result.Failure(DataError.UNKNOWN)
+            }
         }
     }
 }

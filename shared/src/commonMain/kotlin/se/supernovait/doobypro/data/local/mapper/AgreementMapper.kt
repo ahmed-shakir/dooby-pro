@@ -15,6 +15,7 @@ import se.supernovait.doobypro.domain.model.agreement.Agreement
 fun AgreementEntity.toDomain(): Agreement {
     return Agreement(
         id = id,
+        accountId = accountId,
         status = status,
         equipmentId = equipmentId,
         equipmentModel = equipmentModel,
@@ -36,6 +37,7 @@ fun AgreementEntity.toDomain(): Agreement {
 fun Agreement.toEntity(): AgreementEntity {
     return AgreementEntity(
         id = id ?: SupernovaIdGenerator.generateId(IdType.AGREEMENT.prefix),
+        accountId = accountId,
         status = status,
         equipmentId = equipmentId,
         equipmentModel = equipmentModel,

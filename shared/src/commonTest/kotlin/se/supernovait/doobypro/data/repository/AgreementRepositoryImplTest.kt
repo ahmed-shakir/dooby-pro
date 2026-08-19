@@ -1,9 +1,9 @@
 package se.supernovait.doobypro.data.repository
 
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
+import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
@@ -25,9 +25,11 @@ class AgreementRepositoryImplTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private val agreementId = SupernovaIdGenerator.generateId(IdType.AGREEMENT.prefix)
+    private val accountId = SupernovaIdGenerator.generateId(IdType.COMPANY.prefix)
 
     private val testAgreement = Agreement(
         id = agreementId,
+        accountId = accountId,
         status = AgreementStatus.ACTIVE,
         equipmentId = "SN-123",
         equipmentModel = "Model X",
@@ -49,10 +51,10 @@ class AgreementRepositoryImplTest {
     }
 
     @Test
-    fun `getAgreements should return all agreements mapped to models`() = runTest(testDispatcher) {
+    fun `getAgreements should return all agreements for account mapped to models`() = runTest(testDispatcher) {
         repository.saveAgreement(testAgreement)
 
-        val agreements = repository.getAgreements().first()
+        val agreements = repository.getAgreements(accountId)
 
         assertEquals(1, agreements.size)
         assertEquals(testAgreement, agreements[0])
@@ -62,14 +64,14 @@ class AgreementRepositoryImplTest {
     fun `getAgreementById should return mapped model if found`() = runTest(testDispatcher) {
         repository.saveAgreement(testAgreement)
 
-        val result = repository.getAgreementById(testAgreement.id!!)
+        val result = repository.getAgreementById(testAgreement.id!!).getOrNull()
 
         assertEquals(testAgreement, result)
     }
 
     @Test
     fun `getAgreementById should return null if not found`() = runTest(testDispatcher) {
-        val result = repository.getAgreementById("non-existent")
+        val result = repository.getAgreementById("non-existent").getOrNull()
 
         assertNull(result)
     }
@@ -85,10 +87,10 @@ class AgreementRepositoryImplTest {
     @Test
     fun `deleteAgreement should call dao delete`() = runTest(testDispatcher) {
         repository.saveAgreement(testAgreement)
-        assertEquals(1, repository.getAgreements().first().size)
+        assertEquals(1, repository.getAgreements(accountId).size)
 
         repository.deleteAgreement(testAgreement)
 
-        assertEquals(0, repository.getAgreements().first().size)
+        assertEquals(0, repository.getAgreements(accountId).size)
     }
 }

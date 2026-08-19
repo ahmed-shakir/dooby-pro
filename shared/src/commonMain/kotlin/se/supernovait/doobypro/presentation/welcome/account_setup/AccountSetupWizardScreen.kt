@@ -42,6 +42,7 @@ import doobypro.shared.generated.resources.screen_AccountSetup_field_location_no
 import doobypro.shared.generated.resources.screen_AccountSetup_field_phone
 import doobypro.shared.generated.resources.screen_AccountSetup_field_postal_code
 import doobypro.shared.generated.resources.screen_AccountSetup_field_street
+import doobypro.shared.generated.resources.screen_AccountSetup_field_username
 import doobypro.shared.generated.resources.screen_AccountSetup_step_indicator
 import doobypro.shared.generated.resources.screen_AccountSetup_subtitle_step1
 import doobypro.shared.generated.resources.screen_AccountSetup_subtitle_step2
@@ -52,6 +53,7 @@ import doobypro.shared.generated.resources.screen_AccountSetup_summary_email
 import doobypro.shared.generated.resources.screen_AccountSetup_summary_location
 import doobypro.shared.generated.resources.screen_AccountSetup_summary_phone
 import doobypro.shared.generated.resources.screen_AccountSetup_summary_user
+import doobypro.shared.generated.resources.screen_AccountSetup_summary_username
 import doobypro.shared.generated.resources.screen_AccountSetup_title_step1
 import doobypro.shared.generated.resources.screen_AccountSetup_title_step2
 import doobypro.shared.generated.resources.screen_AccountSetup_title_step3
@@ -184,6 +186,11 @@ private fun Step1(state: AccountSetupWizardState, onEvent: (AccountSetupWizardEv
         initialValue = state.lastName,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateLastName(value)) }
     )
+    SupernovaTextField(
+        label = stringResource(Res.string.screen_AccountSetup_field_username),
+        initialValue = state.username,
+        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateUsername(value)) }
+    )
     SupernovaDateField(
         label = stringResource(Res.string.screen_AccountSetup_field_dob),
         placeholder = "YYYY-MM-DD",
@@ -286,6 +293,7 @@ private fun Step4(state: AccountSetupWizardState) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_user), "${state.firstName} ${state.lastName}")
+            SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_username), state.username)
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_company), state.companyDisplayName)
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_phone), state.phoneNumber)
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_email), state.email)

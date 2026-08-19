@@ -5,6 +5,8 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.data.local.dao.CompanyDao
 import se.supernovait.doobypro.data.local.mapper.toDomain
 import se.supernovait.doobypro.data.local.mapper.toEntity
@@ -26,21 +28,37 @@ class CompanyRepositoryImpl(
         }
     }
 
-    override suspend fun getCompanyById(id: String): Company? {
+    override suspend fun getCompanyById(id: String): Result<Company, DataError> {
         return withContext(ioContext) {
-            companyDao.getById(id)?.toDomain()
+            val company = companyDao.getById(id)
+            if (company != null) {
+                Result.Success(company.toDomain())
+            } else {
+                Result.Failure(DataError.NOT_FOUND)
+            }
         }
     }
 
-    override suspend fun saveCompany(company: Company) {
-        withContext(ioContext) {
-            companyDao.upsert(company.toEntity())
+    override suspend fun saveCompany(company: Company): Result<String, DataError> {
+        return withContext(ioContext) {
+            try {
+                val entityToSave = company.toEntity()
+                companyDao.upsert(entityToSave)
+                Result.Success(entityToSave.id)
+            } catch (_: Exception) {
+                Result.Failure(DataError.DATABASE_ERROR)
+            }
         }
     }
 
-    override suspend fun deleteCompany(company: Company) {
-        withContext(ioContext) {
-            companyDao.delete(company.toEntity())
+    override suspend fun deleteCompany(company: Company): Result<Unit, DataError> {
+        return withContext(ioContext) {
+            try {
+                companyDao.delete(company.toEntity())
+                Result.Success(Unit)
+            } catch (_: Exception) {
+                Result.Failure(DataError.UNKNOWN)
+            }
         }
     }
 }

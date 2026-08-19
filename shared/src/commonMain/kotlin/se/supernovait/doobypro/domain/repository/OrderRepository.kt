@@ -1,6 +1,8 @@
 package se.supernovait.doobypro.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.domain.model.Order
 
 /**
@@ -32,18 +34,18 @@ interface OrderRepository {
      * @param id The unique identifier of the order.
      * @return The found [Order], or null if not found.
      */
-    suspend fun getOrderById(id: String): Order?
+    suspend fun getOrderById(id: String): Result<Order, DataError>
     /**
      * Inserts or updates an order.
      *
      * @param order The domain order model to upsert.
      */
-    suspend fun saveOrder(order: Order)
+    suspend fun saveOrder(order: Order): Result<String, DataError>
 
     /**
      * Deletes an order.
      *
      * @param order The domain order model to delete.
      */
-    suspend fun deleteOrder(order: Order)
+    suspend fun deleteOrder(order: Order): Result<Unit, DataError>
 }

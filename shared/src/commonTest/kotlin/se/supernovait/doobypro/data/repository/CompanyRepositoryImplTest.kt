@@ -3,6 +3,7 @@ package se.supernovait.doobypro.data.repository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.location.Address
 import se.supernovait.doobypro.data.local.dao.FakeCompanyDao
@@ -12,6 +13,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Unit tests for [CompanyRepositoryImpl].
@@ -61,14 +63,15 @@ class CompanyRepositoryImplTest {
 
         val result = repository.getCompanyById(testCompany.id!!)
 
-        assertEquals(testCompany, result)
+        assertEquals(testCompany, result.getOrNull())
     }
 
     @Test
     fun `getCompanyById should return null if not found`() = runTest(testDispatcher) {
         val result = repository.getCompanyById("non-existent")
 
-        assertNull(result)
+        assertTrue(result.isFailure)
+        assertNull(result.getOrNull())
     }
 
     @Test

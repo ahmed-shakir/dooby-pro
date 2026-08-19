@@ -6,7 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import org.koin.compose.viewmodel.koinViewModel
-import se.supernovait.doobypro.presentation.app.handleAppEvents
+import se.supernovait.doobypro.presentation.app.AppEventHandler
 import se.supernovait.doobypro.presentation.info.AppInfoScreen
 import se.supernovait.doobypro.presentation.welcome.SignInBottomSheet
 import se.supernovait.doobypro.presentation.welcome.WelcomeScreen
@@ -22,9 +22,7 @@ fun NavGraphBuilder.welcomeGraph(
         val viewModel = koinViewModel<WelcomeViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        handleAppEvents(
-            events = viewModel.events
-        )
+        AppEventHandler(events = viewModel.events)
 
         SignInBottomSheet(
             showSignInForm = uiState.showSignInForm,
@@ -52,6 +50,8 @@ fun NavGraphBuilder.welcomeGraph(
     composable<Route.AccountSetup> {
         val viewModel = koinViewModel<AccountSetupWizardViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        AppEventHandler(events = viewModel.events)
 
         AccountSetupWizardScreen(
             uiState = uiState,

@@ -1,5 +1,7 @@
 package se.supernovait.doobypro.domain.repository
 
+import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.model.license.License
 
 /**
@@ -21,19 +23,19 @@ interface LicenseRepository {
      * @param id The unique identifier of the license.
      * @return The found [License], or null if not found.
      */
-    suspend fun getLicenseById(id: String): License?
+    suspend fun getLicenseById(id: String): Result<License, DataError>
 
     /**
      * Inserts or updates a license.
      *
      * @param license The domain license model to upsert.
      */
-    suspend fun saveLicense(license: License)
+    suspend fun saveLicense(license: License): Result<String, DataError>
 
     /**
      * Deletes a license.
      *
      * @param license The domain license model to delete.
      */
-    suspend fun deleteLicense(license: License)
+    suspend fun deleteLicense(license: License): Result<Unit, DataError>
 }

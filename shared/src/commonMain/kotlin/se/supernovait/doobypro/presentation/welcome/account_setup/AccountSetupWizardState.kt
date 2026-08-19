@@ -8,6 +8,7 @@ import kotlinx.datetime.LocalDate
  * @property currentStep The active step in the wizard (1-4).
  * @property firstName User's first name.
  * @property lastName User's last name.
+ * @property username User's unique identifier.
  * @property birthDate Parsed [LocalDate] of the user's birthdate.
  * @property birthDateString Raw string input for the birthdate.
  * @property email User's personal email address.
@@ -28,6 +29,7 @@ data class AccountSetupWizardState(
     val currentStep: Int = 1,
     val firstName: String = "",
     val lastName: String = "",
+    val username: String = "",
     val birthDate: LocalDate? = null,
     val birthDateString: String = "",
     val email: String = "",

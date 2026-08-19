@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
-import kotlinx.coroutines.flow.Flow
 import se.supernovait.doobypro.data.local.entity.AgreementEntity
 
 /**
@@ -14,10 +13,10 @@ import se.supernovait.doobypro.data.local.entity.AgreementEntity
 interface AgreementDao {
 
     /**
-     * Observes all lease agreements.
+     * Gets all agreements for a specific account.
      */
-    @Query("SELECT * FROM agreements")
-    fun getAll(): Flow<List<AgreementEntity>>
+    @Query("SELECT * FROM agreements WHERE accountId = :accountId")
+    suspend fun getByAccountId(accountId: String): List<AgreementEntity>
 
     /**
      * Retrieves an agreement by its ID.

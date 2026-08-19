@@ -3,6 +3,7 @@ package se.supernovait.doobypro.data.repository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.dao.FakeServiceDao
@@ -12,6 +13,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Unit tests for [ServiceRepositoryImpl].
@@ -52,14 +54,15 @@ class ServiceRepositoryImplTest {
 
         val result = repository.getServiceById(testService.id!!)
 
-        assertEquals(testService, result)
+        assertEquals(testService, result.getOrNull())
     }
 
     @Test
     fun `getServiceById should return null if not found`() = runTest(testDispatcher) {
         val result = repository.getServiceById("non-existent")
 
-        assertNull(result)
+        assertTrue(result.isFailure)
+        assertNull(result.getOrNull())
     }
 
     @Test

@@ -13,6 +13,8 @@ sealed interface AccountSetupWizardEvent {
     data class UpdateFirstName(val value: String) : AccountSetupWizardEvent
     /** Updates the user's last name. */
     data class UpdateLastName(val value: String) : AccountSetupWizardEvent
+    /** Updates the user's username. */
+    data class UpdateUsername(val value: String) : AccountSetupWizardEvent
     /** Updates the user's birthdate string. */
     data class UpdateBirthDate(val value: String) : AccountSetupWizardEvent
     /** Updates the user's email address. */

@@ -12,6 +12,8 @@ import kotlinx.coroutines.withContext
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
 import se.supernovait.doobypro.data.local.mapper.toDomain
@@ -52,18 +54,6 @@ class OrderRepositoryImpl(
         }
     }
 
-    override suspend fun getOrderById(id: String): Order? {
-        return withContext(ioContext) {
-            val order = orderDao.getById(id) ?: return@withContext null
-            val user = userDao.getById(order.customerId)?.toDomain()
-                ?: return@withContext null
-            val service = serviceDao.getById(order.serviceId)?.toDomain()
-                ?: return@withContext null
-            
-            order.toDomain(user, service)
-        }
-    }
-
     override fun getOrdersByCustomerId(customerId: String): Flow<List<Order>> {
         return orderDao.getByCustomerId(customerId).flatMapLatest { entities ->
             if (entities.isEmpty()) return@flatMapLatest flowOf(emptyList())
@@ -83,15 +73,45 @@ class OrderRepositoryImpl(
         }
     }
 
-    override suspend fun saveOrder(order: Order) {
-        withContext(ioContext) {
-            orderDao.upsert(order.toEntity())
+    override suspend fun getOrderById(id: String): Result<Order, DataError> {
+        return withContext(ioContext) {
+            val order = orderDao.getById(id)
+
+            if (order != null) {
+                val user = userDao.getById(order.customerId)?.toDomain()
+                val service = serviceDao.getById(order.serviceId)?.toDomain()
+
+                if (user != null && service != null) {
+                    Result.Success(order.toDomain(user, service))
+                } else {
+                    Result.Failure(DataError.NOT_FOUND)
+                }
+            } else {
+                Result.Failure(DataError.NOT_FOUND)
+            }
         }
     }
 
-    override suspend fun deleteOrder(order: Order) {
-        withContext(ioContext) {
-            orderDao.delete(order.toEntity())
+    override suspend fun saveOrder(order: Order): Result<String, DataError> {
+        return withContext(ioContext) {
+            try {
+                val entityToSave = order.toEntity()
+                orderDao.upsert(entityToSave)
+                Result.Success(entityToSave.id)
+            } catch (_: Exception) {
+                Result.Failure(DataError.DATABASE_ERROR)
+            }
+        }
+    }
+
+    override suspend fun deleteOrder(order: Order): Result<Unit, DataError> {
+        return withContext(ioContext) {
+            try {
+                orderDao.delete(order.toEntity())
+                Result.Success(Unit)
+            } catch (_: Exception) {
+                Result.Failure(DataError.UNKNOWN)
+            }
         }
     }
 

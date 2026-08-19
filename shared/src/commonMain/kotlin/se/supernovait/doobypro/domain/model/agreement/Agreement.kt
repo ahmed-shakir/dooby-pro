@@ -8,6 +8,7 @@ import se.supernovait.app.core.domain.model.billing.BillingFrequency
  * Domain model representing an equipment lease agreement.
  *
  * @property id The unique identifier for the agreement. Null for unsaved agreements.
+ * @property accountId The identifier of the account that owns the agreement.
  * @property status The current status of the agreement (Active, Cancelled).
  * @property equipmentId The serial number or unique identifier of the equipment.
  * @property equipmentModel The model name or number of the equipment.
@@ -21,6 +22,7 @@ import se.supernovait.app.core.domain.model.billing.BillingFrequency
  */
 data class Agreement(
     val id: String? = null,
+    val accountId: String,
     val status: AgreementStatus,
     val equipmentId: String,
     val equipmentModel: String,

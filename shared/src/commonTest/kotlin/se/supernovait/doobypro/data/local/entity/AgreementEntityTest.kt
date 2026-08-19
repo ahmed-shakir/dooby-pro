@@ -2,6 +2,7 @@ package se.supernovait.doobypro.data.local.entity
 
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
+import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
@@ -17,6 +18,7 @@ class AgreementEntityTest {
     fun `AgreementEntity should generate a valid ID with correct prefix by default`() {
         val entity = AgreementEntity(
             status = AgreementStatus.ACTIVE,
+            accountId = SupernovaIdGenerator.generateId(IdType.COMPANY.prefix),
             equipmentId = "SN-1",
             equipmentModel = "M1",
             title = "Title",

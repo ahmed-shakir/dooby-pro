@@ -3,6 +3,7 @@ package se.supernovait.doobypro.data.repository
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
+import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.license.License
 import se.supernovait.app.core.domain.model.license.LicenseStatus
@@ -13,6 +14,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Unit tests for [LicenseRepositoryImpl].
@@ -29,7 +31,7 @@ class LicenseRepositoryImplTest {
         id = licenseId,
         accountId = accountId,
         licenseStatus = LicenseStatus.ACTIVE,
-        tier = Tier.PRO,
+        tier = Tier.FREE,
         title = "Professional License",
         description = "Full access to pro features",
         issueDate = LocalDate(2026, 8, 15),
@@ -64,14 +66,15 @@ class LicenseRepositoryImplTest {
 
         val result = repository.getLicenseById(testLicense.id)
 
-        assertEquals(testLicense, result)
+        assertEquals(testLicense, result.getOrNull())
     }
 
     @Test
     fun `getLicenseById should return null if not found`() = runTest(testDispatcher) {
         val result = repository.getLicenseById("non-existent")
 
-        assertNull(result)
+        assertTrue(result.isFailure)
+        assertNull(result.getOrNull())
     }
 
     @Test

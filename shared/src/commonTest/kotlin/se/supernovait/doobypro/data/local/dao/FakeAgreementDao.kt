@@ -1,8 +1,6 @@
 package se.supernovait.doobypro.data.local.dao
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import se.supernovait.doobypro.data.local.entity.AgreementEntity
 
 /**
@@ -11,8 +9,8 @@ import se.supernovait.doobypro.data.local.entity.AgreementEntity
 class FakeAgreementDao : AgreementDao {
     private val state = MutableStateFlow<Map<String, AgreementEntity>>(emptyMap())
 
-    override fun getAll(): Flow<List<AgreementEntity>> {
-        return state.map { it.values.toList() }
+    override suspend fun getByAccountId(accountId: String): List<AgreementEntity> {
+        return state.value.values.filter { it.accountId == accountId }
     }
 
     override suspend fun getById(id: String): AgreementEntity? {

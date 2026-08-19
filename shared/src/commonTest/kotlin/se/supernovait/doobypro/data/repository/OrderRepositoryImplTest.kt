@@ -8,6 +8,7 @@ import kotlinx.datetime.LocalDateTime
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
 import se.supernovait.app.core.data.persistence.entity.UserEntity
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.dao.FakeOrderDao
@@ -124,7 +125,7 @@ class OrderRepositoryImplTest {
     fun `getOrderById should return assembled order if found`() = runTest(testDispatcher) {
         repository.saveOrder(testOrder)
 
-        val result = repository.getOrderById(testOrder.id!!)
+        val result = repository.getOrderById(testOrder.id!!).getOrNull()
 
         assertNotNull(result)
         assertEquals(testOrder.id, result.id)
@@ -140,7 +141,7 @@ class OrderRepositoryImplTest {
         )
         repository.saveOrder(orderWithMissingService)
 
-        val result = repository.getOrderById(orderWithMissingService.id!!)
+        val result = repository.getOrderById(orderWithMissingService.id!!).getOrNull()
 
         assertNull(result)
     }

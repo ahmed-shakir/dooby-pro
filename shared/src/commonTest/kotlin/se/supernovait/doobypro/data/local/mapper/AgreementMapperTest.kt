@@ -17,9 +17,11 @@ import kotlin.test.assertEquals
  */
 class AgreementMapperTest {
     private val agreementId = SupernovaIdGenerator.generateId(IdType.AGREEMENT.prefix)
+    private val accountId = SupernovaIdGenerator.generateId(IdType.COMPANY.prefix)
 
     private val testAgreement = Agreement(
         id = agreementId,
+        accountId = accountId,
         status = AgreementStatus.ACTIVE,
         equipmentId = "SN-123",
         equipmentModel = "Model X",
@@ -34,6 +36,7 @@ class AgreementMapperTest {
 
     private val testAgreementEntity = AgreementEntity(
         id = agreementId,
+        accountId = accountId,
         status = AgreementStatus.ACTIVE,
         equipmentId = "SN-123",
         equipmentModel = "Model X",

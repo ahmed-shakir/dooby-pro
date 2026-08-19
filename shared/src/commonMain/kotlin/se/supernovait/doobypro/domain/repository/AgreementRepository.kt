@@ -1,6 +1,7 @@
 package se.supernovait.doobypro.domain.repository
 
-import kotlinx.coroutines.flow.Flow
+import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.domain.model.agreement.Agreement
 
 /**
@@ -9,22 +10,22 @@ import se.supernovait.doobypro.domain.model.agreement.Agreement
 interface AgreementRepository {
 
     /**
-     * Observes all agreements in the system.
+     * Retrieves all agreements for a specific account.
      */
-    fun getAgreements(): Flow<List<Agreement>>
+    suspend fun getAgreements(accountId: String): List<Agreement>
 
     /**
      * Retrieves an agreement by its ID.
      */
-    suspend fun getAgreementById(id: String): Agreement?
+    suspend fun getAgreementById(id: String): Result<Agreement, DataError>
 
     /**
      * Inserts or updates an agreement.
      */
-    suspend fun saveAgreement(agreement: Agreement)
+    suspend fun saveAgreement(agreement: Agreement): Result<String, DataError>
 
     /**
      * Deletes an agreement.
      */
-    suspend fun deleteAgreement(agreement: Agreement)
+    suspend fun deleteAgreement(agreement: Agreement): Result<Unit, DataError>
 }

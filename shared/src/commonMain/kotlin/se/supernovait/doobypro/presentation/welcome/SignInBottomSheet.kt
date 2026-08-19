@@ -80,9 +80,13 @@ private fun SignInForm(
             .padding(horizontal = MaterialTheme.spacing.large)
             .padding(bottom = MaterialTheme.spacing.x3Large)
     ) {
-        SupernovaTitle(text = stringResource(Res.string.sheet_SignIn_title))
+        SupernovaTitle(
+            text = stringResource(Res.string.sheet_SignIn_title),
+            color = MaterialTheme.colorScheme.primary
+        )
         SupernovaSubtitle(
             text = stringResource(Res.string.sheet_SignIn_subtitle),
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Normal
         )
 

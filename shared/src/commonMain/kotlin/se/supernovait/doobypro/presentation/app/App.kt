@@ -32,6 +32,7 @@ import se.supernovait.app.core.ui.component.topbar.LocalTopBarState
 import se.supernovait.doobypro.presentation.app.theme.DoobyTheme
 import se.supernovait.doobypro.presentation.common.preview.ScreenPreviewContainer
 import se.supernovait.doobypro.presentation.navigation.Route
+import se.supernovait.doobypro.presentation.navigation.mainGraph
 import se.supernovait.doobypro.presentation.navigation.welcomeGraph
 
 /**
@@ -106,6 +107,7 @@ private fun AppContent() {
             modifier = Modifier.padding(innerPadding)
         ) {
             welcomeGraph(navController)
+            mainGraph(navController)
             // TODO: add nav graphs
         }
     }

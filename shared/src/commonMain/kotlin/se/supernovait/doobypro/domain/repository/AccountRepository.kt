@@ -1,5 +1,7 @@
 package se.supernovait.doobypro.domain.repository
 
+import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.domain.model.Account
 
 /**
@@ -16,19 +18,19 @@ interface AccountRepository {
      * @param id The account identifier.
      * @return The assembled [Account], or null if not found.
      */
-    suspend fun getAccount(id: String): Account?
+    suspend fun getAccount(id: String): Result<Account, DataError>
 
     /**
      * Inserts or updates a account.
      *
      * @param account The domain account model to upsert.
      */
-    suspend fun saveAccount(account: Account)
+    suspend fun saveAccount(account: Account): Result<String, DataError>
 
     /**
      * Deletes a account.
      *
      * @param account The domain account model to delete.
      */
-    suspend fun deleteAccount(account: Account)
+    suspend fun deleteAccount(account: Account): Result<Unit, DataError>
 }

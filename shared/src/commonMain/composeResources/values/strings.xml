@@ -8,6 +8,10 @@
 
     <string name="app_action_back_label">Back</string>
 
+    <!-- Default texts -->
+    <string name="default_license_title">Dooby Pro Free Tier License</string>
+    <string name="default_license_description">Get started with essential order management for your laundry or dry cleaning business. The Free Tier includes basic features to manage staff operations, track orders, and connect with customers—perfect for small teams or those new to digital workflow management. Upgrade anytime to unlock advanced features.</string>
+
     <!-- Welcome Screen -->
     <string name="screen_Welcome_title">Welcome to Dooby Pro</string>
     <string name="screen_Welcome_subtitle">Manage your laundry orders and staff operations</string>
@@ -35,6 +39,7 @@
 
     <string name="screen_AccountSetup_field_first_name">First name</string>
     <string name="screen_AccountSetup_field_last_name">Last name</string>
+    <string name="screen_AccountSetup_field_username">Username</string>
     <string name="screen_AccountSetup_field_dob">Date of birth</string>
     <string name="screen_AccountSetup_field_email">Email</string>
     <string name="screen_AccountSetup_field_phone">Phone number</string>
@@ -57,6 +62,7 @@
     <string name="screen_AccountSetup_confirmation_note">You can update this information anytime in account settings.</string>
 
     <string name="screen_AccountSetup_summary_user">User</string>
+    <string name="screen_AccountSetup_summary_username">Username</string>
     <string name="screen_AccountSetup_summary_company">Company</string>
     <string name="screen_AccountSetup_summary_phone">Phone</string>
     <string name="screen_AccountSetup_summary_email">Email</string>

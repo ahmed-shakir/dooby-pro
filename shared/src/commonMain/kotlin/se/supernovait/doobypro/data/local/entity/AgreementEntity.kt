@@ -14,6 +14,7 @@ import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
  * Database entity representing an equipment lease agreement for Room persistence.
  *
  * @property id The unique identifier for the agreement, defaults to a generated ID.
+ * @property accountId The identifier of the account that owns the agreement.
  * @property status The current status of the agreement.
  * @property equipmentId The serial number of the equipment.
  * @property equipmentModel The model name of the equipment.
@@ -29,6 +30,7 @@ import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 data class AgreementEntity(
     @PrimaryKey
     val id: String = SupernovaIdGenerator.generateId(IdType.AGREEMENT.prefix),
+    val accountId: String,
     val status: AgreementStatus,
     val equipmentId: String,
     val equipmentModel: String,
