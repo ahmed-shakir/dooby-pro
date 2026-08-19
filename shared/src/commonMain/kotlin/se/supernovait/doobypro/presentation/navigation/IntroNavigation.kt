@@ -15,7 +15,7 @@ import se.supernovait.doobypro.presentation.welcome.WelcomeViewModel
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardScreen
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 
-fun NavGraphBuilder.welcomeGraph(
+fun NavGraphBuilder.introGraph(
     navController: NavHostController
 ) {
     composable<Route.Welcome> {

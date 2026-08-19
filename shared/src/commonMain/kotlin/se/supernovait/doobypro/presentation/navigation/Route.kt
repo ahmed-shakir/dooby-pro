@@ -1,5 +1,11 @@
 package se.supernovait.doobypro.presentation.navigation
 
+import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.navigation_item_account_label
+import doobypro.shared.generated.resources.navigation_item_dashboard_label
+import doobypro.shared.generated.resources.navigation_item_orders_label
+import doobypro.shared.generated.resources.navigation_item_services_label
+import doobypro.shared.generated.resources.navigation_item_settings_label
 import kotlinx.serialization.Serializable
 
 sealed interface Route : NavigationRoute {
@@ -32,14 +38,19 @@ sealed interface Route : NavigationRoute {
 
     @Serializable
     data object Settings : Route {
+        override val label = Res.string.navigation_item_settings_label
         override val showBottomBar = false
     }
 
     @Serializable
-    data object Dashboard : Route
+    data object Dashboard : Route {
+        override val label = Res.string.navigation_item_dashboard_label
+    }
 
     @Serializable
-    data object Orders : Route
+    data object Orders : Route {
+        override val label = Res.string.navigation_item_orders_label
+    }
 
     @Serializable
     data class OrderDetails(val id: String) : Route {
@@ -47,7 +58,9 @@ sealed interface Route : NavigationRoute {
     }
 
     @Serializable
-    data object Services : Route
+    data object Services : Route {
+        override val label = Res.string.navigation_item_services_label
+    }
 
     @Serializable
     data class ServiceDetails(val id: String) : Route {
@@ -55,7 +68,9 @@ sealed interface Route : NavigationRoute {
     }
 
     @Serializable
-    data object Account : Route
+    data object Account : Route {
+        override val label = Res.string.navigation_item_account_label
+    }
 
     @Serializable
     data object UserProfile : Route

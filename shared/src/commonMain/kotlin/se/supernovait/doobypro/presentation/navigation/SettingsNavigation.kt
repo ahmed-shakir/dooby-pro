@@ -13,30 +13,10 @@ import androidx.navigation.compose.composable
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
 
-fun NavGraphBuilder.mainGraph(
+fun NavGraphBuilder.settingsGraph(
     navController: NavHostController
 ) {
-    composable<Route.Dashboard> {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.mediumLarge)
-        ) {
-            SupernovaTitle(text = "My Dashboard")
-        }
-    }
-
-    composable<Route.Orders> {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.mediumLarge)
-        ) {
-            SupernovaTitle(text = "Orders")
-        }
-    }
-
-    composable<Route.Services> {
+    composable<Route.Settings> {
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,

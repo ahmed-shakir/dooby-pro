@@ -12,6 +12,14 @@
     <string name="default_license_title">Dooby Pro Free Tier License</string>
     <string name="default_license_description">Get started with essential order management for your laundry or dry cleaning business. The Free Tier includes basic features to manage staff operations, track orders, and connect with customers—perfect for small teams or those new to digital workflow management. Upgrade anytime to unlock advanced features.</string>
 
+    <!-- Route labels -->
+    <string name="navigation_item_menu_label">Menu</string>
+    <string name="navigation_item_dashboard_label">Dashboard</string>
+    <string name="navigation_item_orders_label">Orders</string>
+    <string name="navigation_item_services_label">Services</string>
+    <string name="navigation_item_account_label">Account</string>
+    <string name="navigation_item_settings_label">Settings</string>
+
     <!-- Welcome Screen -->
     <string name="screen_Welcome_title">Welcome to Dooby Pro</string>
     <string name="screen_Welcome_subtitle">Manage your laundry orders and staff operations</string>
