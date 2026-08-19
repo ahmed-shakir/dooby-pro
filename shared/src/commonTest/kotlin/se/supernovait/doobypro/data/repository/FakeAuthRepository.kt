@@ -1,5 +1,6 @@
 package se.supernovait.doobypro.data.repository
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -8,6 +9,7 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.error.DataError
+import kotlin.time.Duration.Companion.milliseconds
 
 class FakeAuthRepository : AuthRepository {
     private val users = MutableStateFlow<Map<String, User>>(emptyMap())
@@ -25,6 +27,7 @@ class FakeAuthRepository : AuthRepository {
     }
 
     override suspend fun signIn(username: String): Result<User, AuthError> {
+        delay(1.milliseconds)
         val user = users.value.values.find { it.username == username }
         return if (user != null) {
             currentUserId.value = user.id
@@ -44,5 +47,9 @@ class FakeAuthRepository : AuthRepository {
 
     override suspend fun signOut() {
         currentUserId.value = null
+    }
+
+    fun setCurrentUserId(id: String?) {
+        currentUserId.value = id
     }
 }

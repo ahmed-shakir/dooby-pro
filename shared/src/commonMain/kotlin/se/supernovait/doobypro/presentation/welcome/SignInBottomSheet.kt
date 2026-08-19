@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -17,10 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.sheet_SignIn_action_sign_in
+import doobypro.shared.generated.resources.sheet_SignIn_error_empty_username
 import doobypro.shared.generated.resources.sheet_SignIn_field_username
 import doobypro.shared.generated.resources.sheet_SignIn_subtitle
 import doobypro.shared.generated.resources.sheet_SignIn_title
 import org.jetbrains.compose.resources.stringResource
+import se.supernovait.app.core.domain.error.AuthError
+import se.supernovait.app.core.domain.extension.error.asString
 import se.supernovait.app.core.ui.component.action.SupernovaButton
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
@@ -33,16 +37,16 @@ import se.supernovait.app.core.ui.theme.spacing
 fun SignInBottomSheet(
     showSignInForm: Boolean,
     isSigningIn: Boolean,
-    signInError: String?,
+    signInError: AuthError?,
+    isUsernameEmpty: Boolean,
     onSignIn: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     val bottomSheetState = LocalBottomSheetState.current
 
-    // Use rememberUpdatedState to ensure the content lambda captures the LATEST values
-    // and correctly subscribes to state changes inside the bottom sheet's composition scope.
     val isSigningInState = rememberUpdatedState(isSigningIn)
     val signInErrorState = rememberUpdatedState(signInError)
+    val isUsernameEmptyState = rememberUpdatedState(isUsernameEmpty)
     val onSignInState = rememberUpdatedState(onSignIn)
 
     LaunchedEffect(showSignInForm) {
@@ -51,6 +55,7 @@ fun SignInBottomSheet(
                 SignInForm(
                     isSigningIn = isSigningInState.value,
                     signInError = signInErrorState.value,
+                    isUsernameEmpty = isUsernameEmptyState.value,
                     onSignIn = onSignInState.value
                 )
             }
@@ -69,10 +74,20 @@ fun SignInBottomSheet(
 @Composable
 private fun SignInForm(
     isSigningIn: Boolean,
-    signInError: String?,
+    signInError: AuthError?,
+    isUsernameEmpty: Boolean,
     onSignIn: (String) -> Unit,
 ) {
     var username by remember { mutableStateOf("") }
+    val emptyUsernameMessage = stringResource(Res.string.sheet_SignIn_error_empty_username)
+
+    val errorText by produceState<String?>(initialValue = null, signInError, isUsernameEmpty) {
+        value = when {
+            isUsernameEmpty -> emptyUsernameMessage
+            signInError != null -> signInError.asString()
+            else -> null
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -99,9 +114,9 @@ private fun SignInForm(
             modifier = Modifier.fillMaxWidth()
         )
 
-        if (signInError != null) {
+        if (errorText != null) {
             SupernovaLabel(
-                text = signInError,
+                text = errorText!!,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = MaterialTheme.spacing.small, start = MaterialTheme.spacing.extraSmall)

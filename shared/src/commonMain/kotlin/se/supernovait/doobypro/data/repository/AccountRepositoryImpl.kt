@@ -92,11 +92,15 @@ class AccountRepositoryImpl(
         return companyRepository.saveCompany(account.company).flatMap { companyId ->
 
             // 3. Provision Default Free License
-            val license = AppDefaults.license(companyId)
-            licenseRepository.saveLicense(license).flatMap { licenseId ->
+            val license = if (account.license != null) {
+                account.license.copy(accountId = companyId)
+            } else {
+                AppDefaults.license(companyId)
+            }
 
+            licenseRepository.saveLicense(license).flatMap { licenseId ->
                 // 4. Link everything in the root Account table
-                linkAccount(companyId, user.id!!, licenseId)
+                linkAccount(user.id!!, companyId, licenseId)
             }
         }
     }

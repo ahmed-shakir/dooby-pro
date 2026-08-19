@@ -16,7 +16,7 @@ import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWi
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 
 fun NavGraphBuilder.introGraph(
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     composable<Route.Welcome> {
         val viewModel = koinViewModel<WelcomeViewModel>()
@@ -28,6 +28,7 @@ fun NavGraphBuilder.introGraph(
             showSignInForm = uiState.showSignInForm,
             isSigningIn = uiState.isSigningIn,
             signInError = uiState.signInError,
+            isUsernameEmpty = uiState.isUsernameEmpty,
             onSignIn = { username -> viewModel.onEvent(WelcomeScreenEvent.SignIn(username)) },
             onDismiss = { viewModel.onEvent(WelcomeScreenEvent.HideSignInForm) }
         )

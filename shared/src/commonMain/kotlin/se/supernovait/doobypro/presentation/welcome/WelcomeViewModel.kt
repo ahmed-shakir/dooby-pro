@@ -2,19 +2,15 @@ package se.supernovait.doobypro.presentation.welcome
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.sheet_SignIn_error_empty_username
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.event.AppEvent
-import se.supernovait.app.core.domain.extension.error.asString
 
 class WelcomeViewModel(
     private val authRepository: AuthRepository
@@ -29,10 +25,10 @@ class WelcomeViewModel(
     fun onEvent(event: WelcomeScreenEvent) {
         when (event) {
             WelcomeScreenEvent.ShowSignInForm -> {
-                _uiState.update { it.copy(showSignInForm = true, signInError = null) }
+                _uiState.update { it.copy(showSignInForm = true, signInError = null, isUsernameEmpty = false) }
             }
             WelcomeScreenEvent.HideSignInForm -> {
-                _uiState.update { it.copy(showSignInForm = false, signInError = null) }
+                _uiState.update { it.copy(showSignInForm = false, signInError = null, isUsernameEmpty = false) }
             }
             is WelcomeScreenEvent.SignIn -> {
                 signIn(event.username)
@@ -42,18 +38,15 @@ class WelcomeViewModel(
     }
 
     private fun signIn(username: String) {
-        _uiState.update { it.copy(signInError = null) }
+        _uiState.update { it.copy(signInError = null, isUsernameEmpty = false) }
 
         if (username.isBlank()) {
-            viewModelScope.launch {
-                val error = getString(Res.string.sheet_SignIn_error_empty_username)
-                _uiState.update { it.copy(signInError = error) }
-            }
+            _uiState.update { it.copy(isUsernameEmpty = true) }
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSigningIn = true, signInError = null) }
+            _uiState.update { it.copy(isSigningIn = true) }
             
             when (val result = authRepository.signIn(username)) {
                 is Result.Success -> {
@@ -63,7 +56,7 @@ class WelcomeViewModel(
                 is Result.Failure -> {
                     _uiState.update { it.copy(
                         isSigningIn = false,
-                        signInError = result.error.asString()
+                        signInError = result.error
                     ) }
                     _events.send(AppEvent.Failure(result.error))
                 }

@@ -125,7 +125,6 @@ class AccountSetupWizardViewModelTest {
     @Test
     fun `OnNextClick on step 4 triggers account creation`() = runTest(testDispatcher) {
         // Collect events to prevent 'send' from suspending indefinitely
-        // Use backgroundScope to ensure the collector is cancelled after the test
         viewModel.events.onEach { }.launchIn(backgroundScope)
 
         // Step 1: User Info

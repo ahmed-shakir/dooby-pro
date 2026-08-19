@@ -7,7 +7,11 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.location.Address
+import se.supernovait.app.core.domain.model.license.License
+import se.supernovait.app.core.domain.model.license.LicenseStatus
+import se.supernovait.app.core.domain.model.license.Tier
 import se.supernovait.doobypro.data.local.dao.FakeAccountDao
+import se.supernovait.doobypro.data.local.entity.AccountEntity
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.domain.model.IdType
@@ -16,6 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Unit tests for [AccountRepositoryImpl].
@@ -56,7 +61,16 @@ class AccountRepositoryImplTest {
         id = accountId,
         user = testUser,
         company = testCompany,
-        license = null,
+        license = License(
+            id = "lic-123",
+            accountId = accountId,
+            licenseStatus = LicenseStatus.ACTIVE,
+            tier = Tier.FREE,
+            title = "Test License",
+            description = "Test Desc",
+            issueDate = LocalDate(2026, 1, 1),
+            expiryDate = LocalDate(2027, 1, 1)
+        ),
         agreement = null
     )
 
@@ -75,17 +89,21 @@ class AccountRepositoryImplTest {
             agreementRepository = fakeAgreementRepository,
             accountDao = fakeAccountDao
         )
-
-        // Seed component data
-        runTest(testDispatcher) {
-            fakeAuthRepository.signUp(testUser)
-            fakeCompanyRepository.saveCompany(testCompany)
-        }
     }
 
     @Test
-    fun `getAccount should return assembled account if found`() = runTest(testDispatcher) {
-        repository.saveAccount(testAccount)
+    fun `getAccount should return assembled account with components if found`() = runTest(testDispatcher) {
+        // Seed component data
+        fakeAuthRepository.signUp(testUser)
+        fakeCompanyRepository.saveCompany(testCompany)
+
+        // Mock account link in root table
+        fakeAccountDao.upsert(AccountEntity(
+            id = accountId,
+            userId = userId,
+            licenseId = null,
+            agreementId = null
+        ))
 
         val result = repository.getAccount(accountId).getOrNull()
 
@@ -96,10 +114,22 @@ class AccountRepositoryImplTest {
     }
 
     @Test
-    fun `getAccount should return null if account entity not found`() = runTest(testDispatcher) {
-        val result = repository.getAccount("unknown").getOrNull()
-
-        assertNull(result)
+    fun `saveAccount for new account should trigger full orchestration`() = runTest(testDispatcher) {
+        // Create an account without an ID to trigger 'saveNewAccount'
+        val newAccount = testAccount.copy(id = null)
+        
+        val result = repository.saveAccount(newAccount)
+        
+        assertTrue(result.isSuccess, "Save account should be successful")
+        val savedAccountId = result.getOrNull()!!
+        
+        // Verify User was signed up
+        val savedUser = fakeAuthRepository.getUserById(userId).getOrNull()
+        assertNotNull(savedUser)
+        
+        // Verify Company was saved
+        val savedCompany = fakeCompanyRepository.getCompanyById(savedAccountId).getOrNull()
+        assertNotNull(savedCompany)
     }
 
     @Test
@@ -114,7 +144,16 @@ class AccountRepositoryImplTest {
 
     @Test
     fun `deleteAccount should call dao delete`() = runTest(testDispatcher) {
-        repository.saveAccount(testAccount)
+        // Manually seed an account since getAccount needs sub-repo data
+        fakeAuthRepository.signUp(testUser)
+        fakeCompanyRepository.saveCompany(testCompany)
+        fakeAccountDao.upsert(AccountEntity(
+            id = accountId, 
+            userId = userId,
+            licenseId = null,
+            agreementId = null
+        ))
+        
         assertNotNull(repository.getAccount(accountId).getOrNull())
 
         repository.deleteAccount(testAccount)

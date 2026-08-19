@@ -1,6 +1,7 @@
 package se.supernovait.doobypro.presentation.app
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
@@ -20,21 +21,33 @@ fun AppEventHandler(
     HandleAppEvents(
         events = events,
         onEvent = { event ->
-            when (event) {
-                AppEvent.NavigateBack -> {
-                    navController?.popBackStack()
-                    true
-                }
-                AppEvent.SignIn -> {
-                    navController?.navigateWithRules(Route.Dashboard)
-                    true
-                }
-                AppEvent.SignOut -> {
-                    authManager.signOut()
-                    true
-                }
-                else -> false // Let default handler handle events
-            }
+            handleAppEvent(event, navController, authManager)
         }
     )
+}
+
+/**
+ * Pure logic for handling global app events.
+ * Extracted from the Composable to enable unit testing.
+ */
+fun handleAppEvent(
+    event: AppEvent,
+    navController: NavController?,
+    authManager: AuthenticationManager
+): Boolean {
+    return when (event) {
+        AppEvent.NavigateBack -> {
+            navController?.popBackStack()
+            true
+        }
+        AppEvent.SignIn -> {
+            navController?.navigateWithRules(Route.Dashboard)
+            true
+        }
+        AppEvent.SignOut -> {
+            authManager.signOut()
+            true
+        }
+        else -> false
+    }
 }
