@@ -145,7 +145,7 @@ class AccountSetupWizardViewModelTest {
         // Step 3: Address Info
         viewModel.onEvent(AccountSetupWizardEvent.UpdateStreetAddress("Main St"))
         viewModel.onEvent(AccountSetupWizardEvent.UpdateCity("Dubai"))
-        viewModel.onEvent(AccountSetupWizardEvent.UpdateEmirate("Dubai"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateEmirate("DUBAI"))
         viewModel.onEvent(AccountSetupWizardEvent.UpdatePostalCode("00000"))
         viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
 

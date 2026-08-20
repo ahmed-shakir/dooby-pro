@@ -11,6 +11,7 @@ import doobypro.shared.generated.resources.screen_Settings_currency_label
 import doobypro.shared.generated.resources.screen_Settings_date_format_label
 import doobypro.shared.generated.resources.screen_Settings_language_label
 import doobypro.shared.generated.resources.screen_Settings_theme_label
+import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.input.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectionGroup
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
@@ -27,6 +28,9 @@ fun CommonSettingsScreen(
     uiState: SettingsState,
     onEvent: (SettingsScreenEvent) -> Unit
 ) {
+    val currencyLabels = Currency.entries.associateWith { stringResource(it.label) }
+    val themeLabels = ThemeMode.entries.associateWith { stringResource(it.label) }
+
     SettingsScreen {
         Spacer(Modifier.height(MaterialTheme.spacing.small))
 
@@ -35,7 +39,7 @@ fun CommonSettingsScreen(
             options = Currency.entries,
             selectedOption = uiState.settings.common.currency,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateCurrency(it)) },
-            optionLabel = { it.label }
+            optionLabel = { currencyLabels[it] ?: "" }
         )
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
@@ -68,7 +72,7 @@ fun CommonSettingsScreen(
             options = ThemeMode.entries,
             selectedOption = uiState.settings.common.themeMode,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateThemeMode(it)) },
-            optionLabel = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() } }
+            optionLabel = { themeLabels[it] ?: "" }
         )
     }
 }

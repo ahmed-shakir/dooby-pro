@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.screen_Settings_printer_connection_method_label
+import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.selection.SupernovaRadioGroup
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
@@ -18,6 +19,8 @@ fun PrinterSettingsScreen(
     state: SettingsState,
     onEvent: (SettingsScreenEvent) -> Unit
 ) {
+    val connectionMethodLabels = ConnectionMethod.entries.associateWith { stringResource(it.label) }
+
     SettingsScreen {
         SupernovaLabel(
             text = Res.string.screen_Settings_printer_connection_method_label,
@@ -30,7 +33,7 @@ fun PrinterSettingsScreen(
             options = ConnectionMethod.entries,
             selectedOption = state.settings.printer.connectionMethod,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdatePrinterConnectionMethod(it)) },
-            optionLabel = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() } }
+            optionLabel = { connectionMethodLabels[it] ?: "" }
         )
     }
 }

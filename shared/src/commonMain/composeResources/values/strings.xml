@@ -20,12 +20,35 @@
     <string name="navigation_item_account_label">Account</string>
     <string name="navigation_item_settings_label">Settings</string>
 
-    <!-- Welcome Screen -->
-    <string name="screen_Welcome_title">Welcome to Dooby Pro</string>
-    <string name="screen_Welcome_subtitle">Manage your laundry orders and staff operations</string>
-    <string name="screen_Welcome_action_sign_in_label">Sign in</string>
-    <string name="screen_Welcome_action_sign_up_label">Create account</string>
-    <string name="screen_Welcome_action_app_info_label">About Dooby Pro</string>
+    <!-- Emirates -->
+    <string name="emirate_abu_dhabi">Abu Dhabi</string>
+    <string name="emirate_dubai">Dubai</string>
+    <string name="emirate_sharjah">Sharjah</string>
+    <string name="emirate_ajman">Ajman</string>
+    <string name="emirate_umm_al_quwain">Umm Al Quwain</string>
+    <string name="emirate_ras_al_khaimah">Ras Al Khaimah</string>
+    <string name="emirate_fujairah">Fujairah</string>
+
+    <!-- Delivery -->
+    <string name="delivery_option_express">Express</string>
+    <string name="delivery_option_standard">Standard</string>
+    <string name="delivery_method_home_delivery">Home delivery</string>
+    <string name="delivery_method_in_store_pickup">In-store pickup</string>
+
+    <!-- Currency -->
+    <string name="currency_aed">AED (United Arab Emirates)</string>
+    <string name="currency_usd">USD (United States)</string>
+    <string name="currency_eur">EUR (European Union)</string>
+    <string name="currency_gbp">GBP (United Kingdom)</string>
+
+    <!-- Theme -->
+    <string name="theme_mode_light">Light mode</string>
+    <string name="theme_mode_dark">Dark mode</string>
+    <string name="theme_mode_system">System settings</string>
+
+    <!-- Connection method -->
+    <string name="connection_method_network">Network (WiFi/Ethernet)</string>
+    <string name="connection_method_bluetooth">Bluetooth</string>
 
     <!-- Sign In Bottom Sheet -->
     <string name="sheet_SignIn_title">Sign in</string>
@@ -33,6 +56,13 @@
     <string name="sheet_SignIn_field_username">Username</string>
     <string name="sheet_SignIn_action_sign_in">Sign in</string>
     <string name="sheet_SignIn_error_empty_username">Username cannot be empty</string>
+
+    <!-- Welcome Screen -->
+    <string name="screen_Welcome_title">Welcome to Dooby Pro</string>
+    <string name="screen_Welcome_subtitle">Manage your laundry orders and staff operations</string>
+    <string name="screen_Welcome_action_sign_in_label">Sign in</string>
+    <string name="screen_Welcome_action_sign_up_label">Create account</string>
+    <string name="screen_Welcome_action_app_info_label">About Dooby Pro</string>
 
     <!-- Account Setup Wizard -->
     <string name="screen_AccountSetup_step_indicator">Step %1$d of %2$d</string>

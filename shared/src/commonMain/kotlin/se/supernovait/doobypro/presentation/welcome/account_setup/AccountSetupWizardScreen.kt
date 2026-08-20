@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import doobypro.shared.generated.resources.Res
@@ -62,11 +64,13 @@ import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.action.SupernovaButton
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.component.input.SupernovaDateField
+import se.supernovait.app.core.ui.component.input.SupernovaSelectField
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.text.SupernovaSubtitle
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.AppDefaults
+import se.supernovait.doobypro.domain.model.Emirate
 import se.supernovait.doobypro.presentation.common.preview.ScreenPreviewContainer
 
 /**
@@ -205,7 +209,8 @@ private fun Step1(state: AccountSetupWizardState, onEvent: (AccountSetupWizardEv
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_phone),
         initialValue = state.phoneNumber,
-        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdatePhoneNumber(value)) }
+        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdatePhoneNumber(value)) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
     )
 }
 
@@ -231,19 +236,22 @@ private fun Step2(state: AccountSetupWizardState, onEvent: (AccountSetupWizardEv
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateLicenseNumber(value)) }
     )
     SupernovaTextField(
-        label = stringResource(Res.string.screen_AccountSetup_field_company_phone),
-        initialValue = state.companyPhone,
-        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCompanyPhone(value)) }
-    )
-    SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_company_email),
         initialValue = state.companyEmail,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCompanyEmail(value)) }
+    )
+    SupernovaTextField(
+        label = stringResource(Res.string.screen_AccountSetup_field_company_phone),
+        initialValue = state.companyPhone,
+        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCompanyPhone(value)) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
     )
 }
 
 @Composable
 private fun Step3(state: AccountSetupWizardState, onEvent: (AccountSetupWizardEvent) -> Unit) {
+    val emirateLabels = Emirate.entries.associateWith { stringResource(it.label) }
+
     SupernovaTitle(text = stringResource(Res.string.screen_AccountSetup_title_step3))
     SupernovaSubtitle(text = stringResource(Res.string.screen_AccountSetup_subtitle_step3), fontWeight = FontWeight.Normal)
     Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
@@ -258,15 +266,18 @@ private fun Step3(state: AccountSetupWizardState, onEvent: (AccountSetupWizardEv
         initialValue = state.city,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCity(value)) }
     )
-    SupernovaTextField(
+    SupernovaSelectField(
         label = stringResource(Res.string.screen_AccountSetup_field_emirate),
-        initialValue = state.emirate,
-        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateEmirate(value)) }
+        options = Emirate.entries,
+        selectedOption = Emirate.fromValue(state.emirate),
+        onOptionSelected = { onEvent(AccountSetupWizardEvent.UpdateEmirate(it.value)) },
+        optionLabel = { emirateLabels[it] ?: "" }
     )
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_postal_code),
         initialValue = state.postalCode,
-        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdatePostalCode(value)) }
+        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdatePostalCode(value)) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_location_note),
@@ -298,9 +309,10 @@ private fun Step4(state: AccountSetupWizardState) {
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_phone), state.phoneNumber)
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_email), state.email)
             
+            val emirateLabel = Emirate.fromName(state.emirate)?.label?.let { stringResource(it) } ?: state.emirate
             val location = buildString {
-                append(state.emirate)
-                if (state.emirate.isNotBlank()) append(", ")
+                append(emirateLabel)
+                if (emirateLabel.isNotBlank()) append(", ")
                 append(AppDefaults.COUNTRY)
             }
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_location), location)

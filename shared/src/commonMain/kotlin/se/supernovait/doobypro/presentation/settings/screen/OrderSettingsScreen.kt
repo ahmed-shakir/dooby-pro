@@ -17,6 +17,7 @@ import doobypro.shared.generated.resources.screen_Settings_order_default_service
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_method_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_option_label
 import doobypro.shared.generated.resources.screen_Settings_order_handling_time_label
+import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.input.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
@@ -32,6 +33,8 @@ fun OrderSettingsScreen(
     onEvent: (SettingsScreenEvent) -> Unit
 ) {
     val selectedService = state.services.find { it.id == state.settings.order.defaultServiceId }
+    val deliveryOptionLabels = DeliveryOption.entries.associateWith { stringResource(it.label) }
+    val deliveryMethodLabels = DeliveryMethod.entries.associateWith { stringResource(it.label) }
 
     SettingsScreen {
         Spacer(Modifier.height(MaterialTheme.spacing.small))
@@ -50,7 +53,7 @@ fun OrderSettingsScreen(
             options = DeliveryOption.entries,
             selectedOption = state.settings.order.defaultDeliveryOption,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateDefaultDeliveryOption(it)) },
-            optionLabel = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() } }
+            optionLabel = { deliveryOptionLabels[it] ?: "" }
         )
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
@@ -59,7 +62,7 @@ fun OrderSettingsScreen(
             options = DeliveryMethod.entries,
             selectedOption = state.settings.order.defaultDeliveryMethod,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateDefaultDeliveryMethod(it)) },
-            optionLabel = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() }.replace("_", " ") }
+            optionLabel = { deliveryMethodLabels[it] ?: "" }
         )
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
