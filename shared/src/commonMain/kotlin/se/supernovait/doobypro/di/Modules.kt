@@ -24,12 +24,15 @@ import se.supernovait.doobypro.data.repository.CompanyRepositoryImpl
 import se.supernovait.doobypro.data.repository.LicenseRepositoryImpl
 import se.supernovait.doobypro.data.repository.OrderRepositoryImpl
 import se.supernovait.doobypro.data.repository.ServiceRepositoryImpl
+import se.supernovait.doobypro.data.repository.SettingsRepositoryImpl
 import se.supernovait.doobypro.domain.repository.AccountRepository
 import se.supernovait.doobypro.domain.repository.AgreementRepository
 import se.supernovait.doobypro.domain.repository.CompanyRepository
 import se.supernovait.doobypro.domain.repository.LicenseRepository
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
+import se.supernovait.doobypro.domain.repository.SettingsRepository
+import se.supernovait.doobypro.presentation.settings.SettingsViewModel
 import se.supernovait.doobypro.presentation.welcome.WelcomeViewModel
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 
@@ -45,9 +48,11 @@ val sharedModule = module {
     singleOf(::AgreementRepositoryImpl).bind<AgreementRepository>()
     singleOf(::ServiceRepositoryImpl).bind<ServiceRepository>()
     singleOf(::OrderRepositoryImpl).bind<OrderRepository>()
+    singleOf(::SettingsRepositoryImpl).bind<SettingsRepository>()
 
     viewModelOf(::WelcomeViewModel)
     viewModelOf(::AccountSetupWizardViewModel)
+    viewModelOf(::SettingsViewModel)
 
     single<AppDatabase> {
         DatabaseFactory.create(get())

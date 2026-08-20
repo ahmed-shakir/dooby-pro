@@ -90,4 +90,45 @@
     <string name="screen_AppInfo_support_action_label">Send feedback</string>
     <string name="screen_AppInfo_copyright">© 2026 Supernova Technology AB</string>
     <string name="screen_AppInfo_check_updates_label">Check for updates</string>
+
+    <!-- Settings Screen -->
+    <string name="screen_Settings_common_label">Common</string>
+    <string name="screen_Settings_common_description">Currency, date format, language and theme</string>
+    <string name="screen_Settings_order_label">Order</string>
+    <string name="screen_Settings_order_description">Defaults and behavior</string>
+    <string name="screen_Settings_receipt_label">Receipt</string>
+    <string name="screen_Settings_receipt_description">Content, style, formatting</string>
+    <string name="screen_Settings_printer_label">Printer</string>
+    <string name="screen_Settings_printer_description">Connection and setup</string>
+    <string name="screen_Settings_notifications_label">Notifications</string>
+    <string name="screen_Settings_notifications_description">Choose what alerts to receive</string>
+
+    <string name="screen_Settings_currency_label">Currency</string>
+    <string name="screen_Settings_date_format_label">Date Format</string>
+    <string name="screen_Settings_language_label">Language</string>
+    <string name="screen_Settings_theme_label">Theme</string>
+    <string name="screen_Settings_order_default_service_label">Default Service</string>
+    <string name="screen_Settings_order_delivery_option_label">Default Delivery Option</string>
+    <string name="screen_Settings_order_delivery_method_label">Default Delivery Method</string>
+    <string name="screen_Settings_order_handling_time_label">Default Handling Time (days)</string>
+    <string name="screen_Settings_order_behavior_label">Order Behavior</string>
+    <string name="screen_Settings_auto_print_receipts_label">Auto-print receipts</string>
+    <string name="screen_Settings_include_on_receipt_label">Include on receipt</string>
+    <string name="screen_Settings_paper_width_label">Paper width</string>
+    <string name="screen_Settings_printer_connection_status_connected">Connected</string>
+    <string name="screen_Settings_printer_connection_method_label">Connection method</string>
+    <string name="screen_Settings_printer_disconnect_action">Disconnect printer</string>
+    <string name="screen_Settings_printer_search_action">Search for printers</string>
+    <string name="screen_Settings_order_notifications_label">Order notifications</string>
+    <string name="screen_Settings_order_notifications_new_orders">New orders</string>
+    <string name="screen_Settings_order_notifications_ready">Order ready for pickup</string>
+    <string name="screen_Settings_order_notifications_delivery">Delivery updates</string>
+    <string name="screen_Settings_system_notifications_label">System notifications</string>
+    <string name="screen_Settings_system_notifications_printer_error">Printer errors</string>
+    <string name="screen_Settings_system_notifications_payment_failure">Payment failures</string>
+
+    <string name="screen_Settings_receipt_include_customer_name">Customer name</string>
+    <string name="screen_Settings_receipt_include_order_time">Order time</string>
+    <string name="screen_Settings_receipt_include_payment_method">Payment method</string>
+    <string name="screen_Settings_receipt_include_store_location">Store location</string>
 </resources>

@@ -43,6 +43,31 @@ sealed interface Route : NavigationRoute {
     }
 
     @Serializable
+    data object SettingsCommon : Route {
+        override val isTopLevel = false
+    }
+
+    @Serializable
+    data object SettingsOrder : Route {
+        override val isTopLevel = false
+    }
+
+    @Serializable
+    data object SettingsReceipt : Route {
+        override val isTopLevel = false
+    }
+
+    @Serializable
+    data object SettingsPrinter : Route {
+        override val isTopLevel = false
+    }
+
+    @Serializable
+    data object SettingsNotifications : Route {
+        override val isTopLevel = false
+    }
+
+    @Serializable
     data object Dashboard : Route {
         override val label = Res.string.navigation_item_dashboard_label
     }
@@ -88,6 +113,7 @@ sealed interface Route : NavigationRoute {
     companion object {
         private val routes = listOf(
             Welcome, AccountSetup, AppInfo, Support, Settings,
+            SettingsCommon, SettingsOrder, SettingsReceipt, SettingsPrinter, SettingsNotifications,
             Dashboard, Orders, OrderDetails(""), Services, ServiceDetails(""),
             Account, UserProfile, CompanyProfile, License, EquipmentLeaseAgreement
         ).associateBy { it.name }

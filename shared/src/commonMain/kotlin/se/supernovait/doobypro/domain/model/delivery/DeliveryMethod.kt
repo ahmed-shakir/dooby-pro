@@ -12,5 +12,5 @@ enum class DeliveryMethod {
     /**
      * The customer picks up the order from a designated location.
      */
-    PICKUP
+    IN_STORE_PICKUP
 }

@@ -20,7 +20,7 @@ class OrderEntityTest {
             customerId = SupernovaIdGenerator.generateId(IdType.USER.prefix),
             serviceId = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix),
             deliveryOption = DeliveryOption.STANDARD,
-            deliveryMethod = DeliveryMethod.PICKUP,
+            deliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
             orderDate = now,
             deliveryDate = now,
             notes = ""

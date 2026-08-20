@@ -1,28 +1,68 @@
 package se.supernovait.doobypro.presentation.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import se.supernovait.app.core.ui.component.text.SupernovaTitle
-import se.supernovait.app.core.ui.theme.spacing
+import org.koin.compose.viewmodel.koinViewModel
+import se.supernovait.doobypro.presentation.settings.SettingsViewModel
+import se.supernovait.doobypro.presentation.settings.event.SettingsNavigationEvent
+import se.supernovait.doobypro.presentation.settings.screen.CommonSettingsScreen
+import se.supernovait.doobypro.presentation.settings.screen.NotificationSettingsScreen
+import se.supernovait.doobypro.presentation.settings.screen.OrderSettingsScreen
+import se.supernovait.doobypro.presentation.settings.screen.PrinterSettingsScreen
+import se.supernovait.doobypro.presentation.settings.screen.ReceiptSettingsScreen
+import se.supernovait.doobypro.presentation.settings.screen.SettingsMenuScreen
 
 fun NavGraphBuilder.settingsGraph(
     navController: NavHostController
 ) {
+    // TODO: Update Notification settings to actual types that will be handled by Dooby Pro
+    // TODO: Update Receipt settings with more choices for what information to add to the receipt
+    // TODO: Update Printer settings let user search and connect to a printer
+
     composable<Route.Settings> {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.mediumLarge)
-        ) {
-            SupernovaTitle(text = "Settings")
-        }
+        SettingsMenuScreen(
+            onNavigation = { event ->
+                when (event) {
+                    SettingsNavigationEvent.NavigateToCommon -> navController.navigate(Route.SettingsCommon)
+                    SettingsNavigationEvent.NavigateToOrder -> navController.navigate(Route.SettingsOrder)
+                    SettingsNavigationEvent.NavigateToReceipt -> navController.navigate(Route.SettingsReceipt)
+                    SettingsNavigationEvent.NavigateToPrinter -> navController.navigate(Route.SettingsPrinter)
+                    SettingsNavigationEvent.NavigateToNotifications -> navController.navigate(Route.SettingsNotifications)
+                }
+            }
+        )
+    }
+
+    composable<Route.SettingsCommon> {
+        val viewModel = koinViewModel<SettingsViewModel>()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        CommonSettingsScreen(state, viewModel::onEvent)
+    }
+
+    composable<Route.SettingsOrder> {
+        val viewModel = koinViewModel<SettingsViewModel>()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        OrderSettingsScreen(state, viewModel::onEvent)
+    }
+
+    composable<Route.SettingsReceipt> {
+        val viewModel = koinViewModel<SettingsViewModel>()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        ReceiptSettingsScreen(state, viewModel::onEvent)
+    }
+
+    composable<Route.SettingsPrinter> {
+        val viewModel = koinViewModel<SettingsViewModel>()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        PrinterSettingsScreen(state, viewModel::onEvent)
+    }
+
+    composable<Route.SettingsNotifications> {
+        val viewModel = koinViewModel<SettingsViewModel>()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        NotificationSettingsScreen(state, viewModel::onEvent)
     }
 }
