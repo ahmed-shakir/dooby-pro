@@ -1,5 +1,6 @@
 package se.supernovait.doobypro.presentation.app
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -12,6 +13,8 @@ import se.supernovait.app.core.domain.initialization.AppInitializer
 import se.supernovait.app.core.domain.initialization.RecoveryOption
 import se.supernovait.app.core.ui.component.error.SupernovaErrorEvent
 import se.supernovait.app.core.ui.component.error.SupernovaErrorScreen
+import se.supernovait.doobypro.domain.model.settings.common.ThemeMode
+import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.presentation.app.theme.DoobyTheme
 
 /**
@@ -26,8 +29,17 @@ import se.supernovait.doobypro.presentation.app.theme.DoobyTheme
  */
 @Composable
 fun App() {
-    DoobyTheme {
-        val appInitializer: AppInitializer = koinInject()
+    val settingsRepository = koinInject<SettingsRepository>()
+    val settings by settingsRepository.settings.collectAsState(initial = null)
+
+    val darkTheme = when (settings?.common?.themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM, null -> isSystemInDarkTheme()
+    }
+
+    DoobyTheme(darkTheme = darkTheme) {
+        val appInitializer = koinInject<AppInitializer>()
         val initState by appInitializer.appInitState.collectAsState()
 
         when (initState) {
