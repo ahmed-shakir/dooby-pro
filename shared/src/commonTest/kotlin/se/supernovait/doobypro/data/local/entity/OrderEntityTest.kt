@@ -23,6 +23,7 @@ class OrderEntityTest {
             deliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
             orderDate = now,
             deliveryDate = now,
+            isPaymentDone = true,
             notes = ""
         )
 

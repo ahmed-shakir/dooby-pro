@@ -48,6 +48,7 @@ class OrderMapperTest {
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
         orderDate = testDateTime,
         deliveryDate = testDateTime,
+        isPaymentDone = true,
         notes = "Handle with care"
     )
 
@@ -59,6 +60,7 @@ class OrderMapperTest {
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
         orderDate = testDateTime,
         deliveryDate = testDateTime,
+        isPaymentDone = true,
         notes = "Handle with care"
     )
 

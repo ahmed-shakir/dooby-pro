@@ -28,12 +28,23 @@ sealed interface SettingsScreenEvent {
     data class UpdateAutoPrintReceipts(val enabled: Boolean) : SettingsScreenEvent
     
     // Receipt
+    data class UpdateIncludeCompanyLogo(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeCompanyName(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeCompanyAddress(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeCompanyPhone(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeCompanyEmail(val include: Boolean) : SettingsScreenEvent
     data class UpdateIncludeCustomerName(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeOrderNumber(val include: Boolean) : SettingsScreenEvent
     data class UpdateIncludeOrderTime(val include: Boolean) : SettingsScreenEvent
-    data class UpdateIncludePaymentMethod(val include: Boolean) : SettingsScreenEvent
-    data class UpdateIncludeStoreLocation(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeOrderItems(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeOrderTotal(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeOrderNotes(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeDeliveryDate(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeDeliveryOption(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeDeliveryMethod(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeTermsAndConditions(val include: Boolean) : SettingsScreenEvent
     data class UpdatePaperWidth(val width: PaperWidth) : SettingsScreenEvent
-    
+
     // Printer
     data class UpdatePrinterConnectionMethod(val method: ConnectionMethod) : SettingsScreenEvent
     data object DisconnectPrinter : SettingsScreenEvent

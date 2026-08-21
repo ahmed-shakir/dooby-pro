@@ -157,8 +157,29 @@
     <string name="screen_Settings_system_notifications_printer_error">Printer errors</string>
     <string name="screen_Settings_system_notifications_payment_failure">Payment failures</string>
 
+    <string name="screen_Settings_receipt_company_details_label">Company details</string>
+    <string name="screen_Settings_receipt_customer_details_label">Customer details</string>
+    <string name="screen_Settings_receipt_order_details_label">Order details</string>
+    <string name="screen_Settings_receipt_delivery_details_label">Delivery details</string>
+    <string name="screen_Settings_receipt_footer_details_label">Footer details</string>
+
+    <string name="screen_Settings_receipt_include_company_logo">Company logo</string>
+    <string name="screen_Settings_receipt_include_company_name">Company name</string>
+    <string name="screen_Settings_receipt_include_company_address">Company address</string>
+    <string name="screen_Settings_receipt_include_company_phone">Company phone</string>
+    <string name="screen_Settings_receipt_include_company_email">Company email</string>
+
     <string name="screen_Settings_receipt_include_customer_name">Customer name</string>
+
+    <string name="screen_Settings_receipt_include_order_number">Order number</string>
     <string name="screen_Settings_receipt_include_order_time">Order time</string>
-    <string name="screen_Settings_receipt_include_payment_method">Payment method</string>
-    <string name="screen_Settings_receipt_include_store_location">Store location</string>
+    <string name="screen_Settings_receipt_include_order_items">Order items</string>
+    <string name="screen_Settings_receipt_include_order_total">Order total</string>
+    <string name="screen_Settings_receipt_include_order_notes">Order notes</string>
+
+    <string name="screen_Settings_receipt_include_delivery_date">Delivery date</string>
+    <string name="screen_Settings_receipt_include_delivery_option">Delivery option</string>
+    <string name="screen_Settings_receipt_include_delivery_method">Delivery method</string>
+
+    <string name="screen_Settings_receipt_include_terms_and_conditions">Terms and conditions</string>
 </resources>

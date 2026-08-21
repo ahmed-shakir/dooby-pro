@@ -51,24 +51,40 @@ class SettingsViewModel(
     fun onEvent(event: SettingsScreenEvent) {
         when (event) {
             SettingsScreenEvent.ResetSettings -> resetSettings()
+            // Common settings
             is SettingsScreenEvent.UpdateCurrency -> updateSettings { it.copy(common = it.common.copy(currency = event.currency)) }
             is SettingsScreenEvent.UpdateDateFormat -> updateSettings { it.copy(common = it.common.copy(dateFormat = event.dateFormat)) }
             is SettingsScreenEvent.UpdateLanguage -> updateSettings { it.copy(common = it.common.copy(language = event.language)) }
             is SettingsScreenEvent.UpdateThemeMode -> updateSettings { it.copy(common = it.common.copy(themeMode = event.themeMode)) }
+            // Order settings
             is SettingsScreenEvent.UpdateDefaultServiceId -> updateSettings { it.copy(order = it.order.copy(defaultServiceId = event.serviceId)) }
             is SettingsScreenEvent.UpdateDefaultDeliveryOption -> updateSettings { it.copy(order = it.order.copy(defaultDeliveryOption = event.option)) }
             is SettingsScreenEvent.UpdateDefaultDeliveryMethod -> updateSettings { it.copy(order = it.order.copy(defaultDeliveryMethod = event.method)) }
             is SettingsScreenEvent.UpdateDefaultHandlingTimeDays -> updateSettings { it.copy(order = it.order.copy(defaultHandlingTimeDays = event.days)) }
             is SettingsScreenEvent.UpdateAutoPrintReceipts -> updateSettings { it.copy(order = it.order.copy(autoPrintReceipts = event.enabled)) }
+            // Receipt settings
+            is SettingsScreenEvent.UpdateIncludeCompanyLogo -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyLogo = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeCompanyName -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyName = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeCompanyAddress -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyAddress = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeCompanyPhone -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyPhone = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeCompanyEmail -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyEmail = event.include)) }
             is SettingsScreenEvent.UpdateIncludeCustomerName -> updateSettings { it.copy(receipt = it.receipt.copy(includeCustomerName = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeOrderNumber -> updateSettings { it.copy(receipt = it.receipt.copy(includeOrderNumber = event.include)) }
             is SettingsScreenEvent.UpdateIncludeOrderTime -> updateSettings { it.copy(receipt = it.receipt.copy(includeOrderTime = event.include)) }
-            is SettingsScreenEvent.UpdateIncludePaymentMethod -> updateSettings { it.copy(receipt = it.receipt.copy(includePaymentMethod = event.include)) }
-            is SettingsScreenEvent.UpdateIncludeStoreLocation -> updateSettings { it.copy(receipt = it.receipt.copy(includeStoreLocation = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeOrderItems -> updateSettings { it.copy(receipt = it.receipt.copy(includeOrderItems = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeOrderTotal -> updateSettings { it.copy(receipt = it.receipt.copy(includeOrderTotal = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeOrderNotes -> updateSettings { it.copy(receipt = it.receipt.copy(includeOrderNotes = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeDeliveryDate -> updateSettings { it.copy(receipt = it.receipt.copy(includeDeliveryDate = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeDeliveryOption -> updateSettings { it.copy(receipt = it.receipt.copy(includeDeliveryOption = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeDeliveryMethod -> updateSettings { it.copy(receipt = it.receipt.copy(includeDeliveryMethod = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeTermsAndConditions -> updateSettings { it.copy(receipt = it.receipt.copy(includeTermsAndConditions = event.include)) }
             is SettingsScreenEvent.UpdatePaperWidth -> updateSettings { it.copy(receipt = it.receipt.copy(paperWidth = event.width)) }
+            // Printer settings
             is SettingsScreenEvent.UpdatePrinterConnectionMethod -> updateSettings { it.copy(printer = it.printer.copy(connectionMethod = event.method)) }
             is SettingsScreenEvent.DisconnectPrinter -> updateSettings { it.copy(printer = it.printer.copy(printerAddress = null, printerName = null)) }
             is SettingsScreenEvent.SearchPrinters -> searchPrinters()
             is SettingsScreenEvent.ConnectPrinter -> updateSettings { it.copy(printer = it.printer.copy(printerAddress = event.address, printerName = event.name)) }
+            // Notification settings
             is SettingsScreenEvent.UpdateNewOrdersNotification -> updateSettings { it.copy(notifications = it.notifications.copy(newOrders = event.enabled)) }
             is SettingsScreenEvent.UpdateOrderReadyNotification -> updateSettings { it.copy(notifications = it.notifications.copy(orderReady = event.enabled)) }
             is SettingsScreenEvent.UpdateDeliveryUpdatesNotification -> updateSettings { it.copy(notifications = it.notifications.copy(deliveryUpdates = event.enabled)) }

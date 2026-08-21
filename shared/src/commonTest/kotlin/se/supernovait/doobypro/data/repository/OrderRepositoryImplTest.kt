@@ -86,6 +86,7 @@ class OrderRepositoryImplTest {
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
         orderDate = testDateTime,
         deliveryDate = testDateTime,
+        isPaymentDone = true,
         notes = "Test note"
     )
 

@@ -19,7 +19,6 @@ fun NavGraphBuilder.settingsGraph(
     navController: NavHostController
 ) {
     // TODO: Update Notification settings to actual types that will be handled by Dooby Pro
-    // TODO: Update Receipt settings with more choices for what information to add to the receipt
 
     composable<Route.Settings> {
         SettingsMenuScreen(

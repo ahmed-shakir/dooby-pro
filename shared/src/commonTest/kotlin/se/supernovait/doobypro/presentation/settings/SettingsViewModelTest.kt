@@ -96,4 +96,29 @@ class SettingsViewModelTest {
         val state = viewModel.uiState.filter { it.settings.printer.printerAddress == null }.first()
         assertNull(state.settings.printer.printerAddress)
     }
+
+    @Test
+    fun `onEvent ResetSettings should reset state`() = runTest {
+        viewModel.onEvent(SettingsScreenEvent.UpdateCurrency(Currency.AED))
+        viewModel.onEvent(SettingsScreenEvent.ResetSettings)
+        
+        val state = viewModel.uiState.filter { it.settings.common.currency == Currency.AED }.first()
+        assertEquals(Settings(), state.settings)
+    }
+
+    @Test
+    fun `onEvent UpdateIncludeCompanyLogo should update state`() = runTest {
+        viewModel.onEvent(SettingsScreenEvent.UpdateIncludeCompanyLogo(false))
+        
+        val state = viewModel.uiState.filter { !it.settings.receipt.includeCompanyLogo }.first()
+        assertEquals(false, state.settings.receipt.includeCompanyLogo)
+    }
+
+    @Test
+    fun `onEvent UpdateIncludeOrderItems should update state`() = runTest {
+        viewModel.onEvent(SettingsScreenEvent.UpdateIncludeOrderItems(false))
+        
+        val state = viewModel.uiState.filter { !it.settings.receipt.includeOrderItems }.first()
+        assertEquals(false, state.settings.receipt.includeOrderItems)
+    }
 }
