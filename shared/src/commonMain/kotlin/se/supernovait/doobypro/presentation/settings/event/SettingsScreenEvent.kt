@@ -53,8 +53,9 @@ sealed interface SettingsScreenEvent {
     
     // Notifications
     data class UpdateNewOrdersNotification(val enabled: Boolean) : SettingsScreenEvent
-    data class UpdateOrderReadyNotification(val enabled: Boolean) : SettingsScreenEvent
-    data class UpdateDeliveryUpdatesNotification(val enabled: Boolean) : SettingsScreenEvent
+    data class UpdateReadyOrdersNotification(val enabled: Boolean) : SettingsScreenEvent
+    data class UpdateLateOrdersNotification(val enabled: Boolean) : SettingsScreenEvent
+    data class UpdateOrderNotPickedUpNotification(val enabled: Boolean) : SettingsScreenEvent
+    data class UpdateOrderNotDeliveredNotification(val enabled: Boolean) : SettingsScreenEvent
     data class UpdatePrinterErrorsNotification(val enabled: Boolean) : SettingsScreenEvent
-    data class UpdatePaymentFailuresNotification(val enabled: Boolean) : SettingsScreenEvent
 }

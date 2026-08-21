@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.screen_Settings_auto_print_receipts_label
+import doobypro.shared.generated.resources.screen_Settings_order_auto_print_receipts_label
 import doobypro.shared.generated.resources.screen_Settings_order_behavior_label
 import doobypro.shared.generated.resources.screen_Settings_order_default_service_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_method_label
@@ -86,7 +86,7 @@ fun OrderSettingsScreen(
         )
 
         SupernovaToggle(
-            label = Res.string.screen_Settings_auto_print_receipts_label,
+            label = Res.string.screen_Settings_order_auto_print_receipts_label,
             checked = state.settings.order.autoPrintReceipts,
             onCheckedChange = { onEvent(SettingsScreenEvent.UpdateAutoPrintReceipts(it)) }
         )

@@ -121,4 +121,12 @@ class SettingsViewModelTest {
         val state = viewModel.uiState.filter { !it.settings.receipt.includeOrderItems }.first()
         assertEquals(false, state.settings.receipt.includeOrderItems)
     }
+
+    @Test
+    fun `onEvent UpdateLateOrdersNotification should update state`() = runTest {
+        viewModel.onEvent(SettingsScreenEvent.UpdateLateOrdersNotification(false))
+        
+        val state = viewModel.uiState.filter { !it.settings.notifications.lateOrders }.first()
+        assertEquals(false, state.settings.notifications.lateOrders)
+    }
 }

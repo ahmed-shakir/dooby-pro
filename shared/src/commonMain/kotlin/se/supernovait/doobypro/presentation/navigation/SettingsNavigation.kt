@@ -18,8 +18,6 @@ import se.supernovait.doobypro.presentation.settings.screen.SettingsMenuScreen
 fun NavGraphBuilder.settingsGraph(
     navController: NavHostController
 ) {
-    // TODO: Update Notification settings to actual types that will be handled by Dooby Pro
-
     composable<Route.Settings> {
         SettingsMenuScreen(
             onNavigation = { event ->

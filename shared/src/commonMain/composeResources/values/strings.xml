@@ -133,29 +133,47 @@
     <string name="screen_Settings_notifications_label">Notifications</string>
     <string name="screen_Settings_notifications_description">Choose what alerts to receive</string>
 
-    <string name="screen_Settings_currency_label">Currency</string>
-    <string name="screen_Settings_date_format_label">Date Format</string>
-    <string name="screen_Settings_language_label">Language</string>
-    <string name="screen_Settings_theme_label">Theme</string>
+    <!-- Common settings -->
+    <string name="screen_Settings_common_currency_label">Currency</string>
+    <string name="screen_Settings_common_date_format_label">Date Format</string>
+    <string name="screen_Settings_common_language_label">Language</string>
+    <string name="screen_Settings_common_theme_label">Theme</string>
+
+    <!-- Order settings -->
     <string name="screen_Settings_order_default_service_label">Default Service</string>
     <string name="screen_Settings_order_delivery_option_label">Default Delivery Option</string>
     <string name="screen_Settings_order_delivery_method_label">Default Delivery Method</string>
     <string name="screen_Settings_order_handling_time_label">Default Handling Time (days)</string>
     <string name="screen_Settings_order_behavior_label">Order Behavior</string>
-    <string name="screen_Settings_auto_print_receipts_label">Auto-print receipts</string>
-    <string name="screen_Settings_include_on_receipt_label">Include on receipt</string>
-    <string name="screen_Settings_paper_width_label">Paper width</string>
+    <string name="screen_Settings_order_auto_print_receipts_label">Auto-print receipts</string>
+
+    <!-- Printer settings -->
     <string name="screen_Settings_printer_connection_status_connected">Connected</string>
     <string name="screen_Settings_printer_connection_method_label">Connection method</string>
     <string name="screen_Settings_printer_disconnect_action">Disconnect printer</string>
     <string name="screen_Settings_printer_search_action">Search for printers</string>
-    <string name="screen_Settings_order_notifications_label">Order notifications</string>
-    <string name="screen_Settings_order_notifications_new_orders">New orders</string>
-    <string name="screen_Settings_order_notifications_ready">Order ready for pickup</string>
-    <string name="screen_Settings_order_notifications_delivery">Delivery updates</string>
-    <string name="screen_Settings_system_notifications_label">System notifications</string>
-    <string name="screen_Settings_system_notifications_printer_error">Printer errors</string>
-    <string name="screen_Settings_system_notifications_payment_failure">Payment failures</string>
+
+    <!-- Notification settings -->
+    <string name="screen_Settings_notifications_order_label">Order notifications</string>
+    <string name="screen_Settings_notifications_order_new">New orders</string>
+    <string name="screen_Settings_notifications_order_ready">Ready orders</string>
+    <string name="screen_Settings_notifications_order_late">Late orders</string>
+    <string name="screen_Settings_notifications_order_not_picked_up">Orders not picked up</string>
+    <string name="screen_Settings_notifications_order_not_delivered">Orders not delivered</string>
+    <string name="screen_Settings_notifications_system_label">System notifications</string>
+    <string name="screen_Settings_notifications_system_printer_error">Printer errors</string>
+
+    <!-- Order Status -->
+    <string name="order_status_new">New</string>
+    <string name="order_status_in_progress">In Progress</string>
+    <string name="order_status_ready">Ready</string>
+    <string name="order_status_out_for_delivery">Out for Delivery</string>
+    <string name="order_status_picked_up">Picked Up</string>
+    <string name="order_status_delivered">Delivered</string>
+    <string name="order_status_cancelled">Cancelled</string>
+
+    <!-- Receipt settings -->
+    <string name="screen_Settings_receipt_paper_width_label">Paper width</string>
 
     <string name="screen_Settings_receipt_company_details_label">Company details</string>
     <string name="screen_Settings_receipt_customer_details_label">Customer details</string>

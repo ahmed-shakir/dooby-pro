@@ -7,10 +7,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.screen_Settings_currency_label
-import doobypro.shared.generated.resources.screen_Settings_date_format_label
-import doobypro.shared.generated.resources.screen_Settings_language_label
-import doobypro.shared.generated.resources.screen_Settings_theme_label
+import doobypro.shared.generated.resources.screen_Settings_common_currency_label
+import doobypro.shared.generated.resources.screen_Settings_common_date_format_label
+import doobypro.shared.generated.resources.screen_Settings_common_language_label
+import doobypro.shared.generated.resources.screen_Settings_common_theme_label
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.input.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectionGroup
@@ -35,7 +35,7 @@ fun CommonSettingsScreen(
         Spacer(Modifier.height(MaterialTheme.spacing.small))
 
         SupernovaSelectField(
-            label = Res.string.screen_Settings_currency_label,
+            label = Res.string.screen_Settings_common_currency_label,
             options = Currency.entries,
             selectedOption = uiState.settings.common.currency,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateCurrency(it)) },
@@ -44,7 +44,7 @@ fun CommonSettingsScreen(
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
         SupernovaSelectField(
-            label = Res.string.screen_Settings_date_format_label,
+            label = Res.string.screen_Settings_common_date_format_label,
             options = DateFormat.entries,
             selectedOption = uiState.settings.common.dateFormat,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateDateFormat(it)) },
@@ -53,7 +53,7 @@ fun CommonSettingsScreen(
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
         SupernovaSelectField(
-            label = Res.string.screen_Settings_language_label,
+            label = Res.string.screen_Settings_common_language_label,
             options = Language.entries,
             selectedOption = uiState.settings.common.language,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateLanguage(it)) },
@@ -62,7 +62,7 @@ fun CommonSettingsScreen(
         )
 
         SupernovaLabel(
-            text = Res.string.screen_Settings_theme_label,
+            text = Res.string.screen_Settings_common_theme_label,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(top = MaterialTheme.spacing.large, bottom = MaterialTheme.spacing.small)

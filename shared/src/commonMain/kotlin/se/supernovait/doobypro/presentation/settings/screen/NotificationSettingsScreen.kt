@@ -5,13 +5,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.screen_Settings_order_notifications_delivery
-import doobypro.shared.generated.resources.screen_Settings_order_notifications_label
-import doobypro.shared.generated.resources.screen_Settings_order_notifications_new_orders
-import doobypro.shared.generated.resources.screen_Settings_order_notifications_ready
-import doobypro.shared.generated.resources.screen_Settings_system_notifications_label
-import doobypro.shared.generated.resources.screen_Settings_system_notifications_payment_failure
-import doobypro.shared.generated.resources.screen_Settings_system_notifications_printer_error
+import doobypro.shared.generated.resources.screen_Settings_notifications_order_label
+import doobypro.shared.generated.resources.screen_Settings_notifications_order_late
+import doobypro.shared.generated.resources.screen_Settings_notifications_order_new
+import doobypro.shared.generated.resources.screen_Settings_notifications_order_not_delivered
+import doobypro.shared.generated.resources.screen_Settings_notifications_order_not_picked_up
+import doobypro.shared.generated.resources.screen_Settings_notifications_order_ready
+import doobypro.shared.generated.resources.screen_Settings_notifications_system_label
+import doobypro.shared.generated.resources.screen_Settings_notifications_system_printer_error
 import se.supernovait.app.core.ui.component.container.SupernovaListGroup
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
@@ -26,7 +27,7 @@ fun NotificationSettingsScreen(
 ) {
     SettingsScreen {
         SupernovaLabel(
-            text = Res.string.screen_Settings_order_notifications_label,
+            text = Res.string.screen_Settings_notifications_order_label,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(top = MaterialTheme.spacing.small, bottom = MaterialTheme.spacing.small)
@@ -34,29 +35,43 @@ fun NotificationSettingsScreen(
         SupernovaListGroup {
             item {
                 SupernovaToggle(
-                    label = Res.string.screen_Settings_order_notifications_new_orders,
+                    label = Res.string.screen_Settings_notifications_order_new,
                     checked = state.settings.notifications.newOrders,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateNewOrdersNotification(it)) }
                 )
             }
             item {
                 SupernovaToggle(
-                    label = Res.string.screen_Settings_order_notifications_ready,
-                    checked = state.settings.notifications.orderReady,
-                    onCheckedChange = { onEvent(SettingsScreenEvent.UpdateOrderReadyNotification(it)) }
+                    label = Res.string.screen_Settings_notifications_order_ready,
+                    checked = state.settings.notifications.readyOrders,
+                    onCheckedChange = { onEvent(SettingsScreenEvent.UpdateReadyOrdersNotification(it)) }
                 )
             }
             item {
                 SupernovaToggle(
-                    label = Res.string.screen_Settings_order_notifications_delivery,
-                    checked = state.settings.notifications.deliveryUpdates,
-                    onCheckedChange = { onEvent(SettingsScreenEvent.UpdateDeliveryUpdatesNotification(it)) }
+                    label = Res.string.screen_Settings_notifications_order_late,
+                    checked = state.settings.notifications.lateOrders,
+                    onCheckedChange = { onEvent(SettingsScreenEvent.UpdateLateOrdersNotification(it)) }
+                )
+            }
+            item {
+                SupernovaToggle(
+                    label = Res.string.screen_Settings_notifications_order_not_picked_up,
+                    checked = state.settings.notifications.orderNotPickedUp,
+                    onCheckedChange = { onEvent(SettingsScreenEvent.UpdateOrderNotPickedUpNotification(it)) }
+                )
+            }
+            item {
+                SupernovaToggle(
+                    label = Res.string.screen_Settings_notifications_order_not_delivered,
+                    checked = state.settings.notifications.orderNotDelivered,
+                    onCheckedChange = { onEvent(SettingsScreenEvent.UpdateOrderNotDeliveredNotification(it)) }
                 )
             }
         }
 
         SupernovaLabel(
-            text = Res.string.screen_Settings_system_notifications_label,
+            text = Res.string.screen_Settings_notifications_system_label,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(top = MaterialTheme.spacing.large, bottom = MaterialTheme.spacing.small)
@@ -64,16 +79,9 @@ fun NotificationSettingsScreen(
         SupernovaListGroup {
             item {
                 SupernovaToggle(
-                    label = Res.string.screen_Settings_system_notifications_printer_error,
+                    label = Res.string.screen_Settings_notifications_system_printer_error,
                     checked = state.settings.notifications.printerErrors,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdatePrinterErrorsNotification(it)) }
-                )
-            }
-            item {
-                SupernovaToggle(
-                    label = Res.string.screen_Settings_system_notifications_payment_failure,
-                    checked = state.settings.notifications.paymentFailures,
-                    onCheckedChange = { onEvent(SettingsScreenEvent.UpdatePaymentFailuresNotification(it)) }
                 )
             }
         }

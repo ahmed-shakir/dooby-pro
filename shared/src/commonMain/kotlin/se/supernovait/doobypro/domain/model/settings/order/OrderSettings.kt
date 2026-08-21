@@ -9,6 +9,6 @@ data class OrderSettings(
     val defaultServiceId: String? = null,
     val defaultDeliveryOption: DeliveryOption = DeliveryOption.STANDARD,
     val defaultDeliveryMethod: DeliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
-    val defaultHandlingTimeDays: Int = 1,
+    val defaultHandlingTimeDays: Int = 2,
     val autoPrintReceipts: Boolean = true
 )

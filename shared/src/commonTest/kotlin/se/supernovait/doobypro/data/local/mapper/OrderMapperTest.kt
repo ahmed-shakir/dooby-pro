@@ -7,10 +7,11 @@ import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.entity.OrderEntity
 import se.supernovait.doobypro.domain.model.IdType
-import se.supernovait.doobypro.domain.model.Order
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.order.OrderStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -44,10 +45,11 @@ class OrderMapperTest {
         id = orderId,
         customerId = userId,
         serviceId = serviceId,
+        status = OrderStatus.NEW,
+        orderDatetime = testDateTime,
+        deliveryDatetime = testDateTime,
         deliveryOption = DeliveryOption.EXPRESS,
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
-        orderDate = testDateTime,
-        deliveryDate = testDateTime,
         isPaymentDone = true,
         notes = "Handle with care"
     )
@@ -56,10 +58,11 @@ class OrderMapperTest {
         id = orderId,
         customer = testUser,
         service = testService,
+        status = OrderStatus.NEW,
+        orderDatetime = testDateTime,
+        deliveryDatetime = testDateTime,
         deliveryOption = DeliveryOption.EXPRESS,
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
-        orderDate = testDateTime,
-        deliveryDate = testDateTime,
         isPaymentDone = true,
         notes = "Handle with care"
     )
@@ -71,11 +74,20 @@ class OrderMapperTest {
         assertEquals(testOrder.id, result.id)
         assertEquals(testOrder.customer.id, result.customer.id)
         assertEquals(testOrder.service.id, result.service.id)
+        assertEquals(testOrder.status, result.status)
+        assertEquals(testOrder.orderDatetime, result.orderDatetime)
+        assertEquals(testOrder.deliveryDatetime, result.deliveryDatetime)
         assertEquals(testOrder.deliveryOption, result.deliveryOption)
         assertEquals(testOrder.deliveryMethod, result.deliveryMethod)
-        assertEquals(testOrder.orderDate, result.orderDate)
-        assertEquals(testOrder.deliveryDate, result.deliveryDate)
+        assertEquals(testOrder.isPaymentDone, result.isPaymentDone)
         assertEquals(testOrder.notes, result.notes)
+    }
+
+    @Test
+    fun `toDomain with OUT_FOR_DELIVERY status`() {
+        val entity = testOrderEntity.copy(status = OrderStatus.OUT_FOR_DELIVERY)
+        val result = entity.toDomain(testUser, testService)
+        assertEquals(OrderStatus.OUT_FOR_DELIVERY, result.status)
     }
 
     @Test
@@ -85,10 +97,12 @@ class OrderMapperTest {
         assertEquals(testOrderEntity.id, result.id)
         assertEquals(testOrderEntity.customerId, result.customerId)
         assertEquals(testOrderEntity.serviceId, result.serviceId)
+        assertEquals(testOrderEntity.status, result.status)
+        assertEquals(testOrderEntity.orderDatetime, result.orderDatetime)
+        assertEquals(testOrderEntity.deliveryDatetime, result.deliveryDatetime)
         assertEquals(testOrderEntity.deliveryOption, result.deliveryOption)
         assertEquals(testOrderEntity.deliveryMethod, result.deliveryMethod)
-        assertEquals(testOrderEntity.orderDate, result.orderDate)
-        assertEquals(testOrderEntity.deliveryDate, result.deliveryDate)
+        assertEquals(testOrderEntity.isPaymentDone, result.isPaymentDone)
         assertEquals(testOrderEntity.notes, result.notes)
     }
 }

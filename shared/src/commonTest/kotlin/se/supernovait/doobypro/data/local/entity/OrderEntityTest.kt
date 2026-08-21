@@ -5,6 +5,7 @@ import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.order.OrderStatus
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -19,10 +20,11 @@ class OrderEntityTest {
         val entity = OrderEntity(
             customerId = SupernovaIdGenerator.generateId(IdType.USER.prefix),
             serviceId = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix),
+            status = OrderStatus.NEW,
+            orderDatetime = now,
+            deliveryDatetime = now,
             deliveryOption = DeliveryOption.STANDARD,
             deliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
-            orderDate = now,
-            deliveryDate = now,
             isPaymentDone = true,
             notes = ""
         )

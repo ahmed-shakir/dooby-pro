@@ -16,10 +16,11 @@ import se.supernovait.doobypro.data.local.dao.FakeServiceDao
 import se.supernovait.doobypro.data.local.dao.FakeUserDao
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
 import se.supernovait.doobypro.domain.model.IdType
-import se.supernovait.doobypro.domain.model.Order
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.order.OrderStatus
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -82,10 +83,11 @@ class OrderRepositoryImplTest {
         id = orderId,
         customer = testUser,
         service = testService,
+        status = OrderStatus.NEW,
+        orderDatetime = testDateTime,
+        deliveryDatetime = testDateTime,
         deliveryOption = DeliveryOption.EXPRESS,
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
-        orderDate = testDateTime,
-        deliveryDate = testDateTime,
         isPaymentDone = true,
         notes = "Test note"
     )
@@ -120,6 +122,21 @@ class OrderRepositoryImplTest {
         assertEquals(testOrder.id, order.id)
         assertEquals(testUser.id, order.customer.id)
         assertEquals(testService.id, order.service.id)
+        assertEquals(OrderStatus.NEW, order.status)
+    }
+
+    @Test
+    fun `saveOrder with OUT_FOR_DELIVERY status`() = runTest(testDispatcher) {
+        val outForDeliveryOrder = testOrder.copy(
+            id = SupernovaIdGenerator.generateId(IdType.ORDER.prefix),
+            status = OrderStatus.OUT_FOR_DELIVERY
+        )
+        repository.saveOrder(outForDeliveryOrder)
+
+        val result = repository.getOrderById(outForDeliveryOrder.id!!).getOrNull()
+
+        assertNotNull(result)
+        assertEquals(OrderStatus.OUT_FOR_DELIVERY, result.status)
     }
 
     @Test

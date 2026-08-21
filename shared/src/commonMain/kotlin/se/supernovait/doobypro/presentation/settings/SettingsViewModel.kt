@@ -86,10 +86,11 @@ class SettingsViewModel(
             is SettingsScreenEvent.ConnectPrinter -> updateSettings { it.copy(printer = it.printer.copy(printerAddress = event.address, printerName = event.name)) }
             // Notification settings
             is SettingsScreenEvent.UpdateNewOrdersNotification -> updateSettings { it.copy(notifications = it.notifications.copy(newOrders = event.enabled)) }
-            is SettingsScreenEvent.UpdateOrderReadyNotification -> updateSettings { it.copy(notifications = it.notifications.copy(orderReady = event.enabled)) }
-            is SettingsScreenEvent.UpdateDeliveryUpdatesNotification -> updateSettings { it.copy(notifications = it.notifications.copy(deliveryUpdates = event.enabled)) }
+            is SettingsScreenEvent.UpdateReadyOrdersNotification -> updateSettings { it.copy(notifications = it.notifications.copy(readyOrders = event.enabled)) }
+            is SettingsScreenEvent.UpdateLateOrdersNotification -> updateSettings { it.copy(notifications = it.notifications.copy(lateOrders = event.enabled)) }
+            is SettingsScreenEvent.UpdateOrderNotPickedUpNotification -> updateSettings { it.copy(notifications = it.notifications.copy(orderNotPickedUp = event.enabled)) }
+            is SettingsScreenEvent.UpdateOrderNotDeliveredNotification -> updateSettings { it.copy(notifications = it.notifications.copy(orderNotDelivered = event.enabled)) }
             is SettingsScreenEvent.UpdatePrinterErrorsNotification -> updateSettings { it.copy(notifications = it.notifications.copy(printerErrors = event.enabled)) }
-            is SettingsScreenEvent.UpdatePaymentFailuresNotification -> updateSettings { it.copy(notifications = it.notifications.copy(paymentFailures = event.enabled)) }
         }
     }
 

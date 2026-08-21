@@ -7,7 +7,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.screen_Settings_paper_width_label
 import doobypro.shared.generated.resources.screen_Settings_receipt_company_details_label
 import doobypro.shared.generated.resources.screen_Settings_receipt_customer_details_label
 import doobypro.shared.generated.resources.screen_Settings_receipt_delivery_details_label
@@ -28,6 +27,7 @@ import doobypro.shared.generated.resources.screen_Settings_receipt_include_order
 import doobypro.shared.generated.resources.screen_Settings_receipt_include_order_total
 import doobypro.shared.generated.resources.screen_Settings_receipt_include_terms_and_conditions
 import doobypro.shared.generated.resources.screen_Settings_receipt_order_details_label
+import doobypro.shared.generated.resources.screen_Settings_receipt_paper_width_label
 import se.supernovait.app.core.ui.component.container.SupernovaListGroup
 import se.supernovait.app.core.ui.component.input.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
@@ -201,7 +201,7 @@ fun ReceiptSettingsScreen(
         Spacer(Modifier.height(MaterialTheme.spacing.large))
 
         SupernovaSelectField(
-            label = Res.string.screen_Settings_paper_width_label,
+            label = Res.string.screen_Settings_receipt_paper_width_label,
             options = PaperWidth.entries,
             selectedOption = state.settings.receipt.paperWidth,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdatePaperWidth(it)) },

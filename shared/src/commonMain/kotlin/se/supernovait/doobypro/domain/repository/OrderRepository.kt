@@ -3,7 +3,7 @@ package se.supernovait.doobypro.domain.repository
 import kotlinx.coroutines.flow.Flow
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
-import se.supernovait.doobypro.domain.model.Order
+import se.supernovait.doobypro.domain.model.order.Order
 
 /**
  * Repository for managing [Order] domain models.

@@ -18,8 +18,8 @@ import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
 import se.supernovait.doobypro.data.local.mapper.toDomain
 import se.supernovait.doobypro.data.local.mapper.toEntity
-import se.supernovait.doobypro.domain.model.Order
 import se.supernovait.doobypro.domain.model.Service
+import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import kotlin.coroutines.CoroutineContext
 

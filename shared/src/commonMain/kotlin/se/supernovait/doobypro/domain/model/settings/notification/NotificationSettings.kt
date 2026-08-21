@@ -4,9 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NotificationSettings(
-    val newOrders: Boolean = true,
-    val orderReady: Boolean = true,
-    val deliveryUpdates: Boolean = true,
-    val printerErrors: Boolean = true,
-    val paymentFailures: Boolean = true
+    val newOrders: Boolean = false,
+    val readyOrders: Boolean = false,
+    val lateOrders: Boolean = true,
+    val orderNotPickedUp: Boolean = true,
+    val orderNotDelivered: Boolean = true,
+    val printerErrors: Boolean = true
 )
