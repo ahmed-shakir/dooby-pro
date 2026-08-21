@@ -36,8 +36,9 @@ sealed interface SettingsScreenEvent {
     
     // Printer
     data class UpdatePrinterConnectionMethod(val method: ConnectionMethod) : SettingsScreenEvent
-    data class UpdatePrinterIp(val ip: String) : SettingsScreenEvent
-    data class UpdatePrinterName(val name: String) : SettingsScreenEvent
+    data object DisconnectPrinter : SettingsScreenEvent
+    data object SearchPrinters : SettingsScreenEvent
+    data class ConnectPrinter(val name: String, val address: String) : SettingsScreenEvent
     
     // Notifications
     data class UpdateNewOrdersNotification(val enabled: Boolean) : SettingsScreenEvent

@@ -20,7 +20,6 @@ fun NavGraphBuilder.settingsGraph(
 ) {
     // TODO: Update Notification settings to actual types that will be handled by Dooby Pro
     // TODO: Update Receipt settings with more choices for what information to add to the receipt
-    // TODO: Update Printer settings let user search and connect to a printer
 
     composable<Route.Settings> {
         SettingsMenuScreen(

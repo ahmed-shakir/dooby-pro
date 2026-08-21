@@ -1,6 +1,7 @@
 package se.supernovait.doobypro.presentation.settings.screen
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -11,7 +12,7 @@ import androidx.compose.ui.Modifier
 import se.supernovait.app.core.ui.theme.spacing
 
 @Composable
-fun SettingsScreen(content: @Composable () -> Unit) {
+fun SettingsScreen(content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()

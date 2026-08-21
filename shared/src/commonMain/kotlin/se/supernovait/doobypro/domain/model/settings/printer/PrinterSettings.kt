@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PrinterSettings(
     val connectionMethod: ConnectionMethod = ConnectionMethod.NETWORK,
-    val printerIp: String? = null,
+    val printerAddress: String? = null,
     val printerName: String? = null
 )

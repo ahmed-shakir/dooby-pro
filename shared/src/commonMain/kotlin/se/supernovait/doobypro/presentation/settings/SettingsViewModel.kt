@@ -8,7 +8,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.settings.Settings
+import se.supernovait.doobypro.domain.model.settings.printer.ConnectionMethod
+import se.supernovait.doobypro.domain.model.settings.printer.DiscoveredPrinter
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
@@ -18,19 +21,26 @@ class SettingsViewModel(
     private val serviceRepository: ServiceRepository
 ) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
+    private val _isSearchingPrinters = MutableStateFlow(false)
+    private val _discoveredPrinters = MutableStateFlow<List<DiscoveredPrinter>>(emptyList())
     private val _error = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<SettingsState> = combine(
         settingsRepository.settings,
         serviceRepository.getServices(),
+        _isSearchingPrinters,
+        _discoveredPrinters,
         _isLoading,
         _error
-    ) { settings, services, isLoading, error ->
+    ) { args: Array<Any?> ->
+        @Suppress("UNCHECKED_CAST")
         SettingsState(
-            settings = settings,
-            services = services,
-            isLoading = isLoading,
-            error = error
+            settings = args[0] as Settings,
+            services = args[1] as List<Service>,
+            isSearchingPrinters = args[2] as Boolean,
+            discoveredPrinters = args[3] as List<DiscoveredPrinter>,
+            isLoading = args[4] as Boolean,
+            error = args[5] as String?
         )
     }.stateIn(
         scope = viewModelScope,
@@ -56,13 +66,30 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateIncludeStoreLocation -> updateSettings { it.copy(receipt = it.receipt.copy(includeStoreLocation = event.include)) }
             is SettingsScreenEvent.UpdatePaperWidth -> updateSettings { it.copy(receipt = it.receipt.copy(paperWidth = event.width)) }
             is SettingsScreenEvent.UpdatePrinterConnectionMethod -> updateSettings { it.copy(printer = it.printer.copy(connectionMethod = event.method)) }
-            is SettingsScreenEvent.UpdatePrinterIp -> updateSettings { it.copy(printer = it.printer.copy(printerIp = event.ip)) }
-            is SettingsScreenEvent.UpdatePrinterName -> updateSettings { it.copy(printer = it.printer.copy(printerName = event.name)) }
+            is SettingsScreenEvent.DisconnectPrinter -> updateSettings { it.copy(printer = it.printer.copy(printerAddress = null, printerName = null)) }
+            is SettingsScreenEvent.SearchPrinters -> searchPrinters()
+            is SettingsScreenEvent.ConnectPrinter -> updateSettings { it.copy(printer = it.printer.copy(printerAddress = event.address, printerName = event.name)) }
             is SettingsScreenEvent.UpdateNewOrdersNotification -> updateSettings { it.copy(notifications = it.notifications.copy(newOrders = event.enabled)) }
             is SettingsScreenEvent.UpdateOrderReadyNotification -> updateSettings { it.copy(notifications = it.notifications.copy(orderReady = event.enabled)) }
             is SettingsScreenEvent.UpdateDeliveryUpdatesNotification -> updateSettings { it.copy(notifications = it.notifications.copy(deliveryUpdates = event.enabled)) }
             is SettingsScreenEvent.UpdatePrinterErrorsNotification -> updateSettings { it.copy(notifications = it.notifications.copy(printerErrors = event.enabled)) }
             is SettingsScreenEvent.UpdatePaymentFailuresNotification -> updateSettings { it.copy(notifications = it.notifications.copy(paymentFailures = event.enabled)) }
+        }
+    }
+
+    private fun searchPrinters() {
+        viewModelScope.launch {
+            val method = uiState.value.settings.printer.connectionMethod
+            _isSearchingPrinters.value = true
+            _discoveredPrinters.value = emptyList()
+
+            // TODO: call printer service to search and connect to printer
+            _discoveredPrinters.value = if (method == ConnectionMethod.BLUETOOTH) {
+                listOf()
+            } else {
+                listOf()
+            }
+            _isSearchingPrinters.value = false
         }
     }
 

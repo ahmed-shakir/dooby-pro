@@ -19,6 +19,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsViewModelTest {
@@ -77,11 +78,22 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `onEvent ResetSettings should reset state`() = runTest {
-        viewModel.onEvent(SettingsScreenEvent.UpdateCurrency(Currency.AED))
-        viewModel.onEvent(SettingsScreenEvent.ResetSettings)
+    fun `onEvent ConnectPrinter should update state`() = runTest {
+        val name = "Test Printer"
+        val address = "192.168.1.100"
+        viewModel.onEvent(SettingsScreenEvent.ConnectPrinter(name, address))
         
-        val state = viewModel.uiState.filter { it.settings.common.currency == Currency.AED }.first()
-        assertEquals(Settings(), state.settings)
+        val state = viewModel.uiState.filter { it.settings.printer.printerAddress == address }.first()
+        assertEquals(address, state.settings.printer.printerAddress)
+        assertEquals(name, state.settings.printer.printerName)
+    }
+
+    @Test
+    fun `onEvent DisconnectPrinter should clear printer settings`() = runTest {
+        viewModel.onEvent(SettingsScreenEvent.ConnectPrinter("Test", "1.1.1.1"))
+        viewModel.onEvent(SettingsScreenEvent.DisconnectPrinter)
+        
+        val state = viewModel.uiState.filter { it.settings.printer.printerAddress == null }.first()
+        assertNull(state.settings.printer.printerAddress)
     }
 }
