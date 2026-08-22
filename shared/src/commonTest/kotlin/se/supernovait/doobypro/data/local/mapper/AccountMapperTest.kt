@@ -43,19 +43,19 @@ class AccountMapperTest {
         user = testUser,
         company = testCompany,
         license = null,
-        agreement = null
+        agreements = emptyList()
     )
 
     private val testAccountEntity = AccountEntity(
         id = accountId,
         userId = userId,
         licenseId = null,
-        agreementId = null
+        agreementIds = emptyList()
     )
 
     @Test
     fun `toDomain should correctly transform AccountEntity to Account model`() {
-        val result = testAccountEntity.toDomain(testUser, testCompany, null, null)
+        val result = testAccountEntity.toDomain(testUser, testCompany, null, emptyList())
 
         assertEquals(testAccount, result)
     }

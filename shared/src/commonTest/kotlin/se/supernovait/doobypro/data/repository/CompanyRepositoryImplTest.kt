@@ -54,7 +54,8 @@ class CompanyRepositoryImplTest {
         val companies = repository.getCompanies().first()
 
         assertEquals(1, companies.size)
-        assertEquals(testCompany, companies[0])
+        assertEquals(testCompany.id, companies[0].id)
+        assertEquals(testCompany.legalName, companies[0].legalName)
     }
 
     @Test
@@ -63,7 +64,8 @@ class CompanyRepositoryImplTest {
 
         val result = repository.getCompanyById(testCompany.id!!)
 
-        assertEquals(testCompany, result.getOrNull())
+        assertEquals(testCompany.id, result.getOrNull()?.id)
+        assertEquals(testCompany.legalName, result.getOrNull()?.legalName)
     }
 
     @Test

@@ -109,7 +109,7 @@ private fun SignInForm(
 
         SupernovaTextField(
             label = stringResource(Res.string.sheet_SignIn_field_username),
-            initialValue = username,
+            value = username,
             onValueChange = { value, _ -> username = value },
             modifier = Modifier.fillMaxWidth()
         )

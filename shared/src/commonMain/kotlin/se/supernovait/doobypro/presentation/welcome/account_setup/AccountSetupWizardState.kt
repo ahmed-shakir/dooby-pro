@@ -33,7 +33,6 @@ data class AccountSetupWizardState(
     val lastName: String = "",
     val username: String = "",
     val birthDate: LocalDate? = null,
-    val birthDateString: String = "",
     val email: String = "",
     val phoneNumber: String = "",
     val companyLegalName: String = "",

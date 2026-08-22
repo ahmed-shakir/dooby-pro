@@ -36,7 +36,7 @@ class AgreementRepositoryImplTest {
         title = "Lease Agreement",
         description = "Lease for Model X",
         fee = Amount(1000, "AED"),
-        billingFrequency = BillingFrequency.MONTHLY,
+        billingFrequency = BillingFrequency.Monthly,
         deposit = Amount(5000, "AED"),
         issueDate = LocalDate(2026, 8, 15),
         cancellationDate = null

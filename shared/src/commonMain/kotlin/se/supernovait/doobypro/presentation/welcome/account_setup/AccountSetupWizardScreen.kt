@@ -24,27 +24,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import doobypro.shared.generated.resources.Address_field_city
+import doobypro.shared.generated.resources.Address_field_country
+import doobypro.shared.generated.resources.Address_field_emirate
+import doobypro.shared.generated.resources.Address_field_location_notes
+import doobypro.shared.generated.resources.Address_field_postal_code
+import doobypro.shared.generated.resources.Address_field_street
+import doobypro.shared.generated.resources.Contact_details_field_email
+import doobypro.shared.generated.resources.Contact_details_field_phone
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.screen_AccountSetup_action_back
 import doobypro.shared.generated.resources.screen_AccountSetup_action_continue
 import doobypro.shared.generated.resources.screen_AccountSetup_action_create_account
 import doobypro.shared.generated.resources.screen_AccountSetup_confirmation_note
-import doobypro.shared.generated.resources.screen_AccountSetup_field_city
 import doobypro.shared.generated.resources.screen_AccountSetup_field_company_display_name
 import doobypro.shared.generated.resources.screen_AccountSetup_field_company_email
 import doobypro.shared.generated.resources.screen_AccountSetup_field_company_legal_name
 import doobypro.shared.generated.resources.screen_AccountSetup_field_company_phone
-import doobypro.shared.generated.resources.screen_AccountSetup_field_country
 import doobypro.shared.generated.resources.screen_AccountSetup_field_dob
-import doobypro.shared.generated.resources.screen_AccountSetup_field_email
-import doobypro.shared.generated.resources.screen_AccountSetup_field_emirate
 import doobypro.shared.generated.resources.screen_AccountSetup_field_first_name
 import doobypro.shared.generated.resources.screen_AccountSetup_field_last_name
 import doobypro.shared.generated.resources.screen_AccountSetup_field_license_number
-import doobypro.shared.generated.resources.screen_AccountSetup_field_location_note
-import doobypro.shared.generated.resources.screen_AccountSetup_field_phone
-import doobypro.shared.generated.resources.screen_AccountSetup_field_postal_code
-import doobypro.shared.generated.resources.screen_AccountSetup_field_street
 import doobypro.shared.generated.resources.screen_AccountSetup_field_username
 import doobypro.shared.generated.resources.screen_AccountSetup_step_indicator
 import doobypro.shared.generated.resources.screen_AccountSetup_subtitle_step1
@@ -52,9 +52,7 @@ import doobypro.shared.generated.resources.screen_AccountSetup_subtitle_step2
 import doobypro.shared.generated.resources.screen_AccountSetup_subtitle_step3
 import doobypro.shared.generated.resources.screen_AccountSetup_subtitle_step4
 import doobypro.shared.generated.resources.screen_AccountSetup_summary_company
-import doobypro.shared.generated.resources.screen_AccountSetup_summary_email
 import doobypro.shared.generated.resources.screen_AccountSetup_summary_location
-import doobypro.shared.generated.resources.screen_AccountSetup_summary_phone
 import doobypro.shared.generated.resources.screen_AccountSetup_summary_user
 import doobypro.shared.generated.resources.screen_AccountSetup_summary_username
 import doobypro.shared.generated.resources.screen_AccountSetup_title_step1
@@ -65,8 +63,8 @@ import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.action.SupernovaButton
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.component.input.SupernovaDateField
-import se.supernovait.app.core.ui.component.input.SupernovaSelectField
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
+import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.text.SupernovaSubtitle
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
@@ -183,33 +181,33 @@ private fun Step1(state: AccountSetupWizardState, onEvent: (AccountSetupWizardEv
 
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_first_name),
-        initialValue = state.firstName,
+        value = state.firstName,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateFirstName(value)) }
     )
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_last_name),
-        initialValue = state.lastName,
+        value = state.lastName,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateLastName(value)) }
     )
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_username),
-        initialValue = state.username,
+        value = state.username,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateUsername(value)) }
     )
     SupernovaDateField(
         label = stringResource(Res.string.screen_AccountSetup_field_dob),
         placeholder = "YYYY-MM-DD",
-        initialValue = state.birthDateString,
+        value = state.birthDate,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateBirthDate(value)) }
     )
     SupernovaTextField(
-        label = stringResource(Res.string.screen_AccountSetup_field_email),
-        initialValue = state.email,
+        label = stringResource(Res.string.Contact_details_field_email),
+        value = state.email,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateEmail(value)) }
     )
     SupernovaTextField(
-        label = stringResource(Res.string.screen_AccountSetup_field_phone),
-        initialValue = state.phoneNumber,
+        label = stringResource(Res.string.Contact_details_field_phone),
+        value = state.phoneNumber,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdatePhoneNumber(value)) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
     )
@@ -223,27 +221,27 @@ private fun Step2(state: AccountSetupWizardState, onEvent: (AccountSetupWizardEv
 
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_company_legal_name),
-        initialValue = state.companyLegalName,
+        value = state.companyLegalName,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCompanyLegalName(value)) }
     )
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_company_display_name),
-        initialValue = state.companyDisplayName,
+        value = state.companyDisplayName,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCompanyDisplayName(value)) }
     )
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_license_number),
-        initialValue = state.licenseNumber,
+        value = state.licenseNumber,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateLicenseNumber(value)) }
     )
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_company_email),
-        initialValue = state.companyEmail,
+        value = state.companyEmail,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCompanyEmail(value)) }
     )
     SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_company_phone),
-        initialValue = state.companyPhone,
+        value = state.companyPhone,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCompanyPhone(value)) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
     )
@@ -258,36 +256,36 @@ private fun Step3(state: AccountSetupWizardState, onEvent: (AccountSetupWizardEv
     Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
 
     SupernovaTextField(
-        label = stringResource(Res.string.screen_AccountSetup_field_street),
-        initialValue = state.streetAddress,
+        label = stringResource(Res.string.Address_field_street),
+        value = state.streetAddress,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateStreetAddress(value)) }
     )
     SupernovaTextField(
-        label = stringResource(Res.string.screen_AccountSetup_field_city),
-        initialValue = state.city,
+        label = stringResource(Res.string.Address_field_city),
+        value = state.city,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCity(value)) }
     )
     SupernovaSelectField(
-        label = stringResource(Res.string.screen_AccountSetup_field_emirate),
+        label = stringResource(Res.string.Address_field_emirate),
         options = Emirate.entries,
         selectedOption = Emirate.fromValue(state.subdivision),
         onOptionSelected = { onEvent(AccountSetupWizardEvent.UpdateSubdivision(it.value)) },
         optionLabel = { emirateLabels[it] ?: "" }
     )
     SupernovaTextField(
-        label = stringResource(Res.string.screen_AccountSetup_field_postal_code),
-        initialValue = state.postalCode,
+        label = stringResource(Res.string.Address_field_postal_code),
+        value = state.postalCode,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdatePostalCode(value)) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
     SupernovaTextField(
-        label = stringResource(Res.string.screen_AccountSetup_field_country),
-        initialValue = state.country,
+        label = stringResource(Res.string.Address_field_country),
+        value = state.country,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCountry(value)) }
     )
     SupernovaTextField(
-        label = stringResource(Res.string.screen_AccountSetup_field_location_note),
-        initialValue = state.notes,
+        label = stringResource(Res.string.Address_field_location_notes),
+        value = state.notes,
         isMultiline = true,
         onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateNotes(value)) }
     )
@@ -312,8 +310,8 @@ private fun Step4(state: AccountSetupWizardState) {
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_user), "${state.firstName} ${state.lastName}")
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_username), state.username)
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_company), state.companyDisplayName)
-            SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_phone), state.phoneNumber)
-            SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_email), state.email)
+            SummaryItem(stringResource(Res.string.Contact_details_field_phone), state.phoneNumber)
+            SummaryItem(stringResource(Res.string.Contact_details_field_email), state.email)
             
             val location = buildString {
                 if (state.subdivision.isNotBlank()) {

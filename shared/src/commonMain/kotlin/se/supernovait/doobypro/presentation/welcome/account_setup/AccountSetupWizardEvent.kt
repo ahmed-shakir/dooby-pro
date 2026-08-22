@@ -1,5 +1,7 @@
 package se.supernovait.doobypro.presentation.welcome.account_setup
 
+import kotlinx.datetime.LocalDate
+
 /**
  * User actions and input events for the Account Setup Wizard.
  */
@@ -16,7 +18,7 @@ sealed interface AccountSetupWizardEvent {
     /** Updates the user's username. */
     data class UpdateUsername(val value: String) : AccountSetupWizardEvent
     /** Updates the user's birthdate string. */
-    data class UpdateBirthDate(val value: String) : AccountSetupWizardEvent
+    data class UpdateBirthDate(val date: LocalDate?) : AccountSetupWizardEvent
     /** Updates the user's email address. */
     data class UpdateEmail(val value: String) : AccountSetupWizardEvent
     /** Updates the user's phone number. */

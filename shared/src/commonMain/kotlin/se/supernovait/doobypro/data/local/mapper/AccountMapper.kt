@@ -16,14 +16,14 @@ fun AccountEntity.toDomain(
     user: User,
     company: Company,
     license: License?,
-    agreement: Agreement?
+    agreements: List<Agreement>
 ): Account {
     return Account(
         id = id,
         user = user,
         company = company,
         license = license,
-        agreement = agreement,
+        agreements = agreements,
         deactivatedAt = deactivatedAt,
         isMarkedForDeletion = isMarkedForDeletion
     )
@@ -37,7 +37,7 @@ fun Account.toEntity(): AccountEntity {
         id = id ?: company.id ?: throw IllegalArgumentException("Account company ID cannot be null"),
         userId = user.id ?: throw IllegalArgumentException("Account user ID cannot be null"),
         licenseId = license?.id,
-        agreementId = agreement?.id,
+        agreementIds = agreements.mapNotNull { it.id },
         deactivatedAt = deactivatedAt,
         isMarkedForDeletion = isMarkedForDeletion
     )

@@ -15,6 +15,11 @@ interface AgreementRepository {
     suspend fun getAgreements(accountId: String): List<Agreement>
 
     /**
+     * Retrieves a list of agreements by their IDs.
+     */
+    suspend fun getAgreementsByIds(ids: List<String>): List<Agreement>
+
+    /**
      * Retrieves an agreement by its ID.
      */
     suspend fun getAgreementById(id: String): Result<Agreement, DataError>

@@ -52,7 +52,7 @@ class AppEventHandlerTest {
     }
 
     @Test
-    fun `handleAppEvent SignOut should trigger authManager signOut`() = runTest {
+    fun `handleAppEvent SignOut should trigger authManager signOut`() = runTest(testDispatcher) {
         // Seed user and sign in
         val user = se.supernovait.app.core.domain.auth.User(
             id = "user-1",

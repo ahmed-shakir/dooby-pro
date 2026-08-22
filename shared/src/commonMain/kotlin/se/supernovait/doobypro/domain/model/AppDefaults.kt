@@ -20,8 +20,8 @@ object AppDefaults {
     suspend fun license(accountId: String) = License(
         id = SupernovaIdGenerator.generateId(IdType.LICENSE.prefix),
         accountId = accountId,
-        licenseStatus = LicenseStatus.ACTIVE,
-        tier = Tier.FREE,
+        licenseStatus = LicenseStatus.Active,
+        tier = Tier.Free,
         title = getString(Res.string.default_license_title),
         description = getString(Res.string.default_license_description),
         issueDate = LocalDate.now(),

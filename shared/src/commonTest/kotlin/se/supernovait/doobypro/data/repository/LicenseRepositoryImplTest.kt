@@ -30,8 +30,8 @@ class LicenseRepositoryImplTest {
     private val testLicense = License(
         id = licenseId,
         accountId = accountId,
-        licenseStatus = LicenseStatus.ACTIVE,
-        tier = Tier.FREE,
+        licenseStatus = LicenseStatus.Active,
+        tier = Tier.Free,
         title = "Professional License",
         description = "Full access to pro features",
         issueDate = LocalDate(2026, 8, 15),

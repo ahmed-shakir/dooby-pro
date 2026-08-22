@@ -21,12 +21,12 @@ class AccountEntityTest {
             id = accountId,
             userId = userId,
             licenseId = licenseId,
-            agreementId = agreementId
+            agreementIds = listOf(agreementId)
         )
 
         assertEquals(accountId, entity.id)
         assertEquals(userId, entity.userId)
         assertEquals(licenseId, entity.licenseId)
-        assertEquals(agreementId, entity.agreementId)
+        assertEquals(listOf(agreementId), entity.agreementIds)
     }
 }

@@ -48,4 +48,20 @@ object DbConverters {
      */
     @TypeConverter
     fun fromDeliveryMethod(method: DeliveryMethod?): String? = method?.name
+
+    /**
+     * Converts a string of comma-separated values to a list of strings.
+     */
+    @TypeConverter
+    fun fromStringList(value: String?): List<String> {
+        return value?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+    }
+
+    /**
+     * Converts a list of strings to a comma-separated string.
+     */
+    @TypeConverter
+    fun toStringList(list: List<String>?): String? {
+        return list?.joinToString(",")
+    }
 }

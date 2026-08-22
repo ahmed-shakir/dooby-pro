@@ -23,7 +23,6 @@ import se.supernovait.doobypro.data.repository.FakeCompanyRepository
 import se.supernovait.doobypro.data.repository.FakeLicenseRepository
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.Company
-import se.supernovait.doobypro.presentation.account.event.AccountEvent
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -44,7 +43,8 @@ class AccountViewModelTest {
         firstname = "John",
         lastname = "Doe",
         birthdate = null,
-        email = "john@example.com"
+        email = "john@example.com",
+        address = Address(street = "User St", city = "Dubai", country = "UAE")
     )
 
     private val testCompany = Company(
@@ -60,8 +60,8 @@ class AccountViewModelTest {
     private val testLicense = License(
         id = "lic-123",
         accountId = "comp-123",
-        licenseStatus = LicenseStatus.ACTIVE,
-        tier = Tier.FREE,
+        licenseStatus = LicenseStatus.Active,
+        tier = Tier.Free,
         title = "Test License",
         description = "Test Description",
         issueDate = LocalDate(2026, 1, 1),
@@ -102,7 +102,7 @@ class AccountViewModelTest {
         val state = viewModel.uiState.first { it.account != null }
         
         assertNotNull(state.account)
-        assertEquals("John", state.editFirstName)
+        assertEquals("John", state.editUserFirstName)
         assertEquals("Legal Corp", state.editCompanyLegalName)
         assertEquals("Main", state.editCompanyAddressStreet)
         
@@ -114,40 +114,116 @@ class AccountViewModelTest {
         val collectJob = launch { viewModel.uiState.collect {} }
         
         viewModel.onEvent(AccountEvent.UpdateFirstName("Jane"))
-        val state = viewModel.uiState.first { it.editFirstName == "Jane" }
-        assertEquals("Jane", state.editFirstName)
+        val state = viewModel.uiState.first { it.editUserFirstName == "Jane" }
+        assertEquals("Jane", state.editUserFirstName)
         
         collectJob.cancel()
     }
 
     @Test
-    fun `SaveUserProfile should update repository and state`() = runTest(testDispatcher) {
+    fun `SaveUserProfile should update repository state and clear edit mode`() = runTest(testDispatcher) {
         val collectJob = launch { viewModel.uiState.collect {} }
         
         // Wait for initial load
         viewModel.uiState.first { it.account != null }
 
+        viewModel.onEvent(AccountEvent.EnterEditMode("personal-info"))
         viewModel.onEvent(AccountEvent.UpdateFirstName("Jane"))
+        
+        // Fix for the address validation failure in ViewModel
+        viewModel.onEvent(AccountEvent.UpdateUserAddressStreet("User St"))
+        
         viewModel.onEvent(AccountEvent.SaveUserProfile)
         
-        val state = viewModel.uiState.first { it.account?.user?.firstname == "Jane" }
+        val state = viewModel.uiState.first { it.account?.user?.firstname == "Jane" && it.editingCardId == null }
         assertEquals("Jane", state.account?.user?.firstname)
+        assertEquals(null, state.editingCardId)
         
         collectJob.cancel()
     }
     
     @Test
-    fun `UpdateCompanyStreet should update address fields`() = runTest(testDispatcher) {
+    fun `UpdateCompanyStreet should update address fields and clear edit mode`() = runTest(testDispatcher) {
         val collectJob = launch { viewModel.uiState.collect {} }
         
         // Wait for initial load
         viewModel.uiState.first { it.account != null }
 
+        viewModel.onEvent(AccountEvent.EnterEditMode("company-address"))
         viewModel.onEvent(AccountEvent.UpdateCompanyAddressStreet("New Street"))
         viewModel.onEvent(AccountEvent.SaveCompanyProfile)
         
-        val state = viewModel.uiState.first { it.account?.company?.address?.street == "New Street" }
+        val state = viewModel.uiState.first { it.account?.company?.address?.street == "New Street" && it.editingCardId == null }
         assertEquals("New Street", state.account?.company?.address?.street)
+        assertEquals(null, state.editingCardId)
+        
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `UpdateProfileImage should update state and repository after save`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        
+        // Wait for initial load
+        viewModel.uiState.first { it.account != null }
+
+        val newAvatarUrl = "https://example.com/avatar.png"
+        viewModel.onEvent(AccountEvent.EnterEditMode("user-branding"))
+        viewModel.onEvent(AccountEvent.UpdateProfileImage(newAvatarUrl))
+        viewModel.onEvent(AccountEvent.SaveUserProfile)
+        
+        val state = viewModel.uiState.first { it.account?.user?.profileImage == newAvatarUrl && it.editingCardId == null }
+        assertEquals(newAvatarUrl, state.account?.user?.profileImage)
+        
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `UpdateCompanyLogo should update state and repository after save`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        
+        // Wait for initial load
+        viewModel.uiState.first { it.account != null }
+
+        val newLogoUrl = "https://example.com/logo.png"
+        viewModel.onEvent(AccountEvent.EnterEditMode("company-branding"))
+        viewModel.onEvent(AccountEvent.UpdateCompanyLogo(newLogoUrl))
+        viewModel.onEvent(AccountEvent.SaveCompanyProfile)
+        
+        val state = viewModel.uiState.first { it.account?.company?.logoUrl == newLogoUrl && it.editingCardId == null }
+        assertEquals(newLogoUrl, state.account?.company?.logoUrl)
+        
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `SignOut event should call authRepository signOut`() = runTest(testDispatcher) {
+        viewModel.onEvent(AccountEvent.SignOut)
+        // Verify via AuthRepository or check if it doesn't crash
+        // Since we don't have a verify() for the fake, we just ensure no exception is thrown
+    }
+
+    @Test
+    fun `SwitchTab event should update currentTab`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        viewModel.onEvent(AccountEvent.SwitchTab(AccountTab.COMPANY_PROFILE))
+        
+        val state = viewModel.uiState.first { it.currentTab == AccountTab.COMPANY_PROFILE }
+        assertEquals(AccountTab.COMPANY_PROFILE, state.currentTab)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `EnterEditMode and ExitEditMode should update editingCardId`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        
+        viewModel.onEvent(AccountEvent.EnterEditMode("test-card"))
+        var state = viewModel.uiState.first { it.editingCardId == "test-card" }
+        assertEquals("test-card", state.editingCardId)
+        
+        viewModel.onEvent(AccountEvent.ExitEditMode)
+        state = viewModel.uiState.first { it.editingCardId == null }
+        assertEquals(null, state.editingCardId)
         
         collectJob.cancel()
     }

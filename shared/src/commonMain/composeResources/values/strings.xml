@@ -20,15 +20,6 @@
     <string name="navigation_item_account_label">Account</string>
     <string name="navigation_item_settings_label">Settings</string>
 
-    <!-- Emirates -->
-    <string name="emirate_abu_dhabi">Abu Dhabi</string>
-    <string name="emirate_dubai">Dubai</string>
-    <string name="emirate_sharjah">Sharjah</string>
-    <string name="emirate_ajman">Ajman</string>
-    <string name="emirate_umm_al_quwain">Umm Al Quwain</string>
-    <string name="emirate_ras_al_khaimah">Ras Al Khaimah</string>
-    <string name="emirate_fujairah">Fujairah</string>
-
     <!-- Delivery -->
     <string name="delivery_option_express">Express</string>
     <string name="delivery_option_standard">Standard</string>
@@ -49,6 +40,39 @@
     <!-- Connection method -->
     <string name="connection_method_network">Network (WiFi/Ethernet)</string>
     <string name="connection_method_bluetooth">Bluetooth</string>
+
+    <!-- Emirates -->
+    <string name="emirate_abu_dhabi">Abu Dhabi</string>
+    <string name="emirate_dubai">Dubai</string>
+    <string name="emirate_sharjah">Sharjah</string>
+    <string name="emirate_ajman">Ajman</string>
+    <string name="emirate_umm_al_quwain">Umm Al Quwain</string>
+    <string name="emirate_ras_al_khaimah">Ras Al Khaimah</string>
+    <string name="emirate_fujairah">Fujairah</string>
+
+    <!-- Address labels -->
+    <string name="Address_field_street">Street address</string>
+    <string name="Address_field_city">City</string>
+    <string name="Address_field_emirate">Emirate</string>
+    <string name="Address_field_postal_code">Postal code</string>
+    <string name="Address_field_country">Country</string>
+    <string name="Address_field_location_notes">Location notes</string>
+
+    <!-- Contact details labels -->
+    <string name="Contact_details_field_email">Email Address</string>
+    <string name="Contact_details_field_phone">Phone Number</string>
+
+    <!-- Shared/Generic labels -->
+    <string name="label_save">Save</string>
+    <string name="label_saving">Saving...</string>
+    <string name="label_edit">Edit</string>
+    <string name="label_locked">Locked</string>
+    <string name="label_user_default">User</string>
+    <string name="label_not_authenticated">Not authenticated</string>
+    <string name="label_sign_out">Sign Out</string>
+    <string name="label_actions">Actions</string>
+    <string name="label_role_admin">Administrator</string>
+    <string name="label_role_user">Staff Member</string>
 
     <!-- Sign In Bottom Sheet -->
     <string name="sheet_SignIn_title">Sign in</string>
@@ -79,21 +103,12 @@
     <string name="screen_AccountSetup_field_last_name">Last name</string>
     <string name="screen_AccountSetup_field_username">Username</string>
     <string name="screen_AccountSetup_field_dob">Date of birth</string>
-    <string name="screen_AccountSetup_field_email">Email</string>
-    <string name="screen_AccountSetup_field_phone">Phone number</string>
 
     <string name="screen_AccountSetup_field_company_legal_name">Legal company name</string>
     <string name="screen_AccountSetup_field_company_display_name">Display name</string>
     <string name="screen_AccountSetup_field_license_number">License number</string>
     <string name="screen_AccountSetup_field_company_phone">Company phone</string>
     <string name="screen_AccountSetup_field_company_email">Company email</string>
-
-    <string name="screen_AccountSetup_field_street">Street address</string>
-    <string name="screen_AccountSetup_field_city">City</string>
-    <string name="screen_AccountSetup_field_emirate">Emirate</string>
-    <string name="screen_AccountSetup_field_postal_code">Postal code</string>
-    <string name="screen_AccountSetup_field_country">Country</string>
-    <string name="screen_AccountSetup_field_location_note">Location note</string>
 
     <string name="screen_AccountSetup_action_continue">Continue</string>
     <string name="screen_AccountSetup_action_back">Back</string>
@@ -103,8 +118,6 @@
     <string name="screen_AccountSetup_summary_user">User</string>
     <string name="screen_AccountSetup_summary_username">Username</string>
     <string name="screen_AccountSetup_summary_company">Company</string>
-    <string name="screen_AccountSetup_summary_phone">Phone</string>
-    <string name="screen_AccountSetup_summary_email">Email</string>
     <string name="screen_AccountSetup_summary_location">Location</string>
 
     <!-- App Info Screen -->
@@ -193,80 +206,88 @@
 
     <string name="screen_Settings_receipt_include_terms_and_conditions">Terms and conditions</string>
 
-    <!-- Account -->
+    <!-- Account labels -->
     <string name="screen_Account_user_profile_label">User Profile</string>
-    <string name="screen_Account_user_profile_desc">Your personal information</string>
     <string name="screen_Account_company_profile_label">Company Profile</string>
-    <string name="screen_Account_company_profile_desc">Company details and settings</string>
     <string name="screen_Account_license_label">Account License</string>
-    <string name="screen_Account_license_desc">License information and status</string>
     <string name="screen_Account_agreements_label">Agreements</string>
-    <string name="screen_Account_agreements_desc">Equipment lease and contracts</string>
 
-    <!-- User Profile Screen -->
-    <string name="screen_UserProfile_title">User Profile</string>
-    <string name="screen_UserProfile_section_account">Account Information</string>
-    <string name="screen_UserProfile_field_user_id">User ID</string>
-    <string name="screen_UserProfile_section_personal">Personal Information</string>
-    <string name="screen_UserProfile_field_first_name">First Name</string>
-    <string name="screen_UserProfile_field_last_name">Last Name</string>
-    <string name="screen_UserProfile_field_dob">Date of Birth</string>
-    <string name="screen_UserProfile_field_dob_placeholder">YYYY-MM-DD</string>
-    <string name="screen_UserProfile_section_contact">Contact Information</string>
-    <string name="screen_UserProfile_field_email">Email Address</string>
-    <string name="screen_UserProfile_field_phone">Phone Number</string>
-    <string name="screen_UserProfile_action_save">Save Changes</string>
-    <string name="screen_UserProfile_action_saving">Saving...</string>
-    <string name="screen_UserProfile_action_delete_account">Delete Account</string>
+    <string name="screen_Account_delete_action">Delete Account</string>
+    <string name="screen_Account_dialog_delete_confirm_title">Delete Account</string>
+    <string name="screen_Account_dialog_delete_confirm_message">Are you sure you want to delete your account? It will be deactivated and permanently deleted after 30 days.</string>
+    <string name="screen_Account_dialog_delete_action">Delete</string>
+    <string name="screen_Account_dialog_cancel_action">Cancel</string>
 
-    <!-- Company Profile Screen -->
-    <string name="screen_CompanyProfile_title">Company Profile</string>
-    <string name="screen_CompanyProfile_section_info">Company Information</string>
-    <string name="screen_CompanyProfile_field_company_id">Company ID</string>
-    <string name="screen_CompanyProfile_field_legal_name">Legal Company Name</string>
-    <string name="screen_CompanyProfile_field_display_name">Display Name</string>
-    <string name="screen_CompanyProfile_field_license_number">License Number</string>
-    <string name="screen_CompanyProfile_section_contact">Contact Information</string>
-    <string name="screen_CompanyProfile_field_email">Email Address</string>
-    <string name="screen_CompanyProfile_field_phone">Phone Number</string>
-    <string name="screen_CompanyProfile_section_address">Address</string>
-    <string name="screen_CompanyProfile_field_street">Street Address</string>
-    <string name="screen_CompanyProfile_field_city">City</string>
-    <string name="screen_CompanyProfile_field_subdivision">Subdivision / Emirate</string>
-    <string name="screen_CompanyProfile_field_postal_code">Postal Code</string>
-    <string name="screen_CompanyProfile_field_country">Country</string>
-    <string name="screen_CompanyProfile_field_notes">Location Notes</string>
-    <string name="screen_CompanyProfile_action_save">Save Changes</string>
-    <string name="screen_CompanyProfile_action_saving">Saving...</string>
+    <!-- Account Error Messages -->
+    <string name="screen_Account_error_load_failed">Failed to load account details</string>
+    <string name="screen_Account_error_save_user_failed">Failed to save user profile</string>
+    <string name="screen_Account_error_save_company_failed">Failed to save company profile</string>
+    <string name="screen_Account_error_delete_failed">Failed to delete account</string>
 
-    <!-- License Screen -->
-    <string name="screen_License_title">Account License</string>
-    <string name="screen_License_error_not_found">No active license found for this account.</string>
-    <string name="screen_License_section_details">License Details</string>
-    <string name="screen_License_field_id">License ID</string>
-    <string name="screen_License_field_tier">Tier</string>
-    <string name="screen_License_field_status">Status</string>
-    <string name="screen_License_section_validity">Terms &amp; Validity</string>
-    <string name="screen_License_field_issue_date">Issue Date</string>
-    <string name="screen_License_field_expiry_date">Expiry Date</string>
-    <string name="screen_License_section_description">Description</string>
+    <!-- Account User Profile -->
+    <string name="Account_UserProfileTab_section_account">Account Information</string>
+    <string name="Account_UserProfileTab_section_personal">Personal Information</string>
+    <string name="Account_UserProfileTab_field_user_id">User ID</string>
+    <string name="Account_UserProfileTab_field_first_name">First Name</string>
+    <string name="Account_UserProfileTab_field_last_name">Last Name</string>
+    <string name="Account_UserProfileTab_field_dob">Date of Birth</string>
+    <string name="Account_UserProfileTab_section_contact">Contact Information</string>
+    <string name="Account_UserProfileTab_field_username">Username</string>
+    <string name="Account_UserProfileTab_field_role">Role</string>
+    <string name="Account_UserProfileTab_field_status">Status</string>
+    <string name="Account_UserProfileTab_field_address">Home Address</string>
+    <string name="Account_UserProfileTab_label_member_since">Member Since</string>
+    <string name="Account_UserProfileTab_label_add_home_address">Add Home Address</string>
 
-    <!-- Agreement Screen -->
-    <string name="screen_Agreement_title">Agreements</string>
-    <string name="screen_Agreement_error_not_found">No equipment lease agreements found.</string>
-    <string name="screen_Agreement_section_equipment">Equipment Info</string>
-    <string name="screen_Agreement_field_model">Model</string>
-    <string name="screen_Agreement_field_serial">Serial Number</string>
-    <string name="screen_Agreement_section_billing">Billing &amp; Status</string>
-    <string name="screen_Agreement_field_status">Status</string>
-    <string name="screen_Agreement_field_fee">Fee (%1$s)</string>
-    <string name="screen_Agreement_field_issue_date">Issue Date</string>
-    <string name="screen_Agreement_field_cancellation_date">Cancellation Date</string>
+    <!-- Account Company Profile -->
+    <string name="Account_CompanyProfileTab_section_info">Company Information</string>
+    <string name="Account_CompanyProfileTab_section_branding">Company Branding</string>
+    <string name="Account_CompanyProfileTab_field_logo">Company Logo</string>
+    <string name="Account_CompanyProfileTab_action_change_logo">Change Logo</string>
+    <string name="Account_CompanyProfileTab_field_company_id">Company ID</string>
+    <string name="Account_CompanyProfileTab_field_legal_name">Legal Company Name</string>
+    <string name="Account_CompanyProfileTab_field_display_name">Display Name</string>
+    <string name="Account_CompanyProfileTab_field_license_number">License Number</string>
+    <string name="Account_CompanyProfileTab_section_contact">Contact Information</string>
+    <string name="Account_CompanyProfileTab_section_address">Address</string>
+    <string name="Account_CompanyProfileTab_label_registered_since">Registered Since</string>
+    <string name="Account_CompanyProfileTab_label_company_details">Company Details</string>
 
-    <string name="screen_Account_delete_confirm_title">Delete Account</string>
-    <string name="screen_Account_delete_confirm_message">Are you sure you want to delete your account? It will be deactivated and permanently deleted after 30 days.</string>
-    <string name="screen_Account_delete_action">Delete</string>
-    <string name="screen_Account_cancel_action">Cancel</string>
+    <!-- Account License -->
+    <string name="Account_LicenseTab_error_not_found">No active license found for this account.</string>
+    <string name="Account_LicenseTab_section_details">License Details</string>
+    <string name="Account_LicenseTab_field_id">License ID</string>
+    <string name="Account_LicenseTab_field_tier">Tier</string>
+    <string name="Account_LicenseTab_field_status">Status</string>
+    <string name="Account_LicenseTab_section_validity">Terms &amp; Validity</string>
+    <string name="Account_LicenseTab_field_issue_date">Issue Date</string>
+    <string name="Account_LicenseTab_field_expiry_date">Expiry Date</string>
+    <string name="Account_LicenseTab_section_description">Description</string>
+    <string name="Account_LicenseTab_label_download_license">Download License</string>
+
+    <!-- Account Agreement -->
+    <string name="Account_AgreementTab_error_not_found">No equipment lease agreements found.</string>
+    <string name="Account_AgreementTab_section_equipment">Equipment Info</string>
+    <string name="Account_AgreementTab_field_model">Model</string>
+    <string name="Account_AgreementTab_field_serial">Serial Number</string>
+    <string name="Account_AgreementTab_section_billing">Billing &amp; Status</string>
+    <string name="Account_AgreementTab_field_status">Status</string>
+    <string name="Account_AgreementTab_field_fee">Fee (%1$s)</string>
+    <string name="Account_AgreementTab_field_issue_date">Issue Date</string>
+    <string name="Account_AgreementTab_field_cancellation_date">Cancellation Date</string>
+
+    <!-- Account agreement Labels -->
+    <string name="Account_AgreementTab_label_id">Agreement ID</string>
+    <string name="Account_AgreementTab_label_equipment">Equipment</string>
+    <string name="Account_AgreementTab_label_model">Model</string>
+    <string name="Account_AgreementTab_label_lease_fee">Lease Fee</string>
+    <string name="Account_AgreementTab_label_issue_date">Issue Date</string>
+    <string name="Account_AgreementTab_label_expiry_date">Expiry Date</string>
+    <string name="Account_AgreementTab_label_no_agreements">No agreements found</string>
+    <string name="Account_AgreementTab_label_download_all">Download All Agreements</string>
+    <string name="Account_AgreementTab_label_cancellation_date">Cancellation Date</string>
+    <string name="Account_AgreementTab_billing_frequency_monthly">month</string>
+    <string name="Account_AgreementTab_billing_frequency_annual">year</string>
 
     <!-- Order Status -->
     <string name="order_status_new">New</string>

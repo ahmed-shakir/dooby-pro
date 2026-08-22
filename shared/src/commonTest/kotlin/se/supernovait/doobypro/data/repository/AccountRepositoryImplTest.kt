@@ -7,6 +7,8 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.location.Address
+import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.domain.model.billing.BillingFrequency
 import se.supernovait.app.core.domain.model.license.License
 import se.supernovait.app.core.domain.model.license.LicenseStatus
 import se.supernovait.app.core.domain.model.license.Tier
@@ -16,6 +18,8 @@ import se.supernovait.doobypro.data.local.entity.AccountEntity
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.domain.model.IdType
+import se.supernovait.doobypro.domain.model.agreement.Agreement
+import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -65,14 +69,14 @@ class AccountRepositoryImplTest {
         license = License(
             id = "lic-123",
             accountId = accountId,
-            licenseStatus = LicenseStatus.ACTIVE,
-            tier = Tier.FREE,
+            licenseStatus = LicenseStatus.Active,
+            tier = Tier.Free,
             title = "Test License",
             description = "Test Desc",
             issueDate = LocalDate(2026, 1, 1),
             expiryDate = LocalDate(2027, 1, 1)
         ),
-        agreement = null
+        agreements = emptyList()
     )
 
     @BeforeTest
@@ -105,7 +109,7 @@ class AccountRepositoryImplTest {
             id = accountId,
             userId = userId,
             licenseId = null,
-            agreementId = null
+            agreementIds = emptyList()
         ))
 
         val result = repository.getAccount(accountId).getOrNull()
@@ -114,6 +118,45 @@ class AccountRepositoryImplTest {
         assertEquals(accountId, result.id)
         assertEquals(testUser.username, result.user.username)
         assertEquals(testCompany.legalName, result.company.legalName)
+    }
+
+    @Test
+    fun `getAccount should return assembled account with multiple agreements`() = runTest(testDispatcher) {
+        // Seed component data
+        fakeAuthRepository.signUp(testUser)
+        fakeCompanyRepository.saveCompany(testCompany)
+        
+        val agr1 = Agreement(
+            id = "agr-1",
+            accountId = accountId,
+            status = AgreementStatus.ACTIVE,
+            equipmentId = "EQ-1",
+            equipmentModel = "M1",
+            title = "Title 1",
+            description = "Desc 1",
+            billingFrequency = BillingFrequency.Monthly,
+            fee = Amount(10000, "AED"),
+            deposit = Amount(0, "AED"),
+            issueDate = LocalDate(2026, 1, 1)
+        )
+        val agr2 = agr1.copy(id = "agr-2", title = "Title 2")
+        fakeAgreementRepository.saveAgreement(agr1)
+        fakeAgreementRepository.saveAgreement(agr2)
+
+        // Mock account link in root table
+        fakeAccountDao.upsert(AccountEntity(
+            id = accountId,
+            userId = userId,
+            licenseId = null,
+            agreementIds = listOf("agr-1", "agr-2")
+        ))
+
+        val result = repository.getAccount(accountId).getOrNull()
+
+        assertNotNull(result)
+        assertEquals(2, result.agreements.size)
+        assertEquals("Title 1", result.agreements[0].title)
+        assertEquals("Title 2", result.agreements[1].title)
     }
 
     @Test
@@ -154,7 +197,7 @@ class AccountRepositoryImplTest {
             id = accountId, 
             userId = userId,
             licenseId = null,
-            agreementId = null
+            agreementIds = emptyList()
         ))
         
         assertNotNull(repository.getAccount(accountId).getOrNull())

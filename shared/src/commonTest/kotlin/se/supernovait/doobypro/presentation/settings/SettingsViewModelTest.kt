@@ -48,38 +48,47 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `uiState should reflect default settings initially`() = runTest {
-        val state = viewModel.uiState.value
+    fun `uiState should reflect default settings initially`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        val state = viewModel.uiState.first { !it.isLoading }
         assertEquals(Settings(), state.settings)
+        collectJob.cancel()
     }
 
     @Test
-    fun `onEvent UpdateCurrency should update state`() = runTest {
+    fun `onEvent UpdateCurrency should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
         viewModel.onEvent(SettingsScreenEvent.UpdateCurrency(Currency.AED))
         
         val state = viewModel.uiState.filter { it.settings.common.currency == Currency.AED }.first()
         assertEquals(Currency.AED, state.settings.common.currency)
+        collectJob.cancel()
     }
 
     @Test
-    fun `onEvent UpdateDefaultHandlingTimeDays should update state`() = runTest {
+    fun `onEvent UpdateDefaultHandlingTimeDays should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
         viewModel.onEvent(SettingsScreenEvent.UpdateDefaultHandlingTimeDays(5))
         
         val state = viewModel.uiState.filter { it.settings.order.defaultHandlingTimeDays == 5 }.first()
         assertEquals(5, state.settings.order.defaultHandlingTimeDays)
+        collectJob.cancel()
     }
 
     @Test
-    fun `onEvent UpdateDefaultServiceId should update state`() = runTest {
+    fun `onEvent UpdateDefaultServiceId should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
         val serviceId = "service_123"
         viewModel.onEvent(SettingsScreenEvent.UpdateDefaultServiceId(serviceId))
         
         val state = viewModel.uiState.filter { it.settings.order.defaultServiceId == serviceId }.first()
         assertEquals(serviceId, state.settings.order.defaultServiceId)
+        collectJob.cancel()
     }
 
     @Test
-    fun `onEvent ConnectPrinter should update state`() = runTest {
+    fun `onEvent ConnectPrinter should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
         val name = "Test Printer"
         val address = "192.168.1.100"
         viewModel.onEvent(SettingsScreenEvent.ConnectPrinter(name, address))
@@ -87,21 +96,17 @@ class SettingsViewModelTest {
         val state = viewModel.uiState.filter { it.settings.printer.printerAddress == address }.first()
         assertEquals(address, state.settings.printer.printerAddress)
         assertEquals(name, state.settings.printer.printerName)
+        collectJob.cancel()
     }
 
     @Test
     fun `onEvent DisconnectPrinter should clear printer settings`() = runTest(testDispatcher) {
-        // Collect in background to keep the StateFlow active and handle WhileSubscribed delay
         val collectJob = launch { viewModel.uiState.collect {} }
-
-        // Wait for flow to be ready and NOT loading
         viewModel.uiState.first { !it.isLoading }
 
-        // Trigger connect and wait for state to reflect the change
         viewModel.onEvent(SettingsScreenEvent.ConnectPrinter("Test", "1.1.1.1"))
         viewModel.uiState.first { it.settings.printer.printerAddress == "1.1.1.1" }
 
-        // Trigger disconnect and wait for state to be null again
         viewModel.onEvent(SettingsScreenEvent.DisconnectPrinter)
         val stateWithoutPrinter = viewModel.uiState.first { it.settings.printer.printerAddress == null }
         assertNull(stateWithoutPrinter.settings.printer.printerAddress)
@@ -110,35 +115,43 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `onEvent ResetSettings should reset state`() = runTest {
+    fun `onEvent ResetSettings should reset state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
         viewModel.onEvent(SettingsScreenEvent.UpdateCurrency(Currency.AED))
         viewModel.onEvent(SettingsScreenEvent.ResetSettings)
         
         val state = viewModel.uiState.filter { it.settings.common.currency == Currency.AED }.first()
         assertEquals(Settings(), state.settings)
+        collectJob.cancel()
     }
 
     @Test
-    fun `onEvent UpdateIncludeCompanyLogo should update state`() = runTest {
+    fun `onEvent UpdateIncludeCompanyLogo should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
         viewModel.onEvent(SettingsScreenEvent.UpdateIncludeCompanyLogo(false))
         
         val state = viewModel.uiState.filter { !it.settings.receipt.includeCompanyLogo }.first()
         assertEquals(false, state.settings.receipt.includeCompanyLogo)
+        collectJob.cancel()
     }
 
     @Test
-    fun `onEvent UpdateIncludeOrderItems should update state`() = runTest {
+    fun `onEvent UpdateIncludeOrderItems should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
         viewModel.onEvent(SettingsScreenEvent.UpdateIncludeOrderItems(false))
         
         val state = viewModel.uiState.filter { !it.settings.receipt.includeOrderItems }.first()
         assertEquals(false, state.settings.receipt.includeOrderItems)
+        collectJob.cancel()
     }
 
     @Test
-    fun `onEvent UpdateLateOrdersNotification should update state`() = runTest {
+    fun `onEvent UpdateLateOrdersNotification should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
         viewModel.onEvent(SettingsScreenEvent.UpdateLateOrdersNotification(false))
         
         val state = viewModel.uiState.filter { !it.settings.notifications.lateOrders }.first()
         assertEquals(false, state.settings.notifications.lateOrders)
+        collectJob.cancel()
     }
 }

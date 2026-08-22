@@ -17,6 +17,7 @@ import doobypro.shared.generated.resources.app_name
 import doobypro.shared.generated.resources.ic_app_icon
 import doobypro.shared.generated.resources.ic_dashboard
 import doobypro.shared.generated.resources.ic_dashboard_selected
+import doobypro.shared.generated.resources.ic_logout
 import doobypro.shared.generated.resources.ic_menu
 import doobypro.shared.generated.resources.ic_menu_selected
 import doobypro.shared.generated.resources.ic_order
@@ -27,6 +28,7 @@ import doobypro.shared.generated.resources.ic_settings
 import doobypro.shared.generated.resources.ic_settings_selected
 import doobypro.shared.generated.resources.ic_user_account
 import doobypro.shared.generated.resources.ic_user_account_selected
+import doobypro.shared.generated.resources.label_sign_out
 import doobypro.shared.generated.resources.navigation_item_menu_label
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -170,6 +172,14 @@ fun AppRoot() {
                         selectedIcon = Res.drawable.ic_settings_selected,
                         onClick = { navController.navigateWithRules(Route.Settings) }
                     )
+                )),
+                NavigationDrawerSection(items = listOf(
+                    NavigationItem(
+                        id = "sign_out",
+                        label = Res.string.label_sign_out,
+                        icon = Res.drawable.ic_logout,
+                        onClick = { authManager.signOut() }
+                    )
                 ))
             ))
 
@@ -182,10 +192,9 @@ fun AppRoot() {
             modifier = Modifier.padding(innerPadding)
         ) {
             introGraph(navController)
-            mainGraph(navController)
             accountGraph(navController)
             settingsGraph(navController)
-            // TODO: add nav graphs
+            mainGraph(navController)
         }
     }
 }

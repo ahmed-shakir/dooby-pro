@@ -12,7 +12,7 @@ import doobypro.shared.generated.resources.screen_Settings_common_date_format_la
 import doobypro.shared.generated.resources.screen_Settings_common_language_label
 import doobypro.shared.generated.resources.screen_Settings_common_theme_label
 import org.jetbrains.compose.resources.stringResource
-import se.supernovait.app.core.ui.component.input.SupernovaSelectField
+import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectionGroup
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing

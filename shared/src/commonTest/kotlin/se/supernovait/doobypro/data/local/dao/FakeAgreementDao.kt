@@ -17,6 +17,10 @@ class FakeAgreementDao : AgreementDao {
         return state.value[id]
     }
 
+    override suspend fun getByIds(ids: List<String>): List<AgreementEntity> {
+        return ids.mapNotNull { state.value[it] }
+    }
+
     override suspend fun upsert(agreement: AgreementEntity) {
         state.value += (agreement.id to agreement)
     }

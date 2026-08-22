@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.event.AppEvent
-import se.supernovait.app.core.domain.extension.toLocalDate
 import se.supernovait.app.core.domain.location.Address
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.AppDefaults
@@ -37,7 +37,7 @@ class AccountSetupWizardViewModel(
             is AccountSetupWizardEvent.UpdateFirstName -> updateFirstName(event.value)
             is AccountSetupWizardEvent.UpdateLastName -> updateLastName(event.value)
             is AccountSetupWizardEvent.UpdateUsername -> updateUsername(event.value)
-            is AccountSetupWizardEvent.UpdateBirthDate -> updateBirthDate(event.value)
+            is AccountSetupWizardEvent.UpdateBirthDate -> updateBirthDate(event.date)
             is AccountSetupWizardEvent.UpdateEmail -> updateEmail(event.value)
             is AccountSetupWizardEvent.UpdatePhoneNumber -> updatePhoneNumber(event.value)
             is AccountSetupWizardEvent.UpdateCompanyLegalName -> updateCompanyLegalName(event.value)
@@ -71,10 +71,7 @@ class AccountSetupWizardViewModel(
     private fun updateFirstName(value: String) { _uiState.value = _uiState.value.copy(firstName = value) }
     private fun updateLastName(value: String) { _uiState.value = _uiState.value.copy(lastName = value) }
     private fun updateUsername(value: String) { _uiState.value = _uiState.value.copy(username = value) }
-    private fun updateBirthDate(value: String) {
-        val date = value.toLocalDate()
-        _uiState.value = _uiState.value.copy(birthDate = date, birthDateString = value)
-    }
+    private fun updateBirthDate(date: LocalDate?) { _uiState.value = _uiState.value.copy(birthDate = date) }
     private fun updateEmail(value: String) { _uiState.value = _uiState.value.copy(email = value) }
     private fun updatePhoneNumber(value: String) { _uiState.value = _uiState.value.copy(phoneNumber = formatPhoneNumber(value)) }
 

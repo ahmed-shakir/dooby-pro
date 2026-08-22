@@ -111,14 +111,12 @@ class AccountSetupWizardViewModelTest {
 
     @Test
     fun `UpdateBirthDate updates both LocalDate and String`() = runTest(testDispatcher) {
-        val validDate = "1990-01-01"
+        val validDate = LocalDate(1990, 1, 1)
         viewModel.onEvent(AccountSetupWizardEvent.UpdateBirthDate(validDate))
-        assertEquals(validDate, viewModel.uiState.value.birthDateString)
-        assertEquals(LocalDate(1990, 1, 1), viewModel.uiState.value.birthDate)
+        assertEquals(validDate, viewModel.uiState.value.birthDate)
 
-        val invalidDate = "not-a-date"
+        val invalidDate = null
         viewModel.onEvent(AccountSetupWizardEvent.UpdateBirthDate(invalidDate))
-        assertEquals(invalidDate, viewModel.uiState.value.birthDateString)
         assertNull(viewModel.uiState.value.birthDate)
     }
 

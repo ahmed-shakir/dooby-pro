@@ -15,7 +15,7 @@ import se.supernovait.doobypro.domain.model.agreement.Agreement
  * @property user The [User] associated with this account.
  * @property company The [Company] profile for this account.
  * @property license The active [License] associated with this account, if any.
- * @property agreement The equipment lease [Agreement] associated with this account, if any.
+ * @property agreements The list of equipment lease or support [Agreement]s associated with this account.
  * @property deactivatedAt The timestamp when the account was deactivated, if any.
  * @property isMarkedForDeletion Whether the account is pending permanent deletion.
  */
@@ -24,7 +24,7 @@ data class Account(
     val user: User,
     val company: Company,
     val license: License? = null,
-    val agreement: Agreement? = null,
+    val agreements: List<Agreement> = emptyList(),
     val deactivatedAt: LocalDateTime? = null,
     val isMarkedForDeletion: Boolean = false
 ) {

@@ -6,10 +6,6 @@ import doobypro.shared.generated.resources.navigation_item_dashboard_label
 import doobypro.shared.generated.resources.navigation_item_orders_label
 import doobypro.shared.generated.resources.navigation_item_services_label
 import doobypro.shared.generated.resources.navigation_item_settings_label
-import doobypro.shared.generated.resources.screen_Agreement_title
-import doobypro.shared.generated.resources.screen_CompanyProfile_title
-import doobypro.shared.generated.resources.screen_License_title
-import doobypro.shared.generated.resources.screen_UserProfile_title
 import kotlinx.serialization.Serializable
 
 sealed interface Route : NavigationRoute {
@@ -43,30 +39,6 @@ sealed interface Route : NavigationRoute {
     @Serializable
     data object Account : Route {
         override val label = Res.string.navigation_item_account_label
-    }
-
-    @Serializable
-    data object UserProfile : Route {
-        override val label = Res.string.screen_UserProfile_title
-        override val isTopLevel = false
-    }
-
-    @Serializable
-    data object CompanyProfile : Route {
-        override val label = Res.string.screen_CompanyProfile_title
-        override val isTopLevel = false
-    }
-
-    @Serializable
-    data object License : Route {
-        override val label = Res.string.screen_License_title
-        override val isTopLevel = false
-    }
-
-    @Serializable
-    data object Agreement : Route {
-        override val label = Res.string.screen_Agreement_title
-        override val isTopLevel = false
     }
 
     @Serializable
@@ -127,8 +99,7 @@ sealed interface Route : NavigationRoute {
 
     companion object {
         private val routes = listOf(
-            Welcome, AccountSetup, AppInfo, Support, Settings,
-            Account, UserProfile, CompanyProfile, License, Agreement,
+            Welcome, AccountSetup, AppInfo, Account, Support, Settings,
             SettingsCommon, SettingsOrder, SettingsReceipt, SettingsPrinter, SettingsNotifications,
             Dashboard, Orders, OrderDetails(""), Services, ServiceDetails("")
         ).associateBy { it.name }

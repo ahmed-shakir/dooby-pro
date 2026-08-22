@@ -19,6 +19,12 @@ interface AgreementDao {
     suspend fun getByAccountId(accountId: String): List<AgreementEntity>
 
     /**
+     * Retrieves a list of agreements by their IDs.
+     */
+    @Query("SELECT * FROM agreements WHERE id IN (:ids)")
+    suspend fun getByIds(ids: List<String>): List<AgreementEntity>
+
+    /**
      * Retrieves an agreement by its ID.
      */
     @Query("SELECT * FROM agreements WHERE id = :id")

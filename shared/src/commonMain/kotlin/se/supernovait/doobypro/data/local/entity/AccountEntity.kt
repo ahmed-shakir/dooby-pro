@@ -13,7 +13,7 @@ import kotlinx.datetime.LocalDateTime
  * @property id The unique identifier for the account (matches the companyId).
  * @property userId The ID of the associated user.
  * @property licenseId The ID of the associated license, if any.
- * @property agreementId The ID of the associated equipment lease agreement, if any.
+ * @property agreementIds The list of IDs of the associated agreements, if any.
  * @property deactivatedAt The timestamp when the account was deactivated, if any.
  * @property isMarkedForDeletion Whether the account is pending permanent deletion.
  */
@@ -23,7 +23,7 @@ data class AccountEntity(
     val id: String,
     val userId: String,
     val licenseId: String?,
-    val agreementId: String?,
+    val agreementIds: List<String>,
     val deactivatedAt: LocalDateTime? = null,
     val isMarkedForDeletion: Boolean = false
 )

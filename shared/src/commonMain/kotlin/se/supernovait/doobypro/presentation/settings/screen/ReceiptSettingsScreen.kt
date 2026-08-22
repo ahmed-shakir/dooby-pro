@@ -29,7 +29,7 @@ import doobypro.shared.generated.resources.screen_Settings_receipt_include_terms
 import doobypro.shared.generated.resources.screen_Settings_receipt_order_details_label
 import doobypro.shared.generated.resources.screen_Settings_receipt_paper_width_label
 import se.supernovait.app.core.ui.component.container.SupernovaListGroup
-import se.supernovait.app.core.ui.component.input.SupernovaSelectField
+import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing

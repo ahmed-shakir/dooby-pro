@@ -13,6 +13,10 @@ class FakeAgreementRepository : AgreementRepository {
         return agreements.value.values.filter { it.accountId == accountId }
     }
 
+    override suspend fun getAgreementsByIds(ids: List<String>): List<Agreement> {
+        return ids.mapNotNull { agreements.value[it] }
+    }
+
     override suspend fun getAgreementById(id: String): Result<Agreement, DataError> {
         return agreements.value[id]?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
     }

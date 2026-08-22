@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -18,7 +17,8 @@ import doobypro.shared.generated.resources.screen_Settings_order_delivery_method
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_option_label
 import doobypro.shared.generated.resources.screen_Settings_order_handling_time_label
 import org.jetbrains.compose.resources.stringResource
-import se.supernovait.app.core.ui.component.input.SupernovaSelectField
+import se.supernovait.app.core.ui.component.input.SupernovaTextField
+import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
@@ -66,10 +66,10 @@ fun OrderSettingsScreen(
         )
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-        OutlinedTextField(
-            label = { SupernovaLabel(text = Res.string.screen_Settings_order_handling_time_label) },
+        SupernovaTextField(
+            label = stringResource(Res.string.screen_Settings_order_handling_time_label),
             value = state.settings.order.defaultHandlingTimeDays.toString(),
-            onValueChange = { newValue ->
+            onValueChange = { newValue, _ ->
                 newValue.toIntOrNull()?.let {
                     onEvent(SettingsScreenEvent.UpdateDefaultHandlingTimeDays(it))
                 }

@@ -70,9 +70,9 @@ class AccountRepositoryImpl(
 
         // Optional components
         val license = entity.licenseId?.let { licenseRepository.getLicenseById(it).getOrNull() }
-        val agreement = entity.agreementId?.let { agreementRepository.getAgreementById(it).getOrNull() }
+        val agreements = agreementRepository.getAgreementsByIds(entity.agreementIds)
 
-        return Result.Success(entity.toDomain(user, company, license, agreement))
+        return Result.Success(entity.toDomain(user, company, license, agreements))
     }
 
     override suspend fun saveAccount(account: Account): Result<String, DataError> {
@@ -141,7 +141,7 @@ class AccountRepositoryImpl(
             }
         }
 
-        entity.agreementId?.let { id ->
+        entity.agreementIds.forEach { id ->
             agreementRepository.getAgreementById(id).getOrNull()?.let {
                 agreementRepository.deleteAgreement(it)
             }
@@ -176,7 +176,7 @@ class AccountRepositoryImpl(
 
             licenseRepository.saveLicense(license).flatMap { licenseId ->
                 // 4. Link everything in the root Account table
-                linkAccount(user.id!!, companyId, licenseId)
+                linkAccount(user.id!!, companyId, licenseId, account.agreements.mapNotNull { it.id })
             }
         }
     }
@@ -196,14 +196,19 @@ class AccountRepositoryImpl(
         }
     }
 
-    private suspend fun linkAccount(userId: String, companyId: String, licenseId: String?): Result<String, DataError> {
+    private suspend fun linkAccount(
+        userId: String,
+        companyId: String,
+        licenseId: String?,
+        agreementIds: List<String>
+    ): Result<String, DataError> {
         return try {
             accountDao.upsert(
                 AccountEntity(
                     id = companyId,
                     userId = userId,
                     licenseId = licenseId,
-                    agreementId = null
+                    agreementIds = agreementIds
                 )
             )
             Result.Success(companyId)

@@ -26,6 +26,12 @@ class AgreementRepositoryImpl(
         }
     }
 
+    override suspend fun getAgreementsByIds(ids: List<String>): List<Agreement> {
+        return withContext(ioContext) {
+            agreementDao.getByIds(ids).map { it.toDomain() }
+        }
+    }
+
     override suspend fun getAgreementById(id: String): Result<Agreement, DataError> {
         return withContext(ioContext) {
             val agreement = agreementDao.getById(id)

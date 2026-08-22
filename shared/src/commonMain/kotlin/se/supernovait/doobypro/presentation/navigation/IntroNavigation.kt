@@ -15,6 +15,9 @@ import se.supernovait.doobypro.presentation.welcome.WelcomeViewModel
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardScreen
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 
+/**
+ * Extension for NavGraphBuilder to add introductory navigation.
+ */
 fun NavGraphBuilder.introGraph(
     navController: NavHostController,
 ) {
