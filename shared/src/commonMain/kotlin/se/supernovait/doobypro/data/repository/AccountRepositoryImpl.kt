@@ -9,6 +9,8 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.data.persistence.dao.UserDao
+import se.supernovait.app.core.data.persistence.mapper.toDomain
+import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.flatMap
@@ -26,7 +28,6 @@ import se.supernovait.doobypro.domain.repository.CompanyRepository
 import se.supernovait.doobypro.domain.repository.LicenseRepository
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Clock
-import se.supernovait.app.core.data.persistence.mapper.toEntity as toUserEntity
 
 /**
  * Implementation of [AccountRepository] using the Assembly Pattern.
@@ -91,6 +92,10 @@ class AccountRepositoryImpl(
                 val datetime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 // Soft delete: Mark for deletion and set deactivation timestamp
                 accountDao.upsert(entity.copy(deactivatedAt = datetime, isMarkedForDeletion = true))
+
+                val user = userDao.getById(entity.userId)?.toDomain()
+                user?.let { userDao.upsert(it.softDelete().toEntity()) }
+
                 Result.Success(Unit)
             } catch (_: Exception) {
                 Result.Failure(DataError.DATABASE_ERROR)
@@ -180,7 +185,7 @@ class AccountRepositoryImpl(
         return try {
             // 1. Update sub-components
             companyRepository.saveCompany(account.company)
-            userDao.upsert(account.user.toUserEntity())
+            userDao.upsert(account.user.toEntity())
             
             // 2. Update the account link entity
             val entityToSave = account.toEntity()
