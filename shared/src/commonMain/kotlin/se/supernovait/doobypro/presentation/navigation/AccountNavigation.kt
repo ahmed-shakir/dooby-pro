@@ -1,28 +1,60 @@
 package se.supernovait.doobypro.presentation.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import se.supernovait.app.core.ui.component.text.SupernovaTitle
-import se.supernovait.app.core.ui.theme.spacing
+import org.koin.compose.viewmodel.koinViewModel
+import se.supernovait.doobypro.presentation.account.AccountViewModel
+import se.supernovait.doobypro.presentation.account.event.AccountScreenEvent
+import se.supernovait.doobypro.presentation.account.screen.AccountScreen
+import se.supernovait.doobypro.presentation.account.screen.AgreementScreen
+import se.supernovait.doobypro.presentation.account.screen.CompanyProfileScreen
+import se.supernovait.doobypro.presentation.account.screen.LicenseScreen
+import se.supernovait.doobypro.presentation.account.screen.UserProfileScreen
 
 fun NavGraphBuilder.accountGraph(
     navController: NavHostController
 ) {
     composable<Route.Account> {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.mediumLarge)
-        ) {
-            SupernovaTitle(text = "My Account")
-        }
+        AccountScreen(
+            onEvent = { event ->
+                when (event) {
+                    AccountScreenEvent.NavigateToUserProfile -> navController.navigateWithRules(Route.UserProfile)
+                    AccountScreenEvent.NavigateToCompanyProfile -> navController.navigateWithRules(Route.CompanyProfile)
+                    AccountScreenEvent.NavigateToLicense -> navController.navigateWithRules(Route.License)
+                    AccountScreenEvent.NavigateToAgreements -> navController.navigateWithRules(Route.Agreement)
+                }
+            }
+        )
+    }
+
+    composable<Route.UserProfile> {
+        val viewModel = koinViewModel<AccountViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        UserProfileScreen(state = uiState, onEvent = viewModel::onEvent)
+    }
+
+    composable<Route.CompanyProfile> {
+        val viewModel = koinViewModel<AccountViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        CompanyProfileScreen(state = uiState, onEvent = viewModel::onEvent)
+    }
+
+    composable<Route.License> {
+        val viewModel = koinViewModel<AccountViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        LicenseScreen(state = uiState)
+    }
+
+    composable<Route.Agreement> {
+        val viewModel = koinViewModel<AccountViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        AgreementScreen(state = uiState)
     }
 }

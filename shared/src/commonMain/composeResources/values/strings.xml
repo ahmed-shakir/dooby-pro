@@ -92,6 +92,7 @@
     <string name="screen_AccountSetup_field_city">City</string>
     <string name="screen_AccountSetup_field_emirate">Emirate</string>
     <string name="screen_AccountSetup_field_postal_code">Postal code</string>
+    <string name="screen_AccountSetup_field_country">Country</string>
     <string name="screen_AccountSetup_field_location_note">Location note</string>
 
     <string name="screen_AccountSetup_action_continue">Continue</string>
@@ -163,15 +164,6 @@
     <string name="screen_Settings_notifications_system_label">System notifications</string>
     <string name="screen_Settings_notifications_system_printer_error">Printer errors</string>
 
-    <!-- Order Status -->
-    <string name="order_status_new">New</string>
-    <string name="order_status_in_progress">In Progress</string>
-    <string name="order_status_ready">Ready</string>
-    <string name="order_status_out_for_delivery">Out for Delivery</string>
-    <string name="order_status_picked_up">Picked Up</string>
-    <string name="order_status_delivered">Delivered</string>
-    <string name="order_status_cancelled">Cancelled</string>
-
     <!-- Receipt settings -->
     <string name="screen_Settings_receipt_paper_width_label">Paper width</string>
 
@@ -200,4 +192,88 @@
     <string name="screen_Settings_receipt_include_delivery_method">Delivery method</string>
 
     <string name="screen_Settings_receipt_include_terms_and_conditions">Terms and conditions</string>
+
+    <!-- Account -->
+    <string name="screen_Account_user_profile_label">User Profile</string>
+    <string name="screen_Account_user_profile_desc">Your personal information</string>
+    <string name="screen_Account_company_profile_label">Company Profile</string>
+    <string name="screen_Account_company_profile_desc">Company details and settings</string>
+    <string name="screen_Account_license_label">Account License</string>
+    <string name="screen_Account_license_desc">License information and status</string>
+    <string name="screen_Account_agreements_label">Agreements</string>
+    <string name="screen_Account_agreements_desc">Equipment lease and contracts</string>
+
+    <!-- User Profile Screen -->
+    <string name="screen_UserProfile_title">User Profile</string>
+    <string name="screen_UserProfile_section_account">Account Information</string>
+    <string name="screen_UserProfile_field_user_id">User ID</string>
+    <string name="screen_UserProfile_section_personal">Personal Information</string>
+    <string name="screen_UserProfile_field_first_name">First Name</string>
+    <string name="screen_UserProfile_field_last_name">Last Name</string>
+    <string name="screen_UserProfile_field_dob">Date of Birth</string>
+    <string name="screen_UserProfile_field_dob_placeholder">YYYY-MM-DD</string>
+    <string name="screen_UserProfile_section_contact">Contact Information</string>
+    <string name="screen_UserProfile_field_email">Email Address</string>
+    <string name="screen_UserProfile_field_phone">Phone Number</string>
+    <string name="screen_UserProfile_action_save">Save Changes</string>
+    <string name="screen_UserProfile_action_saving">Saving...</string>
+    <string name="screen_UserProfile_action_delete_account">Delete Account</string>
+
+    <!-- Company Profile Screen -->
+    <string name="screen_CompanyProfile_title">Company Profile</string>
+    <string name="screen_CompanyProfile_section_info">Company Information</string>
+    <string name="screen_CompanyProfile_field_company_id">Company ID</string>
+    <string name="screen_CompanyProfile_field_legal_name">Legal Company Name</string>
+    <string name="screen_CompanyProfile_field_display_name">Display Name</string>
+    <string name="screen_CompanyProfile_field_license_number">License Number</string>
+    <string name="screen_CompanyProfile_section_contact">Contact Information</string>
+    <string name="screen_CompanyProfile_field_email">Email Address</string>
+    <string name="screen_CompanyProfile_field_phone">Phone Number</string>
+    <string name="screen_CompanyProfile_section_address">Address</string>
+    <string name="screen_CompanyProfile_field_street">Street Address</string>
+    <string name="screen_CompanyProfile_field_city">City</string>
+    <string name="screen_CompanyProfile_field_subdivision">Subdivision / Emirate</string>
+    <string name="screen_CompanyProfile_field_postal_code">Postal Code</string>
+    <string name="screen_CompanyProfile_field_country">Country</string>
+    <string name="screen_CompanyProfile_field_notes">Location Notes</string>
+    <string name="screen_CompanyProfile_action_save">Save Changes</string>
+    <string name="screen_CompanyProfile_action_saving">Saving...</string>
+
+    <!-- License Screen -->
+    <string name="screen_License_title">Account License</string>
+    <string name="screen_License_error_not_found">No active license found for this account.</string>
+    <string name="screen_License_section_details">License Details</string>
+    <string name="screen_License_field_id">License ID</string>
+    <string name="screen_License_field_tier">Tier</string>
+    <string name="screen_License_field_status">Status</string>
+    <string name="screen_License_section_validity">Terms &amp; Validity</string>
+    <string name="screen_License_field_issue_date">Issue Date</string>
+    <string name="screen_License_field_expiry_date">Expiry Date</string>
+    <string name="screen_License_section_description">Description</string>
+
+    <!-- Agreement Screen -->
+    <string name="screen_Agreement_title">Agreements</string>
+    <string name="screen_Agreement_error_not_found">No equipment lease agreements found.</string>
+    <string name="screen_Agreement_section_equipment">Equipment Info</string>
+    <string name="screen_Agreement_field_model">Model</string>
+    <string name="screen_Agreement_field_serial">Serial Number</string>
+    <string name="screen_Agreement_section_billing">Billing &amp; Status</string>
+    <string name="screen_Agreement_field_status">Status</string>
+    <string name="screen_Agreement_field_fee">Fee (%1$s)</string>
+    <string name="screen_Agreement_field_issue_date">Issue Date</string>
+    <string name="screen_Agreement_field_cancellation_date">Cancellation Date</string>
+
+    <string name="screen_Account_delete_confirm_title">Delete Account</string>
+    <string name="screen_Account_delete_confirm_message">Are you sure you want to delete your account? It will be deactivated and permanently deleted after 30 days.</string>
+    <string name="screen_Account_delete_action">Delete</string>
+    <string name="screen_Account_cancel_action">Cancel</string>
+
+    <!-- Order Status -->
+    <string name="order_status_new">New</string>
+    <string name="order_status_in_progress">In Progress</string>
+    <string name="order_status_ready">Ready</string>
+    <string name="order_status_out_for_delivery">Out for Delivery</string>
+    <string name="order_status_picked_up">Picked Up</string>
+    <string name="order_status_delivered">Delivered</string>
+    <string name="order_status_cancelled">Cancelled</string>
 </resources>

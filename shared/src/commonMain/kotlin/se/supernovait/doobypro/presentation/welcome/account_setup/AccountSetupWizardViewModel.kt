@@ -47,9 +47,10 @@ class AccountSetupWizardViewModel(
             is AccountSetupWizardEvent.UpdateCompanyEmail -> updateCompanyEmail(event.value)
             is AccountSetupWizardEvent.UpdateStreetAddress -> updateStreetAddress(event.value)
             is AccountSetupWizardEvent.UpdateCity -> updateCity(event.value)
-            is AccountSetupWizardEvent.UpdateEmirate -> updateEmirate(event.value)
+            is AccountSetupWizardEvent.UpdateSubdivision -> updateSubdivision(event.value)
             is AccountSetupWizardEvent.UpdatePostalCode -> updatePostalCode(event.value)
-            is AccountSetupWizardEvent.UpdateLocationNote -> updateLocationNote(event.value)
+            is AccountSetupWizardEvent.UpdateCountry -> updateCountry(event.value)
+            is AccountSetupWizardEvent.UpdateNotes -> updateNotes(event.value)
         }
     }
 
@@ -85,9 +86,10 @@ class AccountSetupWizardViewModel(
 
     private fun updateStreetAddress(value: String) { _uiState.value = _uiState.value.copy(streetAddress = value) }
     private fun updateCity(value: String) { _uiState.value = _uiState.value.copy(city = value) }
-    private fun updateEmirate(value: String) { _uiState.value = _uiState.value.copy(emirate = value) }
+    private fun updateSubdivision(value: String) { _uiState.value = _uiState.value.copy(subdivision = value) }
     private fun updatePostalCode(value: String) { _uiState.value = _uiState.value.copy(postalCode = value) }
-    private fun updateLocationNote(value: String) { _uiState.value = _uiState.value.copy(locationNote = value) }
+    private fun updateCountry(value: String) { _uiState.value = _uiState.value.copy(country = value) }
+    private fun updateNotes(value: String) { _uiState.value = _uiState.value.copy(notes = value) }
 
     private fun createAccount() {
         viewModelScope.launch {
@@ -112,9 +114,10 @@ class AccountSetupWizardViewModel(
                     address = Address(
                         street = state.streetAddress,
                         city = state.city,
-                        subdivision = state.emirate,
-                        postalCode = if (state.postalCode.isBlank()) null else state.postalCode,
-                        country = AppDefaults.COUNTRY
+                        subdivision = state.subdivision,
+                        postalCode = state.postalCode.ifBlank { null },
+                        country = state.country,
+                        notes = state.notes.ifBlank { null }
                     )
                 )
             )

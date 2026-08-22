@@ -37,10 +37,12 @@ sealed interface AccountSetupWizardEvent {
     data class UpdateStreetAddress(val value: String) : AccountSetupWizardEvent
     /** Updates the business city. */
     data class UpdateCity(val value: String) : AccountSetupWizardEvent
-    /** Updates the business emirate/state. */
-    data class UpdateEmirate(val value: String) : AccountSetupWizardEvent
+    /** Updates the business subdivision (emirate/state). */
+    data class UpdateSubdivision(val value: String) : AccountSetupWizardEvent
     /** Updates the business postal code. */
     data class UpdatePostalCode(val value: String) : AccountSetupWizardEvent
-    /** Updates the business location note. */
-    data class UpdateLocationNote(val value: String) : AccountSetupWizardEvent
+    /** Updates the business country. */
+    data class UpdateCountry(val value: String) : AccountSetupWizardEvent
+    /** Updates the business location notes. */
+    data class UpdateNotes(val value: String) : AccountSetupWizardEvent
 }

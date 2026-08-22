@@ -13,6 +13,14 @@ class FakeAccountDao : AccountDao {
         return state.value[id]
     }
 
+    override suspend fun getByUserId(userId: String): AccountEntity? {
+        return state.value.values.find { it.userId == userId }
+    }
+
+    override suspend fun getAccountsMarkedForDeletion(): List<AccountEntity> {
+        return state.value.values.filter { it.isMarkedForDeletion }
+    }
+
     override suspend fun upsert(account: AccountEntity) {
         state.value += (account.id to account)
     }

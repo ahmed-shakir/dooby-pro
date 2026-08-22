@@ -19,6 +19,15 @@ class FakeAccountRepository : AccountRepository {
         }
     }
 
+    override suspend fun getAccountByUserId(userId: String): Result<Account, DataError> {
+        val account = accounts.value.values.find { it.user.id == userId }
+        return if (account != null) {
+            Result.Success(account)
+        } else {
+            Result.Failure(DataError.NOT_FOUND)
+        }
+    }
+
     override suspend fun saveAccount(account: Account): Result<String, DataError> {
         val id = account.id ?: account.company.id ?: "generated-id"
         val accountToSave = account.copy(id = id)
@@ -26,8 +35,15 @@ class FakeAccountRepository : AccountRepository {
         return Result.Success(id)
     }
 
-    override suspend fun deleteAccount(account: Account): Result<Unit, DataError> {
-        accounts.update { it - (account.id ?: "") }
+    override suspend fun deleteAccount(id: String): Result<Unit, DataError> {
+        val account = accounts.value[id] ?: return Result.Failure(DataError.NOT_FOUND)
+        accounts.update { it + (id to account.copy(isMarkedForDeletion = true)) }
         return Result.Success(Unit)
+    }
+
+    override suspend fun purgeDeletedAccounts(): Result<Int, DataError> {
+        val toDelete = accounts.value.values.filter { it.isMarkedForDeletion }
+        accounts.update { it.filterValues { acc -> !acc.isMarkedForDeletion } }
+        return Result.Success(toDelete.size)
     }
 }

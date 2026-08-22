@@ -11,6 +11,7 @@ import se.supernovait.app.core.domain.model.license.License
 import se.supernovait.app.core.domain.model.license.LicenseStatus
 import se.supernovait.app.core.domain.model.license.Tier
 import se.supernovait.doobypro.data.local.dao.FakeAccountDao
+import se.supernovait.doobypro.data.local.dao.FakeUserDao
 import se.supernovait.doobypro.data.local.entity.AccountEntity
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.Company
@@ -19,7 +20,6 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -27,6 +27,7 @@ import kotlin.test.assertTrue
  */
 class AccountRepositoryImplTest {
     private lateinit var fakeAccountDao: FakeAccountDao
+    private lateinit var fakeUserDao: FakeUserDao
     private lateinit var fakeAuthRepository: FakeAuthRepository
     private lateinit var fakeCompanyRepository: FakeCompanyRepository
     private lateinit var fakeLicenseRepository: FakeLicenseRepository
@@ -77,6 +78,7 @@ class AccountRepositoryImplTest {
     @BeforeTest
     fun setUp() {
         fakeAccountDao = FakeAccountDao()
+        fakeUserDao = FakeUserDao()
         fakeAuthRepository = FakeAuthRepository()
         fakeCompanyRepository = FakeCompanyRepository()
         fakeLicenseRepository = FakeLicenseRepository()
@@ -87,7 +89,8 @@ class AccountRepositoryImplTest {
             companyRepository = fakeCompanyRepository,
             licenseRepository = fakeLicenseRepository,
             agreementRepository = fakeAgreementRepository,
-            accountDao = fakeAccountDao
+            accountDao = fakeAccountDao,
+            userDao = fakeUserDao
         )
     }
 
@@ -156,8 +159,10 @@ class AccountRepositoryImplTest {
         
         assertNotNull(repository.getAccount(accountId).getOrNull())
 
-        repository.deleteAccount(testAccount)
+        repository.deleteAccount(accountId)
 
-        assertNull(repository.getAccount(accountId).getOrNull())
+        val deletedAccount = repository.getAccount(accountId).getOrNull()
+        assertNotNull(deletedAccount)
+        assertTrue(deletedAccount.isMarkedForDeletion)
     }
 }

@@ -1,6 +1,7 @@
 package se.supernovait.doobypro.presentation.welcome.account_setup
 
 import kotlinx.datetime.LocalDate
+import se.supernovait.doobypro.domain.model.AppDefaults
 
 /**
  * State representation for the Account Setup Wizard.
@@ -20,9 +21,10 @@ import kotlinx.datetime.LocalDate
  * @property companyEmail Main business email address.
  * @property streetAddress Physical street address of the business.
  * @property city City where the business is located.
- * @property emirate State or Emirate where the business is located.
+ * @property subdivision State or Emirate where the business is located.
  * @property postalCode Zip or postal code for the business address.
- * @property locationNote Additional directions or landmark info.
+ * @property country Country where the business is located.
+ * @property notes Additional directions or landmark info.
  * @property isCreatingAccount Flag indicating if the account creation process is in progress.
  */
 data class AccountSetupWizardState(
@@ -41,8 +43,9 @@ data class AccountSetupWizardState(
     val companyEmail: String = "",
     val streetAddress: String = "",
     val city: String = "",
-    val emirate: String = "",
+    val subdivision: String = "",
     val postalCode: String = "",
-    val locationNote: String = "",
+    val country: String = AppDefaults.COUNTRY,
+    val notes: String = "",
     val isCreatingAccount: Boolean = false
 )

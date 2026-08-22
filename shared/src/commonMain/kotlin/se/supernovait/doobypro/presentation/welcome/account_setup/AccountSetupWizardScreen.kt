@@ -34,6 +34,7 @@ import doobypro.shared.generated.resources.screen_AccountSetup_field_company_dis
 import doobypro.shared.generated.resources.screen_AccountSetup_field_company_email
 import doobypro.shared.generated.resources.screen_AccountSetup_field_company_legal_name
 import doobypro.shared.generated.resources.screen_AccountSetup_field_company_phone
+import doobypro.shared.generated.resources.screen_AccountSetup_field_country
 import doobypro.shared.generated.resources.screen_AccountSetup_field_dob
 import doobypro.shared.generated.resources.screen_AccountSetup_field_email
 import doobypro.shared.generated.resources.screen_AccountSetup_field_emirate
@@ -269,8 +270,8 @@ private fun Step3(state: AccountSetupWizardState, onEvent: (AccountSetupWizardEv
     SupernovaSelectField(
         label = stringResource(Res.string.screen_AccountSetup_field_emirate),
         options = Emirate.entries,
-        selectedOption = Emirate.fromValue(state.emirate),
-        onOptionSelected = { onEvent(AccountSetupWizardEvent.UpdateEmirate(it.value)) },
+        selectedOption = Emirate.fromValue(state.subdivision),
+        onOptionSelected = { onEvent(AccountSetupWizardEvent.UpdateSubdivision(it.value)) },
         optionLabel = { emirateLabels[it] ?: "" }
     )
     SupernovaTextField(
@@ -280,10 +281,15 @@ private fun Step3(state: AccountSetupWizardState, onEvent: (AccountSetupWizardEv
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
     SupernovaTextField(
+        label = stringResource(Res.string.screen_AccountSetup_field_country),
+        initialValue = state.country,
+        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateCountry(value)) }
+    )
+    SupernovaTextField(
         label = stringResource(Res.string.screen_AccountSetup_field_location_note),
-        initialValue = state.locationNote,
+        initialValue = state.notes,
         isMultiline = true,
-        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateLocationNote(value)) }
+        onValueChange = { value, _ -> onEvent(AccountSetupWizardEvent.UpdateNotes(value)) }
     )
 }
 
@@ -309,10 +315,11 @@ private fun Step4(state: AccountSetupWizardState) {
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_phone), state.phoneNumber)
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_email), state.email)
             
-            val emirateLabel = Emirate.fromName(state.emirate)?.label?.let { stringResource(it) } ?: state.emirate
             val location = buildString {
-                append(emirateLabel)
-                if (emirateLabel.isNotBlank()) append(", ")
+                if (state.subdivision.isNotBlank()) {
+                    append(state.subdivision)
+                    append(", ")
+                }
                 append(AppDefaults.COUNTRY)
             }
             SummaryItem(stringResource(Res.string.screen_AccountSetup_summary_location), location)

@@ -32,6 +32,7 @@ import se.supernovait.doobypro.domain.repository.LicenseRepository
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
+import se.supernovait.doobypro.presentation.account.AccountViewModel
 import se.supernovait.doobypro.presentation.settings.SettingsViewModel
 import se.supernovait.doobypro.presentation.welcome.WelcomeViewModel
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
@@ -53,6 +54,7 @@ val sharedModule = module {
     viewModelOf(::WelcomeViewModel)
     viewModelOf(::AccountSetupWizardViewModel)
     viewModelOf(::SettingsViewModel)
+    viewModelOf(::AccountViewModel)
 
     single<AppDatabase> {
         DatabaseFactory.create(get())

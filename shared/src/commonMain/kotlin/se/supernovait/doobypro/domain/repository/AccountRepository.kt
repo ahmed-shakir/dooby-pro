@@ -6,31 +6,33 @@ import se.supernovait.doobypro.domain.model.Account
 
 /**
  * Repository for managing [Account] domain models.
- *
- * This repository is responsible for assembling the full account model from
- * multiple data sources.
  */
 interface AccountRepository {
 
     /**
      * Retrieves the account for a specific ID.
-     *
-     * @param id The account identifier.
-     * @return The assembled [Account], or null if not found.
      */
     suspend fun getAccount(id: String): Result<Account, DataError>
 
     /**
-     * Inserts or updates a account.
-     *
-     * @param account The domain account model to upsert.
+     * Retrieves the account associated with a specific user ID.
+     */
+    suspend fun getAccountByUserId(userId: String): Result<Account, DataError>
+
+    /**
+     * Inserts or updates an account.
      */
     suspend fun saveAccount(account: Account): Result<String, DataError>
 
     /**
-     * Deletes a account.
-     *
-     * @param account The domain account model to delete.
+     * Soft-deletes an account by marking it for deletion and deactivating it.
+     * The actual data will be purged after a grace period.
      */
-    suspend fun deleteAccount(account: Account): Result<Unit, DataError>
+    suspend fun deleteAccount(id: String): Result<Unit, DataError>
+
+    /**
+     * Hard-deletes all accounts that have been marked for deletion and have
+     * exceeded the grace period threshold.
+     */
+    suspend fun purgeDeletedAccounts(): Result<Int, DataError>
 }

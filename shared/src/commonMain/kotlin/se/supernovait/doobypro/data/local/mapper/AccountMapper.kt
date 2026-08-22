@@ -23,7 +23,9 @@ fun AccountEntity.toDomain(
         user = user,
         company = company,
         license = license,
-        agreement = agreement
+        agreement = agreement,
+        deactivatedAt = deactivatedAt,
+        isMarkedForDeletion = isMarkedForDeletion
     )
 }
 
@@ -35,6 +37,8 @@ fun Account.toEntity(): AccountEntity {
         id = id ?: company.id ?: throw IllegalArgumentException("Account company ID cannot be null"),
         userId = user.id ?: throw IllegalArgumentException("Account user ID cannot be null"),
         licenseId = license?.id,
-        agreementId = agreement?.id
+        agreementId = agreement?.id,
+        deactivatedAt = deactivatedAt,
+        isMarkedForDeletion = isMarkedForDeletion
     )
 }

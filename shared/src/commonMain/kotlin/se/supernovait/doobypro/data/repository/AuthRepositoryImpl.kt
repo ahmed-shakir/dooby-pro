@@ -20,6 +20,7 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
+import se.supernovait.doobypro.data.local.dao.AccountDao
 import se.supernovait.doobypro.domain.model.IdType
 import kotlin.coroutines.CoroutineContext
 
@@ -30,10 +31,12 @@ import kotlin.coroutines.CoroutineContext
  * managing the session of the currently logged-in user.
  *
  * @param userDao The data access object for user entities.
+ * @param accountDao The data access object for account entities.
  * @param prefs The data store for local preferences and session state.
  */
 class AuthRepositoryImpl(
     private val userDao: UserDao,
+    private val accountDao: AccountDao,
     private val prefs: DataStore<Preferences>
 ) : AuthRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
@@ -91,13 +94,16 @@ class AuthRepositoryImpl(
 
     override suspend fun signIn(username: String): Result<User, AuthError> {
         return withContext(ioContext) {
-            val user = userDao.getByUsername(username)
-            return@withContext if (user != null) {
-                saveUserToPrefs(user.id)
-                Result.Success(user.toDomain())
-            } else {
-                Result.Failure(AuthError.USER_NOT_FOUND)
+            val user = userDao.getByUsername(username) ?: return@withContext Result.Failure(AuthError.USER_NOT_FOUND)
+
+            // Check if account is deactivated or marked for deletion
+            val account = accountDao.getByUserId(user.id)
+            if (account != null && (account.deactivatedAt != null || account.isMarkedForDeletion)) {
+                return@withContext Result.Failure(AuthError.ACCOUNT_DEACTIVATED)
             }
+
+            saveUserToPrefs(user.id)
+            Result.Success(user.toDomain())
         }
     }
 

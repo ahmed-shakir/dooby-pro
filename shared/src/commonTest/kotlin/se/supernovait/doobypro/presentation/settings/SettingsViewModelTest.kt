@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -89,12 +90,23 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `onEvent DisconnectPrinter should clear printer settings`() = runTest {
+    fun `onEvent DisconnectPrinter should clear printer settings`() = runTest(testDispatcher) {
+        // Collect in background to keep the StateFlow active and handle WhileSubscribed delay
+        val collectJob = launch { viewModel.uiState.collect {} }
+
+        // Wait for flow to be ready and NOT loading
+        viewModel.uiState.first { !it.isLoading }
+
+        // Trigger connect and wait for state to reflect the change
         viewModel.onEvent(SettingsScreenEvent.ConnectPrinter("Test", "1.1.1.1"))
+        viewModel.uiState.first { it.settings.printer.printerAddress == "1.1.1.1" }
+
+        // Trigger disconnect and wait for state to be null again
         viewModel.onEvent(SettingsScreenEvent.DisconnectPrinter)
+        val stateWithoutPrinter = viewModel.uiState.first { it.settings.printer.printerAddress == null }
+        assertNull(stateWithoutPrinter.settings.printer.printerAddress)
         
-        val state = viewModel.uiState.filter { it.settings.printer.printerAddress == null }.first()
-        assertNull(state.settings.printer.printerAddress)
+        collectJob.cancel()
     }
 
     @Test

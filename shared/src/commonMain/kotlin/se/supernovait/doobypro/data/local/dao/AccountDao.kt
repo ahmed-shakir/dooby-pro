@@ -13,10 +13,22 @@ import se.supernovait.doobypro.data.local.entity.AccountEntity
 interface AccountDao {
 
     /**
+     * Retrieves all accounts marked for deletion.
+     */
+    @Query("SELECT * FROM accounts WHERE isMarkedForDeletion = 1")
+    suspend fun getAccountsMarkedForDeletion(): List<AccountEntity>
+
+    /**
      * Retrieves an account by its ID.
      */
     @Query("SELECT * FROM accounts WHERE id = :id")
     suspend fun getById(id: String): AccountEntity?
+
+    /**
+     * Retrieves an account by user ID.
+     */
+    @Query("SELECT * FROM accounts WHERE userId = :userId")
+    suspend fun getByUserId(userId: String): AccountEntity?
 
     /**
      * Inserts or updates an account.
