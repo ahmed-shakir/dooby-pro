@@ -47,7 +47,6 @@ data class AccountState(
     val editUserBirthDate: LocalDate? = null,
     val editUserEmail: String = "",
     val editUserPhone: String = "",
-    val editUserProfileImageUrl: String? = null,
     val editUserAddressStreet: String = "",
     val editUserAddressCity: String = "",
     val editUserAddressSubdivision: String = "",

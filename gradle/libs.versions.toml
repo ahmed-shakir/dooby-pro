@@ -7,9 +7,9 @@ android-targetSdk = "37"
 app-version-code = "1"
 app-version-name = "1.0.0"
 ###########################
-agp-version = "9.3.1"
+agp-version = "9.3.2"
 ksp-version = "2.3.10"
-supernova-version = "1.9.16"
+supernova-version = "1.9.19"
 # KOTLIN
 kotlin-version = "2.4.10"
 kotlinx-datetime-version = "0.8.0"
@@ -25,8 +25,8 @@ androidx-sqlite-version = "2.7.0"
 androidx-startup-version = "1.2.0"
 androidx-splashscreen-version = "1.2.0"
 # OTHER
-compose-multiplatform-version = "1.11.1"
-material3-version = "1.11.0-alpha07"
+compose-multiplatform-version = "1.12.0"
+material3-version = "1.12.0-alpha03"
 ktor-version = "3.5.2"
 koin-version = "4.2.2"
 
@@ -35,7 +35,7 @@ androidx-espresso-version = "3.7.0"
 androidx-test-ext-version = "1.7.0"
 junit-version = "4.13.2"
 compose-test-version = "1.12.0"
-compose-multiplatform-test-version = "1.11.1"
+compose-multiplatform-test-version = "1.12.0"
 
 [libraries]
 supernova-app-core = { group = "se.supernovait.app", name = "app-core", version.ref = "supernova-version" }

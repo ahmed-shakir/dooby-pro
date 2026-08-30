@@ -97,21 +97,21 @@ fun UserProfileTab(
                     SupernovaTextField(
                         label = stringResource(Res.string.Account_UserProfileTab_field_first_name),
                         value = state.editUserFirstName,
-                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdateFirstName(value)) },
+                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserFirstName(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     SupernovaTextField(
                         label = stringResource(Res.string.Account_UserProfileTab_field_last_name),
                         value = state.editUserLastName,
-                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdateLastName(value)) },
+                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserLastName(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     SupernovaDateField(
                         label = stringResource(Res.string.Account_UserProfileTab_field_dob),
                         value = state.editUserBirthDate,
-                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdateBirthDate(value)) },
+                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserBirthDate(value)) },
                         modifier = plainFieldModifier
                     )
                 }
@@ -153,14 +153,14 @@ fun UserProfileTab(
                     SupernovaTextField(
                         label = stringResource(Res.string.Contact_details_field_email),
                         value = state.editUserEmail,
-                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdateEmail(value)) },
+                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserEmail(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     SupernovaTextField(
                         label = stringResource(Res.string.Contact_details_field_phone),
                         value = state.editUserPhone,
-                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdatePhoneNumber(value)) },
+                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserPhone(value)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = fieldModifier
                     )

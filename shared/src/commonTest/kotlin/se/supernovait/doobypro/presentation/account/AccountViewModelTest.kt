@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -23,6 +24,7 @@ import se.supernovait.doobypro.data.repository.FakeCompanyRepository
 import se.supernovait.doobypro.data.repository.FakeLicenseRepository
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.Company
+import se.supernovait.doobypro.util.FakeFileStorage
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -35,6 +37,7 @@ class AccountViewModelTest {
     
     private lateinit var authRepository: FakeAuthRepository
     private lateinit var accountRepository: AccountRepositoryImpl
+    private lateinit var fileStorage: FakeFileStorage
     private lateinit var viewModel: AccountViewModel
 
     private val testUser = User(
@@ -72,6 +75,7 @@ class AccountViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         authRepository = FakeAuthRepository()
+        fileStorage = FakeFileStorage()
         accountRepository = AccountRepositoryImpl(
             authRepository = authRepository,
             companyRepository = FakeCompanyRepository(),
@@ -87,7 +91,7 @@ class AccountViewModelTest {
             accountRepository.saveAccount(Account(user = testUser, company = testCompany, license = testLicense))
         }
 
-        viewModel = AccountViewModel(authRepository, accountRepository)
+        viewModel = AccountViewModel(authRepository, accountRepository, fileStorage)
     }
 
     @AfterTest
@@ -113,7 +117,7 @@ class AccountViewModelTest {
     fun `UpdateFirstName event should update state`() = runTest(testDispatcher) {
         val collectJob = launch { viewModel.uiState.collect {} }
         
-        viewModel.onEvent(AccountEvent.UpdateFirstName("Jane"))
+        viewModel.onEvent(AccountEvent.UpdateUserFirstName("Jane"))
         val state = viewModel.uiState.first { it.editUserFirstName == "Jane" }
         assertEquals("Jane", state.editUserFirstName)
         
@@ -128,7 +132,7 @@ class AccountViewModelTest {
         viewModel.uiState.first { it.account != null }
 
         viewModel.onEvent(AccountEvent.EnterEditMode("personal-info"))
-        viewModel.onEvent(AccountEvent.UpdateFirstName("Jane"))
+        viewModel.onEvent(AccountEvent.UpdateUserFirstName("Jane"))
         
         // Fix for the address validation failure in ViewModel
         viewModel.onEvent(AccountEvent.UpdateUserAddressStreet("User St"))
@@ -161,37 +165,23 @@ class AccountViewModelTest {
     }
 
     @Test
-    fun `UpdateProfileImage should update state and repository after save`() = runTest(testDispatcher) {
-        val collectJob = launch { viewModel.uiState.collect {} }
-        
-        // Wait for initial load
-        viewModel.uiState.first { it.account != null }
-
-        val newAvatarUrl = "https://example.com/avatar.png"
-        viewModel.onEvent(AccountEvent.EnterEditMode("user-branding"))
-        viewModel.onEvent(AccountEvent.UpdateProfileImage(newAvatarUrl))
-        viewModel.onEvent(AccountEvent.SaveUserProfile)
-        
-        val state = viewModel.uiState.first { it.account?.user?.profileImage == newAvatarUrl && it.editingCardId == null }
-        assertEquals(newAvatarUrl, state.account?.user?.profileImage)
-        
-        collectJob.cancel()
-    }
-
-    @Test
     fun `UpdateCompanyLogo should update state and repository after save`() = runTest(testDispatcher) {
         val collectJob = launch { viewModel.uiState.collect {} }
         
         // Wait for initial load
         viewModel.uiState.first { it.account != null }
 
-        val newLogoUrl = "https://example.com/logo.png"
+        val newLogoBytes = byteArrayOf(4, 5, 6)
         viewModel.onEvent(AccountEvent.EnterEditMode("company-branding"))
-        viewModel.onEvent(AccountEvent.UpdateCompanyLogo(newLogoUrl))
+        viewModel.onEvent(AccountEvent.UpdateCompanyLogo(newLogoBytes))
+
+        // Wait for the background file saving to complete
+        advanceUntilIdle()
+
         viewModel.onEvent(AccountEvent.SaveCompanyProfile)
         
-        val state = viewModel.uiState.first { it.account?.company?.logoUrl == newLogoUrl && it.editingCardId == null }
-        assertEquals(newLogoUrl, state.account?.company?.logoUrl)
+        val state = viewModel.uiState.first { it.account?.company?.logoUrl?.contains("company_logo") == true && it.editingCardId == null }
+        assertNotNull(state.account?.company?.logoUrl)
         
         collectJob.cancel()
     }

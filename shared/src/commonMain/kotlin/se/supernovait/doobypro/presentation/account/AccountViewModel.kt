@@ -18,6 +18,7 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.location.Address
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.repository.AccountRepository
+import se.supernovait.doobypro.domain.util.FileStorage
 
 /**
  * ViewModel for managing account-related operations, including user profile updates,
@@ -25,7 +26,8 @@ import se.supernovait.doobypro.domain.repository.AccountRepository
  */
 class AccountViewModel(
     private val authRepository: AuthRepository,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val fileStorage: FileStorage
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountState())
     val uiState: StateFlow<AccountState> = _uiState.asStateFlow()
@@ -44,13 +46,11 @@ class AccountViewModel(
             is AccountEvent.EnterEditMode -> _uiState.update { it.copy(editingCardId = event.cardId) }
             AccountEvent.ExitEditMode -> _uiState.update { it.copy(editingCardId = null) }
 
-            is AccountEvent.UpdateFirstName -> _uiState.update { it.copy(editUserFirstName = event.value) }
-            is AccountEvent.UpdateLastName -> _uiState.update { it.copy(editUserLastName = event.value) }
-            is AccountEvent.UpdateBirthDate -> _uiState.update { it.copy(editUserBirthDate = event.date) }
-            is AccountEvent.UpdateEmail -> _uiState.update { it.copy(editUserEmail = event.value) }
-            is AccountEvent.UpdatePhoneNumber -> _uiState.update { it.copy(editUserPhone = event.value) }
-            is AccountEvent.UpdateProfileImage -> _uiState.update { it.copy(editUserProfileImageUrl = event.url) }
-            
+            is AccountEvent.UpdateUserFirstName -> _uiState.update { it.copy(editUserFirstName = event.value) }
+            is AccountEvent.UpdateUserLastName -> _uiState.update { it.copy(editUserLastName = event.value) }
+            is AccountEvent.UpdateUserBirthDate -> _uiState.update { it.copy(editUserBirthDate = event.date) }
+            is AccountEvent.UpdateUserEmail -> _uiState.update { it.copy(editUserEmail = event.value) }
+            is AccountEvent.UpdateUserPhone -> _uiState.update { it.copy(editUserPhone = event.value) }
             is AccountEvent.UpdateUserAddressStreet -> _uiState.update { it.copy(editUserAddressStreet = event.value) }
             is AccountEvent.UpdateUserAddressCity -> _uiState.update { it.copy(editUserAddressCity = event.value) }
             is AccountEvent.UpdateUserAddressSubdivision -> _uiState.update { it.copy(editUserAddressSubdivision = event.value) }
@@ -68,7 +68,7 @@ class AccountViewModel(
             is AccountEvent.UpdateCompanyAddressPostalCode -> _uiState.update { it.copy(editCompanyAddressPostalCode = event.value) }
             is AccountEvent.UpdateCompanyAddressCountry -> _uiState.update { it.copy(editCompanyAddressCountry = event.value) }
             is AccountEvent.UpdateCompanyNotes -> _uiState.update { it.copy(editCompanyNotes = event.value) }
-            is AccountEvent.UpdateCompanyLogo -> _uiState.update { it.copy(editCompanyLogoUrl = event.url) }
+            is AccountEvent.UpdateCompanyLogo -> updateCompanyLogo(event.bytes)
             AccountEvent.SaveCompanyProfile -> saveCompanyProfile()
             
             AccountEvent.SignOut -> signOut()
@@ -95,7 +95,6 @@ class AccountViewModel(
                             editUserBirthDate = account.user.birthdate,
                             editUserEmail = account.user.email,
                             editUserPhone = account.user.phoneNumber ?: "",
-                            editUserProfileImageUrl = account.user.profileImage,
                             editUserAddressStreet = account.user.address?.street ?: "",
                             editUserAddressCity = account.user.address?.city ?: "",
                             editUserAddressSubdivision = account.user.address?.subdivision ?: "",
@@ -125,33 +124,36 @@ class AccountViewModel(
     }
 
     private fun saveUserProfile() {
-        val account = _uiState.value.account ?: return
+        val currentAccount = _uiState.value.account ?: return
+        val state = _uiState.value
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
             
-            val updatedAddress = if (account.user.address != null || _uiState.value.editUserAddressStreet.isNotBlank()) {
-                account.user.address?.copy(
-                    street = _uiState.value.editUserAddressStreet,
-                    city = _uiState.value.editUserAddressCity,
-                    subdivision = _uiState.value.editUserAddressSubdivision
+            val updatedAddress = if (currentAccount.user.address != null || state.editUserAddressStreet.isNotBlank()) {
+                val street = state.editUserAddressStreet.takeIf { it.isNotBlank() } ?: currentAccount.user.address?.street ?: "N/A"
+                val city = state.editUserAddressCity.takeIf { it.isNotBlank() } ?: currentAccount.user.address?.city ?: "N/A"
+
+                currentAccount.user.address?.copy(
+                    street = street,
+                    city = city,
+                    subdivision = state.editUserAddressSubdivision
                 ) ?: Address(
-                    street = _uiState.value.editUserAddressStreet,
-                    city = _uiState.value.editUserAddressCity,
-                    subdivision = _uiState.value.editUserAddressSubdivision,
+                    street = street,
+                    city = city,
+                    subdivision = state.editUserAddressSubdivision,
                     country = AppDefaults.COUNTRY
                 )
             } else null
 
-            val updatedUser = account.user.copy(
-                firstname = _uiState.value.editUserFirstName,
-                lastname = _uiState.value.editUserLastName,
-                birthdate = _uiState.value.editUserBirthDate,
-                email = _uiState.value.editUserEmail,
-                phoneNumber = _uiState.value.editUserPhone,
-                profileImage = _uiState.value.editUserProfileImageUrl,
+            val updatedUser = currentAccount.user.copy(
+                firstname = state.editUserFirstName.takeIf { it.isNotBlank() } ?: currentAccount.user.firstname,
+                lastname = state.editUserLastName.takeIf { it.isNotBlank() } ?: currentAccount.user.lastname,
+                birthdate = state.editUserBirthDate,
+                email = state.editUserEmail.takeIf { it.isNotBlank() } ?: currentAccount.user.email,
+                phoneNumber = state.editUserPhone,
                 address = updatedAddress
             )
-            val updatedAccount = account.copy(user = updatedUser)
+            val updatedAccount = currentAccount.copy(user = updatedUser)
             val result = accountRepository.saveAccount(updatedAccount)
             if (result is Result.Success) {
                 _uiState.update { 
@@ -168,28 +170,30 @@ class AccountViewModel(
     }
 
     private fun saveCompanyProfile() {
-        val account = _uiState.value.account ?: return
+        val currentAccount = _uiState.value.account ?: return
+        val state = _uiState.value
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
-            val currentAddress = account.company.address
-            val updatedCompany = account.company.copy(
-                legalName = _uiState.value.editCompanyLegalName,
-                displayName = _uiState.value.editCompanyDisplayName,
-                licenseNumber = _uiState.value.editCompanyLicenseNumber,
-                email = _uiState.value.editCompanyEmail,
-                phoneNumber = _uiState.value.editCompanyPhone,
+
+            val currentAddress = currentAccount.company.address
+            val updatedCompany = currentAccount.company.copy(
+                legalName = state.editCompanyLegalName,
+                displayName = state.editCompanyDisplayName,
+                licenseNumber = state.editCompanyLicenseNumber,
+                email = state.editCompanyEmail,
+                phoneNumber = state.editCompanyPhone,
                 address = Address(
                     id = currentAddress?.id,
-                    street = _uiState.value.editCompanyAddressStreet,
-                    city = _uiState.value.editCompanyAddressCity,
-                    subdivision = _uiState.value.editCompanyAddressSubdivision,
-                    postalCode = _uiState.value.editCompanyAddressPostalCode,
-                    country = _uiState.value.editCompanyAddressCountry,
-                    notes = _uiState.value.editCompanyNotes
+                    street = state.editCompanyAddressStreet,
+                    city = state.editCompanyAddressCity,
+                    subdivision = state.editCompanyAddressSubdivision,
+                    postalCode = state.editCompanyAddressPostalCode,
+                    country = state.editCompanyAddressCountry,
+                    notes = state.editCompanyNotes
                 ),
-                logoUrl = _uiState.value.editCompanyLogoUrl
+                logoUrl = state.editCompanyLogoUrl
             )
-            val updatedAccount = account.copy(company = updatedCompany)
+            val updatedAccount = currentAccount.copy(company = updatedCompany)
             val result = accountRepository.saveAccount(updatedAccount)
             if (result is Result.Success) {
                 _uiState.update { 
@@ -201,6 +205,15 @@ class AccountViewModel(
                 }
             } else {
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Account_error_save_company_failed) }
+            }
+        }
+    }
+
+    private fun updateCompanyLogo(bytes: ByteArray) {
+        viewModelScope.launch {
+            _uiState.value.account?.company?.let { company ->
+                val logoUrl = fileStorage.saveFile("company_logo_${company.id}.png", bytes)
+                _uiState.update { it.copy(editCompanyLogoUrl = logoUrl) }
             }
         }
     }

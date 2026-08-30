@@ -11,12 +11,11 @@ sealed interface AccountEvent {
     data object ExitEditMode : AccountEvent
 
     // User Profile Updates
-    data class UpdateFirstName(val value: String) : AccountEvent
-    data class UpdateLastName(val value: String) : AccountEvent
-    data class UpdateBirthDate(val date: LocalDate?) : AccountEvent
-    data class UpdateEmail(val value: String) : AccountEvent
-    data class UpdatePhoneNumber(val value: String) : AccountEvent
-    data class UpdateProfileImage(val url: String?) : AccountEvent
+    data class UpdateUserFirstName(val value: String) : AccountEvent
+    data class UpdateUserLastName(val value: String) : AccountEvent
+    data class UpdateUserBirthDate(val date: LocalDate?) : AccountEvent
+    data class UpdateUserEmail(val value: String) : AccountEvent
+    data class UpdateUserPhone(val value: String) : AccountEvent
     data class UpdateUserAddressStreet(val value: String) : AccountEvent
     data class UpdateUserAddressCity(val value: String) : AccountEvent
     data class UpdateUserAddressSubdivision(val value: String) : AccountEvent
@@ -34,7 +33,19 @@ sealed interface AccountEvent {
     data class UpdateCompanyAddressPostalCode(val value: String) : AccountEvent
     data class UpdateCompanyAddressCountry(val value: String) : AccountEvent
     data class UpdateCompanyNotes(val value: String) : AccountEvent
-    data class UpdateCompanyLogo(val url: String?) : AccountEvent
+    data class UpdateCompanyLogo(val bytes: ByteArray) : AccountEvent {
+        // ByteArray/Array needs explicit equals/hashCode
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || this::class != other::class) return false
+            other as UpdateCompanyLogo
+            return bytes.contentEquals(other.bytes)
+        }
+
+        override fun hashCode(): Int {
+            return bytes.contentHashCode()
+        }
+    }
     data object SaveCompanyProfile : AccountEvent
 
     // Account Actions

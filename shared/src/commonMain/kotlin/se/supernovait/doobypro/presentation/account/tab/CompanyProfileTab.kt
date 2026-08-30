@@ -1,19 +1,23 @@
 package se.supernovait.doobypro.presentation.account.tab
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,9 +29,11 @@ import doobypro.shared.generated.resources.Account_CompanyProfileTab_field_compa
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_field_display_name
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_field_legal_name
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_field_license_number
-import doobypro.shared.generated.resources.Account_CompanyProfileTab_field_logo
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_label_company_details
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_label_registered_since
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_picker_option_files
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_picker_option_photos
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_picker_title
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_address
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_branding
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_contact
@@ -41,15 +47,20 @@ import doobypro.shared.generated.resources.Address_field_street
 import doobypro.shared.generated.resources.Contact_details_field_email
 import doobypro.shared.generated.resources.Contact_details_field_phone
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.ic_files
 import doobypro.shared.generated.resources.ic_info
+import doobypro.shared.generated.resources.ic_photo_library
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.SupernovaIcon
 import se.supernovait.app.core.ui.component.action.SupernovaTextAction
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
+import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
+import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.sizing
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.Emirate
+import se.supernovait.doobypro.domain.util.rememberImagePickerLauncher
 import se.supernovait.doobypro.presentation.account.AccountEvent
 import se.supernovait.doobypro.presentation.account.AccountState
 import se.supernovait.doobypro.presentation.account.component.AccountCard
@@ -68,11 +79,16 @@ fun CompanyProfileTab(
     onEvent: (AccountEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val plainFieldModifier = Modifier.fillMaxWidth()
     val fieldModifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = MaterialTheme.spacing.extraSmall)
 
-    val plainFieldModifier = Modifier.fillMaxWidth()
+    val bottomSheetState = LocalBottomSheetState.current
+
+    val imagePicker = rememberImagePickerLauncher { bytes ->
+        bytes?.let { onEvent(AccountEvent.UpdateCompanyLogo(it)) }
+    }
 
     Column(
         modifier = modifier
@@ -103,7 +119,7 @@ fun CompanyProfileTab(
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     if (logoUrl != null) {
-                        // TODO: use an image loader (like Coil) to display the actual logo image
+                        // TODO: use an image loader to display the actual logo image
                         Text("Logo", style = MaterialTheme.typography.labelSmall)
                     } else {
                         SupernovaIcon(
@@ -116,16 +132,22 @@ fun CompanyProfileTab(
                 
                 if (state.editingCardId == "company-branding") {
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
-                    SupernovaTextField(
-                        label = stringResource(Res.string.Account_CompanyProfileTab_field_logo),
-                        value = state.editCompanyLogoUrl ?: "",
-                        onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyLogo(value)) },
-                        modifier = fieldModifier
-                    )
-                    Spacer(Modifier.height(MaterialTheme.spacing.small))
                     SupernovaTextAction(
                         label = stringResource(Res.string.Account_CompanyProfileTab_action_change_logo),
-                        onClick = { /* TODO: trigger platform-specific image picker */ }
+                        onClick = {
+                            bottomSheetState.show {
+                                LogoSourcePickerSheet(
+                                    onPhotosClick = {
+                                        bottomSheetState.hide()
+                                        imagePicker.launchPhotos()
+                                    },
+                                    onFilesClick = {
+                                        bottomSheetState.hide()
+                                        imagePicker.launchFiles()
+                                    }
+                                )
+                            }
+                        }
                     )
                 }
             }
@@ -353,5 +375,68 @@ fun CompanyProfileTab(
         }
 
         Spacer(Modifier.height(MaterialTheme.spacing.large))
+    }
+}
+
+/**
+ * Bottom sheet content for selecting the image source (Photos or Files).
+ */
+@Composable
+private fun LogoSourcePickerSheet(
+    onPhotosClick: () -> Unit,
+    onFilesClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(MaterialTheme.spacing.medium)
+            .padding(bottom = MaterialTheme.spacing.large)
+    ) {
+        SupernovaLabel(
+            text = Res.string.Account_CompanyProfileTab_picker_title,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = MaterialTheme.spacing.medium)
+        )
+        
+        // Photos Option
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onPhotosClick() }
+                .padding(vertical = MaterialTheme.spacing.medium)
+        ) {
+            SupernovaIcon(
+                icon = Res.drawable.ic_photo_library,
+                tint = contentColorFor(MaterialTheme.colorScheme.surfaceContainerLow),
+                modifier = Modifier.size(MaterialTheme.sizing.icon.medium)
+            )
+            Spacer(Modifier.width(MaterialTheme.spacing.medium))
+            SupernovaLabel(
+                text = Res.string.Account_CompanyProfileTab_picker_option_photos,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        // Files Option
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onFilesClick() }
+                .padding(vertical = MaterialTheme.spacing.medium)
+        ) {
+            SupernovaIcon(
+                icon = Res.drawable.ic_files,
+                tint = contentColorFor(MaterialTheme.colorScheme.surfaceContainerLow),
+                modifier = Modifier.size(MaterialTheme.sizing.icon.medium)
+            )
+            Spacer(Modifier.width(MaterialTheme.spacing.medium))
+            SupernovaLabel(
+                text = Res.string.Account_CompanyProfileTab_picker_option_files,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
     }
 }

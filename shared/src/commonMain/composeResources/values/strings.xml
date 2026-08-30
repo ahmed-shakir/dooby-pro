@@ -244,6 +244,9 @@
     <string name="Account_CompanyProfileTab_section_branding">Company Branding</string>
     <string name="Account_CompanyProfileTab_field_logo">Company Logo</string>
     <string name="Account_CompanyProfileTab_action_change_logo">Change Logo</string>
+    <string name="Account_CompanyProfileTab_picker_title">Select Logo Source</string>
+    <string name="Account_CompanyProfileTab_picker_option_photos">Photos</string>
+    <string name="Account_CompanyProfileTab_picker_option_files">Files</string>
     <string name="Account_CompanyProfileTab_field_company_id">Company ID</string>
     <string name="Account_CompanyProfileTab_field_legal_name">Legal Company Name</string>
     <string name="Account_CompanyProfileTab_field_display_name">Display Name</string>
