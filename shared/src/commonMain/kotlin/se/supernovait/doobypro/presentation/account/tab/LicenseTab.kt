@@ -29,10 +29,10 @@ import se.supernovait.app.core.domain.model.license.LicenseStatus
 import se.supernovait.app.core.ui.component.action.SupernovaButton
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
-import se.supernovait.app.core.ui.theme.statusColor
 import se.supernovait.doobypro.presentation.account.AccountState
 import se.supernovait.doobypro.presentation.account.component.AccountCard
 import se.supernovait.doobypro.presentation.account.component.AccountField
+import se.supernovait.doobypro.presentation.app.theme.statusColor
 
 @Composable
 fun LicenseTab(

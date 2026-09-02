@@ -7,15 +7,30 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 data class StatusColor(
-    val info: Color = Color(0xFF0066FF), // Clear informational blue
-    val success: Color = Color(0xFF2E7D32), // Professional green — order completed, action successful
-    val warning: Color = Color(0xFFF57C00), // Authority amber — alerts, pending actions, delayed orders
-    val error: Color = Color(0xFFB3261E), // Standard red — validation errors, failures, cancellations
-
-    val active: Color = Color(0xFF4CAF50)
+    val info: Color,
+    val success: Color,
+    val warning: Color,
+    val error: Color,
+    val active: Color
 )
 
-val LocalStatus = staticCompositionLocalOf { StatusColor() }
+val lightStatusColors = StatusColor(
+    info = Color(0xFF0066FF),
+    success = Color(0xFF2E7D32),
+    warning = Color(0xFFF57C00),
+    error = Color(0xFFB3261E),
+    active = Color(0xFF4CAF50)
+)
+
+val darkStatusColors = StatusColor(
+    info = Color(0xFF64B5F6),
+    success = Color(0xFF81C784),
+    warning = Color(0xFFFFB74D),
+    error = Color(0xFFFFB4AA), // Matches errorDark in Color.kt
+    active = Color(0xFF66BB6A)
+)
+
+val LocalStatus = staticCompositionLocalOf { lightStatusColors }
 
 val MaterialTheme.statusColor: StatusColor
     @Composable

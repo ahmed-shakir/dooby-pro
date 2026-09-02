@@ -37,9 +37,9 @@ import se.supernovait.app.core.ui.component.SupernovaIcon
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.component.text.SupernovaTag
 import se.supernovait.app.core.ui.theme.spacing
-import se.supernovait.app.core.ui.theme.statusColor
 import se.supernovait.doobypro.domain.model.agreement.Agreement
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
+import se.supernovait.doobypro.presentation.app.theme.statusColor
 
 @Composable
 fun AgreementAccordionItem(
@@ -93,7 +93,7 @@ fun AgreementAccordionItem(
                     Spacer(Modifier.width(MaterialTheme.spacing.small))
                     SupernovaTag(
                         text = agreement.status.name.uppercase(),
-                        containerColor = statusColor.copy(alpha = 0.12f),
+                        containerColor = statusColor.copy(alpha = 0.16f),
                         contentColor = statusColor,
                         style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
                     )

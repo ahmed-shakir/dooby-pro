@@ -415,6 +415,7 @@ private fun LogoSourcePickerSheet(
             Spacer(Modifier.width(MaterialTheme.spacing.medium))
             SupernovaLabel(
                 text = Res.string.Account_CompanyProfileTab_picker_option_photos,
+                color = contentColorFor(MaterialTheme.colorScheme.surfaceContainerLow),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -435,6 +436,7 @@ private fun LogoSourcePickerSheet(
             Spacer(Modifier.width(MaterialTheme.spacing.medium))
             SupernovaLabel(
                 text = Res.string.Account_CompanyProfileTab_picker_option_files,
+                color = contentColorFor(MaterialTheme.colorScheme.surfaceContainerLow),
                 style = MaterialTheme.typography.bodyLarge
             )
         }

@@ -82,7 +82,7 @@ fun AccountField(
         } else if (isStatus && value.isNotBlank()) {
             SupernovaTag(
                 text = value.uppercase(),
-                containerColor = valueColor.copy(alpha = 0.12f),
+                containerColor = valueColor.copy(alpha = 0.16f),
                 contentColor = valueColor,
                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
             )
