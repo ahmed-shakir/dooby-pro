@@ -12,13 +12,16 @@ import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.printer.ConnectionMethod
 import se.supernovait.doobypro.domain.model.settings.printer.DiscoveredPrinter
+import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
+import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
-    private val serviceRepository: ServiceRepository
+    private val serviceRepository: ServiceRepository,
+    private val storageLocationRepository: StorageLocationRepository
 ) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     private val _isSearchingPrinters = MutableStateFlow(false)
@@ -28,6 +31,7 @@ class SettingsViewModel(
     val uiState: StateFlow<SettingsState> = combine(
         settingsRepository.settings,
         serviceRepository.getServices(),
+        storageLocationRepository.getActiveLocations(),
         _isSearchingPrinters,
         _discoveredPrinters,
         _isLoading,
@@ -37,10 +41,11 @@ class SettingsViewModel(
         SettingsState(
             settings = args[0] as Settings,
             services = args[1] as List<Service>,
-            isSearchingPrinters = args[2] as Boolean,
-            discoveredPrinters = args[3] as List<DiscoveredPrinter>,
-            isLoading = args[4] as Boolean,
-            error = args[5] as String?
+            activeStorageLocations = args[2] as List<StorageLocation>,
+            isSearchingPrinters = args[3] as Boolean,
+            discoveredPrinters = args[4] as List<DiscoveredPrinter>,
+            isLoading = args[5] as Boolean,
+            error = args[6] as String?
         )
     }.stateIn(
         scope = viewModelScope,
@@ -62,6 +67,8 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateDefaultDeliveryMethod -> updateSettings { it.copy(order = it.order.copy(defaultDeliveryMethod = event.method)) }
             is SettingsScreenEvent.UpdateDefaultHandlingTimeDays -> updateSettings { it.copy(order = it.order.copy(defaultHandlingTimeDays = event.days)) }
             is SettingsScreenEvent.UpdateAutoPrintReceipts -> updateSettings { it.copy(order = it.order.copy(autoPrintReceipts = event.enabled)) }
+            is SettingsScreenEvent.UpdateStorageAllocationMode -> updateSettings { it.copy(order = it.order.copy(storageAllocationMode = event.mode)) }
+            is SettingsScreenEvent.UpdateDefaultStorageLocationId -> updateSettings { it.copy(order = it.order.copy(defaultStorageLocationId = event.id)) }
             // Receipt settings
             is SettingsScreenEvent.UpdateIncludeCompanyLogo -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyLogo = event.include)) }
             is SettingsScreenEvent.UpdateIncludeCompanyName -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyName = event.include)) }

@@ -17,28 +17,24 @@ fun AccountEntity.toDomain(
     company: Company,
     license: License?,
     agreements: List<Agreement>
-): Account {
-    return Account(
-        id = id,
-        user = user,
-        company = company,
-        license = license,
-        agreements = agreements,
-        deactivatedAt = deactivatedAt,
-        isMarkedForDeletion = isMarkedForDeletion
-    )
-}
+) = Account(
+    id = id,
+    user = user,
+    company = company,
+    license = license,
+    agreements = agreements,
+    deactivatedAt = deactivatedAt,
+    isMarkedForDeletion = isMarkedForDeletion
+)
 
 /**
  * Extension function to map [Account] domain model to [AccountEntity].
  */
-fun Account.toEntity(): AccountEntity {
-    return AccountEntity(
-        id = id ?: company.id ?: throw IllegalArgumentException("Account company ID cannot be null"),
-        userId = user.id ?: throw IllegalArgumentException("Account user ID cannot be null"),
-        licenseId = license?.id,
-        agreementIds = agreements.mapNotNull { it.id },
-        deactivatedAt = deactivatedAt,
-        isMarkedForDeletion = isMarkedForDeletion
-    )
-}
+fun Account.toEntity() = AccountEntity(
+    id = id ?: company.id ?: throw IllegalArgumentException("Account company ID cannot be null"),
+    userId = user.id ?: throw IllegalArgumentException("Account user ID cannot be null"),
+    licenseId = license?.id,
+    agreementIds = agreements.mapNotNull { it.id },
+    deactivatedAt = deactivatedAt,
+    isMarkedForDeletion = isMarkedForDeletion
+)

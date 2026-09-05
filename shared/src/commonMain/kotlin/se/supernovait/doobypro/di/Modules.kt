@@ -17,6 +17,7 @@ import se.supernovait.doobypro.data.local.dao.AgreementDao
 import se.supernovait.doobypro.data.local.dao.CompanyDao
 import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
+import se.supernovait.doobypro.data.local.dao.StorageLocationDao
 import se.supernovait.doobypro.data.repository.AccountRepositoryImpl
 import se.supernovait.doobypro.data.repository.AgreementRepositoryImpl
 import se.supernovait.doobypro.data.repository.AuthRepositoryImpl
@@ -25,6 +26,7 @@ import se.supernovait.doobypro.data.repository.LicenseRepositoryImpl
 import se.supernovait.doobypro.data.repository.OrderRepositoryImpl
 import se.supernovait.doobypro.data.repository.ServiceRepositoryImpl
 import se.supernovait.doobypro.data.repository.SettingsRepositoryImpl
+import se.supernovait.doobypro.data.repository.StorageLocationRepositoryImpl
 import se.supernovait.doobypro.domain.repository.AccountRepository
 import se.supernovait.doobypro.domain.repository.AgreementRepository
 import se.supernovait.doobypro.domain.repository.CompanyRepository
@@ -32,9 +34,12 @@ import se.supernovait.doobypro.domain.repository.LicenseRepository
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
+import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 import se.supernovait.doobypro.domain.util.FileStorage
+import se.supernovait.doobypro.domain.util.StorageLocationManager
 import se.supernovait.doobypro.presentation.account.AccountViewModel
 import se.supernovait.doobypro.presentation.settings.SettingsViewModel
+import se.supernovait.doobypro.presentation.storage.StorageViewModel
 import se.supernovait.doobypro.presentation.welcome.WelcomeViewModel
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 
@@ -51,12 +56,15 @@ val sharedModule = module {
     singleOf(::ServiceRepositoryImpl).bind<ServiceRepository>()
     singleOf(::OrderRepositoryImpl).bind<OrderRepository>()
     singleOf(::SettingsRepositoryImpl).bind<SettingsRepository>()
+    singleOf(::StorageLocationRepositoryImpl).bind<StorageLocationRepository>()
 
     viewModelOf(::WelcomeViewModel)
     viewModelOf(::AccountSetupWizardViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::AccountViewModel)
+    viewModelOf(::StorageViewModel)
 
+    singleOf(::StorageLocationManager)
     single<FileStorage> { FileStorage() }
 
     single<AppDatabase> {
@@ -93,5 +101,9 @@ val sharedModule = module {
 
     single<ServiceDao> {
         get<AppDatabase>().serviceDao()
+    }
+
+    single<StorageLocationDao> {
+        get<AppDatabase>().storageLocationDao()
     }
 }

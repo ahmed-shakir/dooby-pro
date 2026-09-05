@@ -20,6 +20,7 @@ class OrderEntityTest {
         val entity = OrderEntity(
             customerId = SupernovaIdGenerator.generateId(IdType.USER.prefix),
             serviceId = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix),
+            storageLocationId = "default",
             status = OrderStatus.NEW,
             orderDatetime = now,
             deliveryDatetime = now,

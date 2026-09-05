@@ -16,37 +16,33 @@ import kotlin.time.Clock
  *
  * @return The mapped [Company] model.
  */
-fun CompanyEntity.toDomain(): Company {
-    return Company(
-        id = id,
-        legalName = legalName,
-        displayName = displayName,
-        licenseNumber = licenseNumber,
-        phoneNumber = phoneNumber,
-        email = email,
-        address = address?.toDomain(),
-        logoUrl = logoUrl,
-        createdAt = createdAt.toLocalDateTime(TimeZone.currentSystemDefault()),
-        updatedAt = updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
-    )
-}
+fun CompanyEntity.toDomain() = Company(
+    id = id,
+    legalName = legalName,
+    displayName = displayName,
+    licenseNumber = licenseNumber,
+    phoneNumber = phoneNumber,
+    email = email,
+    address = address?.toDomain(),
+    logoUrl = logoUrl,
+    createdAt = createdAt.toLocalDateTime(TimeZone.currentSystemDefault()),
+    updatedAt = updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
+)
 
 /**
  * Extension function to map [Company] domain model to [CompanyEntity].
  *
  * @return The mapped [CompanyEntity].
  */
-fun Company.toEntity(): CompanyEntity {
-    return CompanyEntity(
-        id = id ?: SupernovaIdGenerator.generateId(IdType.COMPANY.prefix),
-        legalName = legalName,
-        displayName = displayName,
-        licenseNumber = licenseNumber,
-        phoneNumber = phoneNumber,
-        email = email,
-        address = address?.toEntity(),
-        logoUrl = logoUrl,
-        createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()),
-        updatedAt = Clock.System.now()
-    )
-}
+fun Company.toEntity() = CompanyEntity(
+    id = id ?: SupernovaIdGenerator.generateId(IdType.COMPANY.prefix),
+    legalName = legalName,
+    displayName = displayName,
+    licenseNumber = licenseNumber,
+    phoneNumber = phoneNumber,
+    email = email,
+    address = address?.toEntity(),
+    logoUrl = logoUrl,
+    createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()),
+    updatedAt = Clock.System.now()
+)

@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import se.supernovait.doobypro.data.local.entity.OrderEntity
+import se.supernovait.doobypro.domain.model.order.OrderStatus
 
 /**
  * Data Access Object for the "orders" table.
@@ -40,6 +41,21 @@ interface OrderDao {
      */
     @Query("SELECT * FROM orders WHERE customerId = :customerId")
     fun getByCustomerId(customerId: String): Flow<List<OrderEntity>>
+
+    /**
+     * Observes all orders for a specific storage location.
+     *
+     * @param storageLocationId The ID of the storage location.
+     * @return A flow emitting the list of orders for the location.
+     */
+    @Query("SELECT * FROM orders WHERE storageLocationId = :storageLocationId")
+    fun getByStorageLocationId(storageLocationId: String): Flow<List<OrderEntity>>
+    
+    /**
+     * Updates the status of an order.
+     */
+    @Query("UPDATE orders SET status = :newStatus WHERE id = :orderId")
+    suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus)
 
     /**
      * Inserts or updates an order in the database.

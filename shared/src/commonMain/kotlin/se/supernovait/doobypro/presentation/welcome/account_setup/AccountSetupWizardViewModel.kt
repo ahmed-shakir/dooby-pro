@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
@@ -56,6 +57,13 @@ class AccountSetupWizardViewModel(
 
     private fun onNextStep() {
         if (_uiState.value.currentStep < 4) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    phoneNumber = if (currentState.phoneNumber.isNotBlank()) formatPhoneNumber(currentState.phoneNumber) else "",
+                    companyPhone = if (currentState.companyPhone.isNotBlank()) formatPhoneNumber(currentState.companyPhone) else ""
+                )
+            }
+
             _uiState.value = _uiState.value.copy(currentStep = _uiState.value.currentStep + 1)
         } else if (_uiState.value.currentStep == 4) {
             createAccount()
@@ -73,12 +81,12 @@ class AccountSetupWizardViewModel(
     private fun updateUsername(value: String) { _uiState.value = _uiState.value.copy(username = value) }
     private fun updateBirthDate(date: LocalDate?) { _uiState.value = _uiState.value.copy(birthDate = date) }
     private fun updateEmail(value: String) { _uiState.value = _uiState.value.copy(email = value) }
-    private fun updatePhoneNumber(value: String) { _uiState.value = _uiState.value.copy(phoneNumber = formatPhoneNumber(value)) }
+    private fun updatePhoneNumber(value: String) { _uiState.value = _uiState.value.copy(phoneNumber = value) }
 
     private fun updateCompanyLegalName(value: String) { _uiState.value = _uiState.value.copy(companyLegalName = value) }
     private fun updateCompanyDisplayName(value: String) { _uiState.value = _uiState.value.copy(companyDisplayName = value) }
     private fun updateLicenseNumber(value: String) { _uiState.value = _uiState.value.copy(licenseNumber = value) }
-    private fun updateCompanyPhone(value: String) { _uiState.value = _uiState.value.copy(companyPhone = formatPhoneNumber(value)) }
+    private fun updateCompanyPhone(value: String) { _uiState.value = _uiState.value.copy(companyPhone = value) }
     private fun updateCompanyEmail(value: String) { _uiState.value = _uiState.value.copy(companyEmail = value) }
 
     private fun updateStreetAddress(value: String) { _uiState.value = _uiState.value.copy(streetAddress = value) }

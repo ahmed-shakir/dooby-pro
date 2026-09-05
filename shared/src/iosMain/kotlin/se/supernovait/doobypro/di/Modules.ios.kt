@@ -7,8 +7,10 @@ import se.supernovait.doobypro.data.local.AppDatabase
 
 actual val platformModule = module {
     single<RoomDatabase.Builder<AppDatabase>> {
-        IosDatabaseManager.createDatabaseBuilder(
+        val builder: RoomDatabase.Builder<AppDatabase> = IosDatabaseManager.createDatabaseBuilder(
             databaseName = AppDatabase.DATABASE_FILENAME
         )
+        builder.fallbackToDestructiveMigration(true)
+        builder
     }
 }

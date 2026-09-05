@@ -12,9 +12,11 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
 import se.supernovait.doobypro.data.local.preferences.FakeDataStore
 import se.supernovait.doobypro.data.repository.FakeServiceRepository
+import se.supernovait.doobypro.data.repository.FakeStorageLocationRepository
 import se.supernovait.doobypro.data.repository.SettingsRepositoryImpl
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.common.Currency
+import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -28,6 +30,7 @@ class SettingsViewModelTest {
     private lateinit var fakeDataStore: FakeDataStore
     private lateinit var settingsRepository: SettingsRepositoryImpl
     private lateinit var serviceRepository: FakeServiceRepository
+    private lateinit var storageLocationRepository: FakeStorageLocationRepository
     private lateinit var viewModel: SettingsViewModel
 
     @BeforeTest
@@ -39,7 +42,8 @@ class SettingsViewModelTest {
             encodeDefaults = true
         })
         serviceRepository = FakeServiceRepository()
-        viewModel = SettingsViewModel(settingsRepository, serviceRepository)
+        storageLocationRepository = FakeStorageLocationRepository()
+        viewModel = SettingsViewModel(settingsRepository, serviceRepository, storageLocationRepository)
     }
 
     @AfterTest
@@ -152,6 +156,27 @@ class SettingsViewModelTest {
         
         val state = viewModel.uiState.filter { !it.settings.notifications.lateOrders }.first()
         assertEquals(false, state.settings.notifications.lateOrders)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `onEvent UpdateStorageAllocationMode should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        viewModel.onEvent(SettingsScreenEvent.UpdateStorageAllocationMode(StorageAllocationMode.AUTO))
+        
+        val state = viewModel.uiState.filter { it.settings.order.storageAllocationMode == StorageAllocationMode.AUTO }.first()
+        assertEquals(StorageAllocationMode.AUTO, state.settings.order.storageAllocationMode)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `onEvent UpdateDefaultStorageLocationId should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        val locationId = "shelf_a"
+        viewModel.onEvent(SettingsScreenEvent.UpdateDefaultStorageLocationId(locationId))
+        
+        val state = viewModel.uiState.filter { it.settings.order.defaultStorageLocationId == locationId }.first()
+        assertEquals(locationId, state.settings.order.defaultStorageLocationId)
         collectJob.cancel()
     }
 }

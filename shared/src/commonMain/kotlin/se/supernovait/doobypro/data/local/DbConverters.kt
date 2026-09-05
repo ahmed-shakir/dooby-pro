@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.storage.StorageType
 
 /**
  * Room type converters for capturing custom data types in the database.
@@ -48,6 +49,18 @@ object DbConverters {
      */
     @TypeConverter
     fun fromDeliveryMethod(method: DeliveryMethod?): String? = method?.name
+
+    /**
+     * Converts a string to a [StorageType].
+     */
+    @TypeConverter
+    fun toStorageType(value: String?): StorageType? = value?.let { StorageType.valueOf(it) }
+
+    /**
+     * Converts a [StorageType] to a string.
+     */
+    @TypeConverter
+    fun fromStorageType(type: StorageType?): String? = type?.name
 
     /**
      * Converts a string of comma-separated values to a list of strings.

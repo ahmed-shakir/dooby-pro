@@ -7,6 +7,7 @@ import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -30,6 +31,12 @@ class OrderTest {
         price = Amount(1000, "AED")
     )
 
+    private val testStorage = StorageLocation(
+        id = "default",
+        label = "Uncategorized",
+        isDefault = true
+    )
+
     private val testDateTime = LocalDateTime(2026, 8, 21, 20, 0, 0)
 
     private fun createOrder(
@@ -39,6 +46,7 @@ class OrderTest {
         id = "order_123",
         customer = testUser,
         service = testService,
+        storageLocation = testStorage,
         status = status,
         orderDatetime = testDateTime,
         deliveryDatetime = testDateTime,

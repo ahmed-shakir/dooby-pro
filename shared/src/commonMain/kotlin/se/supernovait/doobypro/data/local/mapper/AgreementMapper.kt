@@ -12,41 +12,37 @@ import se.supernovait.doobypro.domain.model.agreement.Agreement
  *
  * @return The mapped [Agreement] model.
  */
-fun AgreementEntity.toDomain(): Agreement {
-    return Agreement(
-        id = id,
-        accountId = accountId,
-        status = status,
-        equipmentId = equipmentId,
-        equipmentModel = equipmentModel,
-        title = title,
-        description = description,
-        billingFrequency = billingFrequency,
-        fee = fee.toDomain(),
-        deposit = deposit.toDomain(),
-        issueDate = issueDate,
-        cancellationDate = cancellationDate
-    )
-}
+fun AgreementEntity.toDomain() = Agreement(
+    id = id,
+    accountId = accountId,
+    status = status,
+    equipmentId = equipmentId,
+    equipmentModel = equipmentModel,
+    title = title,
+    description = description,
+    billingFrequency = billingFrequency,
+    fee = fee.toDomain(),
+    deposit = deposit.toDomain(),
+    issueDate = issueDate,
+    cancellationDate = cancellationDate
+)
 
 /**
  * Extension function to map [Agreement] domain model to [AgreementEntity].
  *
  * @return The mapped [AgreementEntity].
  */
-fun Agreement.toEntity(): AgreementEntity {
-    return AgreementEntity(
-        id = id ?: SupernovaIdGenerator.generateId(IdType.AGREEMENT.prefix),
-        accountId = accountId,
-        status = status,
-        equipmentId = equipmentId,
-        equipmentModel = equipmentModel,
-        title = title,
-        description = description,
-        billingFrequency = billingFrequency,
-        fee = fee.toEntity(),
-        deposit = deposit.toEntity(),
-        issueDate = issueDate,
-        cancellationDate = cancellationDate
-    )
-}
+fun Agreement.toEntity() = AgreementEntity(
+    id = id ?: SupernovaIdGenerator.generateId(IdType.AGREEMENT.prefix),
+    accountId = accountId,
+    status = status,
+    equipmentId = equipmentId,
+    equipmentModel = equipmentModel,
+    title = title,
+    description = description,
+    billingFrequency = billingFrequency,
+    fee = fee.toEntity(),
+    deposit = deposit.toEntity(),
+    issueDate = issueDate,
+    cancellationDate = cancellationDate
+)

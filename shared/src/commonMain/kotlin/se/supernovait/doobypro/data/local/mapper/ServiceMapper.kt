@@ -12,25 +12,21 @@ import se.supernovait.doobypro.domain.model.Service
  *
  * @return The mapped [Service] model.
  */
-fun ServiceEntity.toDomain(): Service {
-    return Service(
-        id = id,
-        title = title,
-        description = description,
-        price = price.toDomain()
-    )
-}
+fun ServiceEntity.toDomain() = Service(
+    id = id,
+    title = title,
+    description = description,
+    price = price.toDomain()
+)
 
 /**
  * Extension function to map [Service] domain model to [ServiceEntity].
  *
  * @return The mapped [ServiceEntity].
  */
-fun Service.toEntity(): ServiceEntity {
-    return ServiceEntity(
-        id = id ?: SupernovaIdGenerator.generateId(IdType.SERVICE.prefix),
-        title = title,
-        description = description,
-        price = price.toEntity()
-    )
-}
+fun Service.toEntity() = ServiceEntity(
+    id = id ?: SupernovaIdGenerator.generateId(IdType.SERVICE.prefix),
+    title = title,
+    description = description,
+    price = price.toEntity()
+)

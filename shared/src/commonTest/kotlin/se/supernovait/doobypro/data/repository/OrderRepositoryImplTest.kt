@@ -13,14 +13,17 @@ import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.dao.FakeOrderDao
 import se.supernovait.doobypro.data.local.dao.FakeServiceDao
+import se.supernovait.doobypro.data.local.dao.FakeStorageLocationDao
 import se.supernovait.doobypro.data.local.dao.FakeUserDao
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
+import se.supernovait.doobypro.data.local.mapper.toEntity
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
+import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -36,10 +39,12 @@ class OrderRepositoryImplTest {
     private val orderId = SupernovaIdGenerator.generateId(IdType.ORDER.prefix)
     private val userId = SupernovaIdGenerator.generateId(IdType.USER.prefix)
     private val serviceId = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix)
+    private val storageId = "default"
 
     private lateinit var fakeOrderDao: FakeOrderDao
     private lateinit var fakeServiceDao: FakeServiceDao
     private lateinit var fakeUserDao: FakeUserDao
+    private lateinit var fakeStorageDao: FakeStorageLocationDao
     private lateinit var repository: OrderRepositoryImpl
     private val testDispatcher = StandardTestDispatcher()
 
@@ -79,10 +84,17 @@ class OrderRepositoryImplTest {
         price = AmountEntity(1000, "AED")
     )
 
+    private val testStorage = StorageLocation(
+        id = storageId,
+        label = "Uncategorized",
+        isDefault = true
+    )
+
     private val testOrder = Order(
         id = orderId,
         customer = testUser,
         service = testService,
+        storageLocation = testStorage,
         status = OrderStatus.NEW,
         orderDatetime = testDateTime,
         deliveryDatetime = testDateTime,
@@ -97,17 +109,20 @@ class OrderRepositoryImplTest {
         fakeOrderDao = FakeOrderDao()
         fakeServiceDao = FakeServiceDao()
         fakeUserDao = FakeUserDao()
+        fakeStorageDao = FakeStorageLocationDao()
         
         repository = OrderRepositoryImpl(
             userDao = fakeUserDao,
             orderDao = fakeOrderDao,
-            serviceDao = fakeServiceDao
+            serviceDao = fakeServiceDao,
+            storageLocationDao = fakeStorageDao
         )
 
         // Seed fakes
         runTest(testDispatcher) {
             fakeUserDao.upsert(testUserEntity)
             fakeServiceDao.upsert(testServiceEntity)
+            fakeStorageDao.upsert(testStorage.toEntity())
         }
     }
 
@@ -122,6 +137,7 @@ class OrderRepositoryImplTest {
         assertEquals(testOrder.id, order.id)
         assertEquals(testUser.id, order.customer.id)
         assertEquals(testService.id, order.service.id)
+        assertEquals(testStorage.id, order.storageLocation.id)
         assertEquals(OrderStatus.NEW, order.status)
     }
 
@@ -148,6 +164,7 @@ class OrderRepositoryImplTest {
         assertNotNull(result)
         assertEquals(testOrder.id, result.id)
         assertEquals(testUser.username, result.customer.username)
+        assertEquals(testStorage.label, result.storageLocation.label)
     }
 
     @Test
@@ -179,5 +196,18 @@ class OrderRepositoryImplTest {
 
         assertEquals(1, orders.size)
         assertEquals(testUser.id, orders[0].customer.id)
+    }
+
+    @Test
+    fun `updateOrderStatus should release slot on terminal status`() = runTest(testDispatcher) {
+        repository.saveOrder(testOrder)
+        
+        // Mock some occupied slots
+        fakeStorageDao.incrementOccupiedSlots(testStorage.id!!)
+        
+        repository.updateOrderStatus(testOrder.id!!, OrderStatus.PICKED_UP)
+        
+        val location = fakeStorageDao.getById(testStorage.id!!)
+        assertEquals(0, location?.occupiedSlots)
     }
 }

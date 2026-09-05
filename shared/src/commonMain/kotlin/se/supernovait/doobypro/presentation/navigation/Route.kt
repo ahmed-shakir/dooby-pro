@@ -6,6 +6,7 @@ import doobypro.shared.generated.resources.navigation_item_dashboard_label
 import doobypro.shared.generated.resources.navigation_item_orders_label
 import doobypro.shared.generated.resources.navigation_item_services_label
 import doobypro.shared.generated.resources.navigation_item_settings_label
+import doobypro.shared.generated.resources.navigation_item_storage_label
 import kotlinx.serialization.Serializable
 
 sealed interface Route : NavigationRoute {
@@ -97,11 +98,16 @@ sealed interface Route : NavigationRoute {
         override val isTopLevel = false
     }
 
+    @Serializable
+    data object StorageManagement : Route {
+        override val label = Res.string.navigation_item_storage_label
+    }
+
     companion object {
         private val routes = listOf(
             Welcome, AccountSetup, AppInfo, Account, Support, Settings,
             SettingsCommon, SettingsOrder, SettingsReceipt, SettingsPrinter, SettingsNotifications,
-            Dashboard, Orders, OrderDetails(""), Services, ServiceDetails("")
+            Dashboard, Orders, OrderDetails(""), Services, ServiceDetails(""), StorageManagement
         ).associateBy { it.name }
 
         fun startScreen(isAuthenticated: Boolean): Route {

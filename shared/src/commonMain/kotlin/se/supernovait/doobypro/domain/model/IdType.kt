@@ -11,5 +11,6 @@ enum class IdType(val prefix: String) {
     LICENSE("DL"),
     ORDER("DO"),
     SERVICE("DS"),
+    STORAGE_LOCATION("DP"),
     USER("DU")
 }

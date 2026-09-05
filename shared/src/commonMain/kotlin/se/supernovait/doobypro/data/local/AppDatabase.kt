@@ -18,11 +18,14 @@ import se.supernovait.doobypro.data.local.dao.AgreementDao
 import se.supernovait.doobypro.data.local.dao.CompanyDao
 import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
+import se.supernovait.doobypro.data.local.dao.StorageLocationDao
 import se.supernovait.doobypro.data.local.entity.AccountEntity
 import se.supernovait.doobypro.data.local.entity.AgreementEntity
 import se.supernovait.doobypro.data.local.entity.CompanyEntity
 import se.supernovait.doobypro.data.local.entity.OrderEntity
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
+import se.supernovait.doobypro.data.local.entity.StorageLocationEntity
+import se.supernovait.doobypro.domain.model.storage.StorageType
 
 @Database(
     entities = [
@@ -32,7 +35,8 @@ import se.supernovait.doobypro.data.local.entity.ServiceEntity
         AgreementEntity::class,
         AccountEntity::class,
         OrderEntity::class,
-        ServiceEntity::class
+        ServiceEntity::class,
+        StorageLocationEntity::class
     ], version = 1
 )
 @TypeConverters(RoomConverters::class, DbConverters::class)
@@ -45,9 +49,27 @@ abstract class AppDatabase : RoomDatabase(), InitializableDatabase {
     abstract fun accountDao(): AccountDao
     abstract fun orderDao(): OrderDao
     abstract fun serviceDao(): ServiceDao
+    abstract fun storageLocationDao(): StorageLocationDao
 
     override suspend fun verify() {
         userDao().getCount()
+        ensureDefaultStorageLocation()
+    }
+
+    private suspend fun ensureDefaultStorageLocation() {
+        val dao = storageLocationDao()
+        if (dao.getDefault() == null) {
+            dao.upsert(
+                StorageLocationEntity(
+                    id = "default",
+                    label = "Uncategorized",
+                    type = StorageType.OTHER,
+                    capacity = 0, // Unlimited
+                    isDefault = true,
+                    isActive = true
+                )
+            )
+        }
     }
 
     override suspend fun clearTables() {
@@ -71,6 +93,7 @@ suspend fun AppDatabase.clearAllTablesKmp() {
         connection.execSQL("DELETE FROM accounts")
         connection.execSQL("DELETE FROM orders")
         connection.execSQL("DELETE FROM services")
+        connection.execSQL("DELETE FROM storage_locations")
     }
 }
 

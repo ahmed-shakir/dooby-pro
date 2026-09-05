@@ -13,9 +13,12 @@ import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.screen_Settings_order_auto_print_receipts_label
 import doobypro.shared.generated.resources.screen_Settings_order_behavior_label
 import doobypro.shared.generated.resources.screen_Settings_order_default_service_label
+import doobypro.shared.generated.resources.screen_Settings_order_default_storage_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_method_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_option_label
 import doobypro.shared.generated.resources.screen_Settings_order_handling_time_label
+import doobypro.shared.generated.resources.screen_Settings_order_storage_allocation_label
+import doobypro.shared.generated.resources.screen_Storage_title
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
@@ -24,6 +27,7 @@ import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.presentation.settings.SettingsState
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 
@@ -35,6 +39,9 @@ fun OrderSettingsScreen(
     val selectedService = state.services.find { it.id == state.settings.order.defaultServiceId }
     val deliveryOptionLabels = DeliveryOption.entries.associateWith { stringResource(it.label) }
     val deliveryMethodLabels = DeliveryMethod.entries.associateWith { stringResource(it.label) }
+    
+    val allocationModeLabels = StorageAllocationMode.entries.associateWith { stringResource(it.label) }
+    val selectedStorageLocation = state.activeStorageLocations.find { it.id == state.settings.order.defaultStorageLocationId }
 
     SettingsScreen {
         Spacer(Modifier.height(MaterialTheme.spacing.small))
@@ -89,6 +96,30 @@ fun OrderSettingsScreen(
             label = Res.string.screen_Settings_order_auto_print_receipts_label,
             checked = state.settings.order.autoPrintReceipts,
             onCheckedChange = { onEvent(SettingsScreenEvent.UpdateAutoPrintReceipts(it)) }
+        )
+
+        SupernovaLabel(
+            text = Res.string.screen_Storage_title,
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(top = MaterialTheme.spacing.large, bottom = MaterialTheme.spacing.small)
+        )
+
+        SupernovaSelectField(
+            label = Res.string.screen_Settings_order_storage_allocation_label,
+            options = StorageAllocationMode.entries,
+            selectedOption = state.settings.order.storageAllocationMode,
+            onOptionSelected = { onEvent(SettingsScreenEvent.UpdateStorageAllocationMode(it)) },
+            optionLabel = { allocationModeLabels[it] ?: "" }
+        )
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        SupernovaSelectField(
+            label = Res.string.screen_Settings_order_default_storage_label,
+            options = state.activeStorageLocations,
+            selectedOption = selectedStorageLocation,
+            onOptionSelected = { it.id?.let { id -> onEvent(SettingsScreenEvent.UpdateDefaultStorageLocationId(id)) } },
+            optionLabel = { it.label }
         )
     }
 }

@@ -3,11 +3,13 @@ package se.supernovait.doobypro.domain.model.delivery
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.delivery_option_express
 import doobypro.shared.generated.resources.delivery_option_standard
+import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
 
 /**
  * Defines the priority options for order delivery.
  */
+@Serializable
 enum class DeliveryOption(val label: StringResource) {
     /**
      * Fast delivery, typically with a higher cost.

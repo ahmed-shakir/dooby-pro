@@ -17,7 +17,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -65,6 +64,7 @@ import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.component.input.SupernovaDateField
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
+import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.component.text.SupernovaSubtitle
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
@@ -124,7 +124,7 @@ fun AccountSetupWizardScreen(
 private fun WizardProgress(currentStep: Int) {
     val progress = currentStep / 4f
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = MaterialTheme.spacing.medium)) {
-        Text(
+        SupernovaLabel(
             text = stringResource(Res.string.screen_AccountSetup_step_indicator, currentStep, 4),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.secondary,
@@ -326,8 +326,8 @@ private fun Step4(state: AccountSetupWizardState) {
 
     Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
-    Text(
-        text = stringResource(Res.string.screen_AccountSetup_confirmation_note),
+    SupernovaLabel(
+        text = Res.string.screen_AccountSetup_confirmation_note,
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
@@ -339,12 +339,12 @@ private fun SummaryItem(label: String, value: String) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
     ) {
-        Text(
+        SupernovaLabel(
             text = "$label:",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Text(
+        SupernovaLabel(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,

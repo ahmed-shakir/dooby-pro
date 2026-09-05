@@ -12,6 +12,7 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
+import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -41,10 +42,16 @@ class OrderMapperTest {
         price = Amount(1000, "AED")
     )
 
+    private val testStorage = StorageLocation(
+        id = "Shelf B",
+        label = "Shelf B"
+    )
+
     private val testOrderEntity = OrderEntity(
         id = orderId,
         customerId = userId,
         serviceId = serviceId,
+        storageLocationId = "Shelf B",
         status = OrderStatus.NEW,
         orderDatetime = testDateTime,
         deliveryDatetime = testDateTime,
@@ -58,6 +65,7 @@ class OrderMapperTest {
         id = orderId,
         customer = testUser,
         service = testService,
+        storageLocation = testStorage,
         status = OrderStatus.NEW,
         orderDatetime = testDateTime,
         deliveryDatetime = testDateTime,
@@ -69,11 +77,12 @@ class OrderMapperTest {
 
     @Test
     fun `toDomain should correctly transform OrderEntity to Order model`() {
-        val result = testOrderEntity.toDomain(testUser, testService)
+        val result = testOrderEntity.toDomain(testUser, testService, testStorage)
 
         assertEquals(testOrder.id, result.id)
         assertEquals(testOrder.customer.id, result.customer.id)
         assertEquals(testOrder.service.id, result.service.id)
+        assertEquals(testOrder.storageLocation.id, result.storageLocation.id)
         assertEquals(testOrder.status, result.status)
         assertEquals(testOrder.orderDatetime, result.orderDatetime)
         assertEquals(testOrder.deliveryDatetime, result.deliveryDatetime)
@@ -86,7 +95,7 @@ class OrderMapperTest {
     @Test
     fun `toDomain with OUT_FOR_DELIVERY status`() {
         val entity = testOrderEntity.copy(status = OrderStatus.OUT_FOR_DELIVERY)
-        val result = entity.toDomain(testUser, testService)
+        val result = entity.toDomain(testUser, testService, testStorage)
         assertEquals(OrderStatus.OUT_FOR_DELIVERY, result.status)
     }
 
@@ -97,6 +106,7 @@ class OrderMapperTest {
         assertEquals(testOrderEntity.id, result.id)
         assertEquals(testOrderEntity.customerId, result.customerId)
         assertEquals(testOrderEntity.serviceId, result.serviceId)
+        assertEquals(testOrderEntity.storageLocationId, result.storageLocationId)
         assertEquals(testOrderEntity.status, result.status)
         assertEquals(testOrderEntity.orderDatetime, result.orderDatetime)
         assertEquals(testOrderEntity.deliveryDatetime, result.deliveryDatetime)

@@ -17,6 +17,7 @@
     <string name="navigation_item_dashboard_label">Dashboard</string>
     <string name="navigation_item_orders_label">Orders</string>
     <string name="navigation_item_services_label">Services</string>
+    <string name="navigation_item_storage_label">Storage</string>
     <string name="navigation_item_account_label">Account</string>
     <string name="navigation_item_settings_label">Settings</string>
 
@@ -67,6 +68,7 @@
     <string name="label_saving">Saving...</string>
     <string name="label_edit">Edit</string>
     <string name="label_locked">Locked</string>
+    <string name="label_default">Default</string>
     <string name="label_user_default">User</string>
     <string name="label_not_authenticated">Not authenticated</string>
     <string name="label_sign_out">Sign Out</string>
@@ -160,6 +162,8 @@
     <string name="screen_Settings_order_handling_time_label">Default Handling Time (days)</string>
     <string name="screen_Settings_order_behavior_label">Order Behavior</string>
     <string name="screen_Settings_order_auto_print_receipts_label">Auto-print receipts</string>
+    <string name="screen_Settings_order_storage_allocation_label">Storage allocation mode</string>
+    <string name="screen_Settings_order_default_storage_label">Default storage area</string>
 
     <!-- Printer settings -->
     <string name="screen_Settings_printer_connection_status_connected">Connected</string>
@@ -300,4 +304,30 @@
     <string name="order_status_picked_up">Picked Up</string>
     <string name="order_status_delivered">Delivered</string>
     <string name="order_status_cancelled">Cancelled</string>
+
+    <!-- Storage Management -->
+    <string name="screen_Storage_title">Storage Management</string>
+    <string name="screen_Storage_action_add_location">Add Storage Area</string>
+    <string name="screen_Storage_label_capacity">Capacity: %1$d slots</string>
+    <string name="screen_Storage_label_occupancy">%1$d / %2$d slots used</string>
+    <string name="screen_Storage_label_unlimited">Unlimited capacity</string>
+    <string name="screen_Storage_field_label">Area Label</string>
+    <string name="screen_Storage_field_type">Storage Type</string>
+    <string name="screen_Storage_field_capacity">Total Slots</string>
+    <string name="screen_Storage_dialog_delete_title">Delete Storage Area</string>
+    <string name="screen_Storage_dialog_delete_message">Are you sure you want to delete this storage area? This action cannot be undone if there are active orders.</string>
+    <string name="screen_Storage_error_save_failed">Failed to save storage area</string>
+    <string name="screen_Storage_error_delete_failed">Failed to delete storage area</string>
+    <string name="screen_Storage_empty_state">No storage areas configured. Add your first hanger rack or shelf to get started.</string>
+
+    <!-- Storage Types -->
+    <string name="storage_type_hanger">Hanger</string>
+    <string name="storage_type_shelf">Shelf</string>
+    <string name="storage_type_drawer">Drawer</string>
+    <string name="storage_type_cabinet">Cabinet</string>
+    <string name="storage_type_other">Other</string>
+
+    <!-- Storage Allocation Mode -->
+    <string name="storage_allocation_mode_manual">Manual</string>
+    <string name="storage_allocation_mode_auto">Automatic</string>
 </resources>

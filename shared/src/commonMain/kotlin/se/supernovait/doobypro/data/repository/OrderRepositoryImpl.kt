@@ -16,10 +16,13 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
+import se.supernovait.doobypro.data.local.dao.StorageLocationDao
 import se.supernovait.doobypro.data.local.mapper.toDomain
 import se.supernovait.doobypro.data.local.mapper.toEntity
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.order.OrderStatus
+import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import kotlin.coroutines.CoroutineContext
 
@@ -30,7 +33,8 @@ import kotlin.coroutines.CoroutineContext
 class OrderRepositoryImpl(
     private val userDao: UserDao,
     private val orderDao: OrderDao,
-    private val serviceDao: ServiceDao
+    private val serviceDao: ServiceDao,
+    private val storageLocationDao: StorageLocationDao
 ) : OrderRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -40,15 +44,18 @@ class OrderRepositoryImpl(
 
             val userIds = entities.map { it.customerId }.distinct()
             val serviceIds = entities.map { it.serviceId }.distinct()
+            val storageLocationIds = entities.map { it.storageLocationId }.distinct()
 
             combine(
                 assembleUsersFlow(userIds),
-                assembleServicesFlow(serviceIds)
-            ) { usersMap, servicesMap ->
+                assembleServicesFlow(serviceIds),
+                assembleStorageLocationsFlow(storageLocationIds)
+            ) { usersMap, servicesMap, storageMap ->
                 entities.mapNotNull { entity ->
                     val user = usersMap[entity.customerId] ?: return@mapNotNull null
                     val service = servicesMap[entity.serviceId] ?: return@mapNotNull null
-                    entity.toDomain(user, service)
+                    val storageLocation = storageMap[entity.storageLocationId] ?: return@mapNotNull null
+                    entity.toDomain(user, service, storageLocation)
                 }
             }
         }
@@ -59,15 +66,18 @@ class OrderRepositoryImpl(
             if (entities.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
             val serviceIds = entities.map { it.serviceId }.distinct()
+            val storageLocationIds = entities.map { it.storageLocationId }.distinct()
 
             combine(
                 assembleUsersFlow(listOf(customerId)),
-                assembleServicesFlow(serviceIds)
-            ) { usersMap, servicesMap ->
+                assembleServicesFlow(serviceIds),
+                assembleStorageLocationsFlow(storageLocationIds)
+            ) { usersMap, servicesMap, storageMap ->
                 val user = usersMap[customerId] ?: return@combine emptyList()
                 entities.mapNotNull { entity ->
                     val service = servicesMap[entity.serviceId] ?: return@mapNotNull null
-                    entity.toDomain(user, service)
+                    val storageLocation = storageMap[entity.storageLocationId] ?: return@mapNotNull null
+                    entity.toDomain(user, service, storageLocation)
                 }
             }
         }
@@ -80,9 +90,10 @@ class OrderRepositoryImpl(
             if (order != null) {
                 val user = userDao.getById(order.customerId)?.toDomain()
                 val service = serviceDao.getById(order.serviceId)?.toDomain()
+                val storageLocation = storageLocationDao.getById(order.storageLocationId)?.toDomain()
 
-                if (user != null && service != null) {
-                    Result.Success(order.toDomain(user, service))
+                if (user != null && service != null && storageLocation != null) {
+                    Result.Success(order.toDomain(user, service, storageLocation))
                 } else {
                     Result.Failure(DataError.NOT_FOUND)
                 }
@@ -115,6 +126,24 @@ class OrderRepositoryImpl(
         }
     }
 
+    override suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus): Result<Unit, DataError> {
+        return withContext(ioContext) {
+            try {
+                val order = orderDao.getById(orderId) ?: return@withContext Result.Failure(DataError.NOT_FOUND)
+                
+                // If transitioning to a terminal status, release the storage slot
+                if (newStatus.isTerminal()) {
+                    storageLocationDao.decrementOccupiedSlots(order.storageLocationId)
+                }
+
+                orderDao.updateOrderStatus(orderId, newStatus)
+                Result.Success(Unit)
+            } catch (_: Exception) {
+                Result.Failure(DataError.DATABASE_ERROR)
+            }
+        }
+    }
+
     private fun assembleUsersFlow(ids: List<String>): Flow<Map<String, User>> = flow {
         val users = userDao.getAllByIds(ids).associateBy({ it.id }, { it.toDomain() })
         emit(users)
@@ -123,5 +152,10 @@ class OrderRepositoryImpl(
     private fun assembleServicesFlow(ids: List<String>): Flow<Map<String, Service>> = flow {
         val services = serviceDao.getAllByIds(ids).associateBy({ it.id }, { it.toDomain() })
         emit(services)
+    }
+
+    private fun assembleStorageLocationsFlow(ids: List<String>): Flow<Map<String, StorageLocation>> = flow {
+        val locations = storageLocationDao.getAllByIds(ids).associateBy({ it.id }, { it.toDomain() })
+        emit(locations)
     }
 }

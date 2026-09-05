@@ -26,6 +26,8 @@ import doobypro.shared.generated.resources.ic_service
 import doobypro.shared.generated.resources.ic_service_selected
 import doobypro.shared.generated.resources.ic_settings
 import doobypro.shared.generated.resources.ic_settings_selected
+import doobypro.shared.generated.resources.ic_storage
+import doobypro.shared.generated.resources.ic_storage_selected
 import doobypro.shared.generated.resources.ic_user_account
 import doobypro.shared.generated.resources.ic_user_account_selected
 import doobypro.shared.generated.resources.label_sign_out
@@ -155,6 +157,13 @@ fun AppRoot() {
                         icon = Res.drawable.ic_service,
                         selectedIcon = Res.drawable.ic_service_selected,
                         onClick = { navController.navigateWithRules(Route.Services) }
+                    ),
+                    NavigationItem(
+                        id = Route.StorageManagement.name,
+                        label = Route.StorageManagement.label,
+                        icon = Res.drawable.ic_storage,
+                        selectedIcon = Res.drawable.ic_storage_selected,
+                        onClick = { navController.navigateWithRules(Route.StorageManagement) }
                     )
                 )),
                 NavigationDrawerSection(items = listOf(

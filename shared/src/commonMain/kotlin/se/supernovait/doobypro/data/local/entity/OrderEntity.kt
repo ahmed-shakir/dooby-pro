@@ -10,11 +10,12 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 
 /**
- * Database entity representing an order in the system.
+ * Database entity representing an order in the persistent store.
  *
  * @property id The unique identifier for the order, generated using [SupernovaIdGenerator].
  * @property customerId The ID of the customer who placed the order.
  * @property serviceId The ID of the service being ordered.
+ * @property storageLocationId The ID of the assigned storage area.
  * @property status The current lifecycle stage of the order.
  * @property orderDatetime The date and time when the order was placed.
  * @property deliveryDatetime The scheduled date and time for delivery.
@@ -29,6 +30,7 @@ data class OrderEntity(
     val id: String = SupernovaIdGenerator.generateId(IdType.ORDER.prefix),
     val customerId: String,
     val serviceId: String,
+    val storageLocationId: String = "default",
     val status: OrderStatus,
     val orderDatetime: LocalDateTime,
     val deliveryDatetime: LocalDateTime,

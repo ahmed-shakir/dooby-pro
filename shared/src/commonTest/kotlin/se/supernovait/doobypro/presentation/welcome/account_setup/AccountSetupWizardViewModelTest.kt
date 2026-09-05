@@ -84,28 +84,49 @@ class AccountSetupWizardViewModelTest {
     }
 
     @Test
-    fun `UpdatePhoneNumber prepends country code if missing`() = runTest(testDispatcher) {
+    fun `UpdatePhoneNumber formats number on next step`() = runTest(testDispatcher) {
         val rawNumber = "501234567"
         viewModel.onEvent(AccountSetupWizardEvent.UpdatePhoneNumber(rawNumber))
-        assertEquals("${AppDefaults.COUNTRY_CODE}$rawNumber", viewModel.uiState.value.phoneNumber)
+        // Not formatted yet
+        assertEquals(rawNumber, viewModel.uiState.value.phoneNumber)
 
+        viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
+        assertEquals("${AppDefaults.COUNTRY_CODE}501234567", viewModel.uiState.value.phoneNumber)
+
+        // Reset to step 1 for more checks
+        viewModel.onEvent(AccountSetupWizardEvent.OnBackClick)
+        
         val withLeadingZero = "0501234567"
         viewModel.onEvent(AccountSetupWizardEvent.UpdatePhoneNumber(withLeadingZero))
+        viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
         assertEquals("${AppDefaults.COUNTRY_CODE}501234567", viewModel.uiState.value.phoneNumber)
+
+        viewModel.onEvent(AccountSetupWizardEvent.OnBackClick)
 
         val alreadyFormatted = "+971501234567"
         viewModel.onEvent(AccountSetupWizardEvent.UpdatePhoneNumber(alreadyFormatted))
+        viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
         assertEquals(alreadyFormatted, viewModel.uiState.value.phoneNumber)
         
+        viewModel.onEvent(AccountSetupWizardEvent.OnBackClick)
+
         val countryCodeNoPlus = "971501234567"
         viewModel.onEvent(AccountSetupWizardEvent.UpdatePhoneNumber(countryCodeNoPlus))
+        viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
         assertEquals("+971501234567", viewModel.uiState.value.phoneNumber)
     }
 
     @Test
-    fun `UpdateCompanyPhone prepends country code if missing`() = runTest(testDispatcher) {
+    fun `UpdateCompanyPhone formats number on next step`() = runTest(testDispatcher) {
         val rawNumber = "41234567"
+        // Move to step 2 where company phone is
+        viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
+        
         viewModel.onEvent(AccountSetupWizardEvent.UpdateCompanyPhone(rawNumber))
+        // Not formatted yet
+        assertEquals(rawNumber, viewModel.uiState.value.companyPhone)
+
+        viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
         assertEquals("${AppDefaults.COUNTRY_CODE}$rawNumber", viewModel.uiState.value.companyPhone)
     }
 
