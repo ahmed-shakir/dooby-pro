@@ -15,4 +15,6 @@ interface NavigationRoute {
         get() = true
     val showBottomBar: Boolean
         get() = true
+    val showFab: Boolean
+        get() = false
 }

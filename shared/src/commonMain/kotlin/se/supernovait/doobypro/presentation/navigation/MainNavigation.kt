@@ -15,6 +15,8 @@ import androidx.navigation.compose.composable
 import org.koin.compose.viewmodel.koinViewModel
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.doobypro.presentation.service.ServiceManagementScreen
+import se.supernovait.doobypro.presentation.service.ServiceViewModel
 import se.supernovait.doobypro.presentation.storage.StorageManagementScreen
 import se.supernovait.doobypro.presentation.storage.StorageViewModel
 
@@ -42,13 +44,13 @@ fun NavGraphBuilder.mainGraph(
     }
 
     composable<Route.Services> {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.mediumLarge)
-        ) {
-            SupernovaTitle(text = "Services")
-        }
+        val viewModel = koinViewModel<ServiceViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        ServiceManagementScreen(
+            state = uiState,
+            onEvent = viewModel::onEvent
+        )
     }
 
     composable<Route.StorageManagement> {

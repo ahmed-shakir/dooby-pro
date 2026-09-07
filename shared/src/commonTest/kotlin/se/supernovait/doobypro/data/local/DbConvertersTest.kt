@@ -2,6 +2,7 @@ package se.supernovait.doobypro.data.local
 
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.storage.StorageType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -39,5 +40,20 @@ class DbConvertersTest {
     fun `DeliveryMethod converters should handle nulls`() {
         assertNull(DbConverters.fromDeliveryMethod(null))
         assertNull(DbConverters.toDeliveryMethod(null))
+    }
+
+    @Test
+    fun `StorageType converters should work bidirectional`() {
+        val type = StorageType.HANGER
+        val string = "HANGER"
+
+        assertEquals(string, DbConverters.fromStorageType(type))
+        assertEquals(type, DbConverters.toStorageType(string))
+    }
+
+    @Test
+    fun `StorageType converters should handle nulls`() {
+        assertNull(DbConverters.fromStorageType(null))
+        assertNull(DbConverters.toStorageType(null))
     }
 }

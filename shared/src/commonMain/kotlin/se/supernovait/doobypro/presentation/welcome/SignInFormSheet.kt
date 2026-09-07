@@ -97,7 +97,8 @@ private fun SignInForm(
     ) {
         SupernovaTitle(
             text = stringResource(Res.string.sheet_SignIn_title),
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.titleLarge
         )
         SupernovaSubtitle(
             text = stringResource(Res.string.sheet_SignIn_subtitle),

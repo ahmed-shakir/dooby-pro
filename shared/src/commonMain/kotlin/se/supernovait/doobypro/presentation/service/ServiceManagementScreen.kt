@@ -1,4 +1,4 @@
-package se.supernovait.doobypro.presentation.storage
+package se.supernovait.doobypro.presentation.service
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -17,45 +17,46 @@ import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_add
 import doobypro.shared.generated.resources.label_cancel
 import doobypro.shared.generated.resources.label_delete
-import doobypro.shared.generated.resources.screen_Storage_action_add_location
-import doobypro.shared.generated.resources.screen_Storage_dialog_delete_message
-import doobypro.shared.generated.resources.screen_Storage_dialog_delete_title
-import doobypro.shared.generated.resources.screen_Storage_empty_state
+import doobypro.shared.generated.resources.screen_Service_action_add_service
+import doobypro.shared.generated.resources.screen_Service_dialog_delete_message
+import doobypro.shared.generated.resources.screen_Service_dialog_delete_title
+import doobypro.shared.generated.resources.screen_Service_empty_state
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.fab.LocalFabState
 import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
-import se.supernovait.doobypro.domain.model.storage.StorageLocation
-import se.supernovait.doobypro.presentation.storage.component.StorageLocationFormSheet
-import se.supernovait.doobypro.presentation.storage.component.StorageLocationItem
+import se.supernovait.doobypro.domain.model.Service
+import se.supernovait.doobypro.presentation.service.component.ServiceFormSheet
+import se.supernovait.doobypro.presentation.service.component.ServiceItem
 
 @Composable
-fun StorageManagementScreen(
-    state: StorageState,
-    onEvent: (StorageEvent) -> Unit
+fun ServiceManagementScreen(
+    state: ServiceState,
+    onEvent: (ServiceEvent) -> Unit
 ) {
     val bottomSheetState = LocalBottomSheetState.current
     val fabState = LocalFabState.current
     val dialogState = LocalDialogState.current
 
     val deleteColor = MaterialTheme.colorScheme.error
-    val deleteTitle = stringResource(Res.string.screen_Storage_dialog_delete_title)
-    val deleteMessage = stringResource(Res.string.screen_Storage_dialog_delete_message)
+    val deleteTitle = stringResource(Res.string.screen_Service_dialog_delete_title)
+    val deleteMessage = stringResource(Res.string.screen_Service_dialog_delete_message)
 
     DisposableEffect(Unit) {
         fabState.set(
             icon = Res.drawable.ic_add,
-            contentDescription = Res.string.screen_Storage_action_add_location,
+            contentDescription = Res.string.screen_Service_action_add_service,
             onClick = {
-                val newLocation = StorageLocation()
-                onEvent(StorageEvent.EditLocation(newLocation))
+                val newServiceTemplate = Service()
+                onEvent(ServiceEvent.EditService(newServiceTemplate))
                 bottomSheetState.show {
-                    StorageLocationFormSheet(
-                        location = newLocation,
-                        onSave = { label, type, capacity ->
-                            onEvent(StorageEvent.SaveLocation(label, type, capacity))
+                    ServiceFormSheet(
+                        service = newServiceTemplate,
+                        currency = state.currency,
+                        onSave = { title, description, price ->
+                            onEvent(ServiceEvent.SaveService(title, description, price))
                             bottomSheetState.hide()
                         },
                         onDelete = null
@@ -67,10 +68,10 @@ fun StorageManagementScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (state.locations.isEmpty() && !state.isLoading) {
+        if (state.services.isEmpty() && !state.isLoading) {
             Box(modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.large), contentAlignment = Alignment.Center) {
                 SupernovaLabel(
-                    text = Res.string.screen_Storage_empty_state,
+                    text = Res.string.screen_Service_empty_state,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -79,16 +80,17 @@ fun StorageManagementScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = MaterialTheme.spacing.medium)
             ) {
-                items(state.locations) { location ->
-                    StorageLocationItem(
-                        location = location,
+                items(state.services) { service ->
+                    ServiceItem(
+                        service = service,
                         onEdit = {
-                            onEvent(StorageEvent.EditLocation(location))
+                            onEvent(ServiceEvent.EditService(service))
                             bottomSheetState.show {
-                                StorageLocationFormSheet(
-                                    location = location,
-                                    onSave = { label, type, capacity ->
-                                        onEvent(StorageEvent.SaveLocation(label, type, capacity))
+                                ServiceFormSheet(
+                                    service = service,
+                                    currency = state.currency,
+                                    onSave = { title, description, price ->
+                                        onEvent(ServiceEvent.SaveService(title, description, price))
                                         bottomSheetState.hide()
                                     },
                                     onDelete = {
@@ -99,7 +101,7 @@ fun StorageManagementScreen(
                                             dismissLabel = Res.string.label_cancel,
                                             primaryActionColor = deleteColor,
                                             onConfirm = {
-                                                onEvent(StorageEvent.DeleteLocation(location))
+                                                onEvent(ServiceEvent.DeleteService(service))
                                                 bottomSheetState.hide()
                                                 dialogState.hide()
                                             },

@@ -1,4 +1,4 @@
-package se.supernovait.doobypro.presentation.storage.component
+package se.supernovait.doobypro.presentation.service.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,31 +20,29 @@ import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.label_delete
 import doobypro.shared.generated.resources.label_edit
 import doobypro.shared.generated.resources.label_save
-import doobypro.shared.generated.resources.screen_Storage_action_add_location
-import doobypro.shared.generated.resources.screen_Storage_field_capacity
-import doobypro.shared.generated.resources.screen_Storage_field_label
-import doobypro.shared.generated.resources.screen_Storage_field_type
+import doobypro.shared.generated.resources.screen_Service_action_add_service
+import doobypro.shared.generated.resources.screen_Service_field_description
+import doobypro.shared.generated.resources.screen_Service_field_price
+import doobypro.shared.generated.resources.screen_Service_field_title
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
-import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
-import se.supernovait.doobypro.domain.model.storage.StorageLocation
-import se.supernovait.doobypro.domain.model.storage.StorageType
+import se.supernovait.doobypro.domain.model.Service
 
 @Composable
-fun StorageLocationFormSheet(
-    location: StorageLocation,
-    onSave: (String, StorageType, Int) -> Unit,
+fun ServiceFormSheet(
+    service: Service,
+    currency: String,
+    onSave: (String, String, Long) -> Unit,
     onDelete: (() -> Unit)? = null
 ) {
-    var label by remember { mutableStateOf(location.label) }
-    var type by remember { mutableStateOf(location.type) }
-    var capacity by remember { mutableStateOf(location.capacity.toString()) }
+    var title by remember { mutableStateOf(service.title) }
+    var description by remember { mutableStateOf(service.description) }
+    var priceValue by remember { mutableStateOf(service.price.value) }
 
-    val isNew = location.id == null
-    val typeLabels = StorageType.entries.associateWith { stringResource(it.label) }
+    val isNew = service.id == null
 
     Column(
         modifier = Modifier
@@ -52,39 +50,43 @@ fun StorageLocationFormSheet(
             .padding(MaterialTheme.spacing.medium)
     ) {
         SupernovaTitle(
-            text = if (isNew) stringResource(Res.string.screen_Storage_action_add_location) else stringResource(Res.string.label_edit),
+            text = if (isNew) stringResource(Res.string.screen_Service_action_add_service) else stringResource(Res.string.label_edit),
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.titleLarge
         )
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
         SupernovaTextField(
-            label = stringResource(Res.string.screen_Storage_field_label),
-            value = label,
-            onValueChange = { v, _ -> label = v },
+            label = stringResource(Res.string.screen_Service_field_title),
+            value = title,
+            onValueChange = { v, _ -> title = v },
+            modifier = Modifier.fillMaxWidth()
+        )
+        
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        SupernovaTextField(
+            label = stringResource(Res.string.screen_Service_field_description),
+            value = description,
+            onValueChange = { v, _ -> description = v },
+            isMultiline = true,
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-        SupernovaSelectField(
-            label = Res.string.screen_Storage_field_type,
-            options = StorageType.entries,
-            selectedOption = type,
-            onOptionSelected = { type = it },
-            optionLabel = { typeLabels[it] ?: it.name }
+        SupernovaTextField(
+            label = stringResource(Res.string.screen_Service_field_price, currency),
+            value = priceValue,
+            onValueChange = { v, _ -> 
+                // Basic validation for decimal input
+                if (v.isEmpty() || v.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
+                    priceValue = v
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            modifier = Modifier.fillMaxWidth()
         )
-
-        if (!location.isDefault) {
-            Spacer(Modifier.height(MaterialTheme.spacing.medium))
-            SupernovaTextField(
-                label = stringResource(Res.string.screen_Storage_field_capacity),
-                value = capacity,
-                onValueChange = { v, _ -> capacity = v },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
 
         Spacer(Modifier.height(MaterialTheme.spacing.large))
 
@@ -92,7 +94,7 @@ fun StorageLocationFormSheet(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
-            if (onDelete != null && !location.isDefault) {
+            if (onDelete != null && !isNew) {
                 SupernovaOutlinedButton(
                     label = Res.string.label_delete,
                     onClick = onDelete,
@@ -105,8 +107,11 @@ fun StorageLocationFormSheet(
 
             SupernovaOutlinedButton(
                 label = Res.string.label_save,
-                onClick = { onSave(label, type, capacity.toIntOrNull() ?: 0) },
-                enabled = label.isNotBlank() && (location.isDefault || (capacity.toIntOrNull() ?: 0) > 0),
+                onClick = { 
+                    val rawPrice = (priceValue.toDoubleOrNull() ?: 0.0) * 100
+                    onSave(title, description, rawPrice.toLong()) 
+                },
+                enabled = title.isNotBlank() && description.isNotBlank() && priceValue.isNotBlank(),
                 shape = MaterialTheme.shapes.extraSmall,
                 modifier = Modifier.weight(1f)
             )

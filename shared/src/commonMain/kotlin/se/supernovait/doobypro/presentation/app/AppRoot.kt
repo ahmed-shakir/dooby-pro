@@ -39,6 +39,7 @@ import se.supernovait.app.core.domain.auth.AuthenticationState
 import se.supernovait.app.core.domain.connectivity.ConnectivityManager
 import se.supernovait.app.core.ui.component.drawer.LocalNavigationDrawerState
 import se.supernovait.app.core.ui.component.drawer.NavigationDrawerSection
+import se.supernovait.app.core.ui.component.fab.LocalFabState
 import se.supernovait.app.core.ui.component.navigation.LocalNavigationBarState
 import se.supernovait.app.core.ui.component.navigation.NavigationItem
 import se.supernovait.app.core.ui.component.scaffold.SupernovaScaffold
@@ -66,11 +67,18 @@ fun AppRoot() {
         val topBarState = LocalTopBarState.current
         val navigationBarState = LocalNavigationBarState.current
         val navigationDrawerState = LocalNavigationDrawerState.current
+        val fabState = LocalFabState.current
 
         val navController: NavHostController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
         val startScreen = Route.startScreen(isAuthenticated)
         val currentScreen = Route.parse(backStackEntry?.destination?.route, startScreen)
+
+        LaunchedEffect(currentScreen) {
+            if (!currentScreen.showFab) {
+                fabState.clear()
+            }
+        }
 
         LaunchedEffect(authState) {
             if (authState is AuthenticationState.NotAuthenticated && currentScreen != Route.Welcome) {

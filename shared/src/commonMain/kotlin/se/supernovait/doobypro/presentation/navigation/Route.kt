@@ -91,6 +91,7 @@ sealed interface Route : NavigationRoute {
     @Serializable
     data object Services : Route {
         override val label = Res.string.navigation_item_services_label
+        override val showFab = true
     }
 
     @Serializable
@@ -101,6 +102,7 @@ sealed interface Route : NavigationRoute {
     @Serializable
     data object StorageManagement : Route {
         override val label = Res.string.navigation_item_storage_label
+        override val showFab = true
     }
 
     companion object {

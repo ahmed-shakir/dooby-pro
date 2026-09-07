@@ -38,6 +38,7 @@ import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 import se.supernovait.doobypro.domain.util.FileStorage
 import se.supernovait.doobypro.domain.util.StorageLocationManager
 import se.supernovait.doobypro.presentation.account.AccountViewModel
+import se.supernovait.doobypro.presentation.service.ServiceViewModel
 import se.supernovait.doobypro.presentation.settings.SettingsViewModel
 import se.supernovait.doobypro.presentation.storage.StorageViewModel
 import se.supernovait.doobypro.presentation.welcome.WelcomeViewModel
@@ -62,6 +63,7 @@ val sharedModule = module {
     viewModelOf(::AccountSetupWizardViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::AccountViewModel)
+    viewModelOf(::ServiceViewModel)
     viewModelOf(::StorageViewModel)
 
     singleOf(::StorageLocationManager)
