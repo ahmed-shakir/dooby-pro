@@ -1,5 +1,14 @@
 package se.supernovait.doobypro.domain.model.order
 
+import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.order_status_cancelled
+import doobypro.shared.generated.resources.order_status_delivered
+import doobypro.shared.generated.resources.order_status_in_progress
+import doobypro.shared.generated.resources.order_status_new
+import doobypro.shared.generated.resources.order_status_out_for_delivery
+import doobypro.shared.generated.resources.order_status_picked_up
+import doobypro.shared.generated.resources.order_status_ready
+import org.jetbrains.compose.resources.StringResource
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 
 /**
@@ -17,47 +26,49 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
  * [OUT_FOR_DELIVERY] -> [DELIVERED] or [CANCELLED]
  *
  * Terminal statuses: [PICKED_UP], [DELIVERED], [CANCELLED]
+ *
+ * @property label The localized string resource for the status name.
  */
-enum class OrderStatus {
+enum class OrderStatus(val label: StringResource) {
     /**
      * Order received and waiting to be processed.
      * This is the only state where an order can be deleted.
      */
-    NEW,
+    NEW(Res.string.order_status_new),
 
     /**
      * Laundry is being processed (washing, drying, ironing, etc.).
      */
-    IN_PROGRESS,
+    IN_PROGRESS(Res.string.order_status_in_progress),
 
     /**
      * Laundry is ready for pickup or out for delivery.
      */
-    READY,
+    READY(Res.string.order_status_ready),
 
     /**
      * Laundry is with the delivery driver and on its way to the customer.
      * Specific to [DeliveryMethod.HOME_DELIVERY].
      */
-    OUT_FOR_DELIVERY,
+    OUT_FOR_DELIVERY(Res.string.order_status_out_for_delivery),
 
     /**
      * Customer has picked up their laundry from the store.
      * Terminal state for Pickup orders.
      */
-    PICKED_UP,
+    PICKED_UP(Res.string.order_status_picked_up),
 
     /**
      * Laundry has been delivered to the customer's address.
      * Terminal state for Home Delivery orders.
      */
-    DELIVERED,
+    DELIVERED(Res.string.order_status_delivered),
 
     /**
      * Order was cancelled.
      * Terminal state.
      */
-    CANCELLED;
+    CANCELLED(Res.string.order_status_cancelled);
 
     /**
      * Determines the next logical status in the workflow based on the delivery method.

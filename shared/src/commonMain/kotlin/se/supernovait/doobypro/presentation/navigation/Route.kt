@@ -81,6 +81,7 @@ sealed interface Route : NavigationRoute {
     @Serializable
     data object Orders : Route {
         override val label = Res.string.navigation_item_orders_label
+        override val showFab = true
     }
 
     @Serializable
