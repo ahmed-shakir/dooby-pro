@@ -17,14 +17,20 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.doobypro.domain.manager.OrderManager
+import se.supernovait.doobypro.domain.manager.OrderQueryManager
+import se.supernovait.doobypro.domain.manager.StorageLocationManager
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
+import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
+import se.supernovait.doobypro.domain.repository.CustomerRepository
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
+import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -38,12 +44,16 @@ class OrderViewModelTest {
     private lateinit var fakeOrderRepo: FakeOrderRepository
     private lateinit var fakeServiceRepo: FakeServiceRepository
     private lateinit var fakeStorageRepo: FakeStorageLocationRepository
+    private lateinit var fakeSettingsRepo: FakeSettingsRepository
+    private lateinit var fakeCustomerRepo: FakeCustomerRepository
     private lateinit var fakeUserDao: FakeUserDao
+    private lateinit var orderManager: OrderManager
+    private lateinit var orderQueryManager: OrderQueryManager
     private val testDispatcher = UnconfinedTestDispatcher()
 
     private val testUser = User(id = "u1", username = "u1", firstname = "F", lastname = "L", birthdate = LocalDate(1990, 1, 1), email = "")
     private val testService = Service(id = "s1", title = "S1", description = "", price = Amount(0, "AED"))
-    private val testStorage = StorageLocation(id = "l1", label = "L1")
+    private val testStorage = StorageLocation(id = "l1", label = "L1", capacity = 10)
     private val testOrder = Order(
         id = "o1",
         customer = testUser,
@@ -55,7 +65,9 @@ class OrderViewModelTest {
         deliveryOption = DeliveryOption.STANDARD,
         deliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
         isPaymentDone = false,
-        notes = null
+        notes = null,
+        createdAt = LocalDateTime(2026, 1, 1, 0, 0),
+        updatedAt = LocalDateTime(2026, 1, 1, 0, 0)
     )
 
     @BeforeTest
@@ -64,8 +76,18 @@ class OrderViewModelTest {
         fakeOrderRepo = FakeOrderRepository()
         fakeServiceRepo = FakeServiceRepository()
         fakeStorageRepo = FakeStorageLocationRepository()
+        fakeSettingsRepo = FakeSettingsRepository()
+        fakeCustomerRepo = FakeCustomerRepository()
         fakeUserDao = FakeUserDao()
-        viewModel = OrderViewModel(fakeOrderRepo, fakeServiceRepo, fakeStorageRepo, fakeUserDao)
+        
+        val storageManager = StorageLocationManager(
+            fakeStorageRepo, fakeSettingsRepo
+        )
+        
+        orderManager = OrderManager(fakeOrderRepo, fakeServiceRepo, storageManager, fakeStorageRepo, fakeSettingsRepo)
+        orderQueryManager = OrderQueryManager(fakeOrderRepo)
+        
+        viewModel = OrderViewModel(fakeOrderRepo, fakeServiceRepo, fakeStorageRepo, fakeSettingsRepo, fakeCustomerRepo, orderManager, orderQueryManager)
     }
 
     @AfterTest
@@ -88,6 +110,10 @@ class OrderViewModelTest {
     @Test
     fun `SaveOrder should call repository and clear editing state`() = runTest(testDispatcher) {
         val collectJob = launch { viewModel.uiState.collect {} }
+        
+        // Seed storage for OrderManager to succeed
+        fakeStorageRepo.saveLocation(testStorage)
+        
         viewModel.onEvent(OrderEvent.EditOrder(testOrder))
         viewModel.onEvent(OrderEvent.SaveOrder(testOrder))
 
@@ -135,13 +161,42 @@ class OrderViewModelTest {
     }
 
     private class FakeStorageLocationRepository : StorageLocationRepository {
-        override fun getActiveLocations(): Flow<List<StorageLocation>> = MutableStateFlow(emptyList())
-        override suspend fun getLocationById(id: String) = Result.Failure(DataError.NOT_FOUND)
-        override suspend fun getDefaultLocation() = Result.Failure(DataError.NOT_FOUND)
-        override suspend fun saveLocation(location: StorageLocation) = Result.Success("")
+        private val _locations = MutableStateFlow<List<StorageLocation>>(emptyList())
+        override fun getActiveLocations(): Flow<List<StorageLocation>> = _locations
+        
+        override suspend fun getLocationById(id: String): Result<StorageLocation, DataError> {
+            return _locations.value.find { it.id == id }?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
+        }
+        
+        override suspend fun getDefaultLocation(): Result<StorageLocation, DataError> {
+            return _locations.value.find { it.isDefault }?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
+        }
+        
+        override suspend fun saveLocation(location: StorageLocation): Result<String, DataError> {
+            _locations.value = _locations.value + location
+            return Result.Success(location.id!!)
+        }
+        
         override suspend fun deleteLocation(location: StorageLocation) = Result.Success(Unit)
         override suspend fun incrementOccupiedSlots(id: String) {}
         override suspend fun decrementOccupiedSlots(id: String) {}
+    }
+
+    private class FakeSettingsRepository : SettingsRepository {
+        override val settings: Flow<Settings> = MutableStateFlow(Settings())
+        override suspend fun updateSettings(settings: Settings) {}
+        override suspend fun resetSettings() {}
+    }
+
+    private class FakeCustomerRepository : CustomerRepository {
+        private val _customers = MutableStateFlow<List<User>>(emptyList())
+        override fun getCustomers(): Flow<List<User>> = _customers
+        override suspend fun getCustomerById(id: String): Result<User, DataError> = Result.Failure(DataError.NOT_FOUND)
+        override suspend fun saveCustomer(customer: User): Result<String, DataError> {
+            _customers.value = _customers.value + customer
+            return Result.Success(customer.id ?: "gen")
+        }
+        override suspend fun deleteCustomer(customer: User): Result<Unit, DataError> = Result.Success(Unit)
     }
 
     private class FakeUserDao : UserDao {

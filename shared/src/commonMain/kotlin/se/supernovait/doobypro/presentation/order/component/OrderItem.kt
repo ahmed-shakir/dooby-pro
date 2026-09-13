@@ -26,6 +26,7 @@ import se.supernovait.doobypro.domain.model.order.OrderStatus
 @Composable
 fun OrderItem(
     order: Order,
+    onClick: () -> Unit,
     onEdit: () -> Unit
 ) {
     val statusColor = when (order.status) {
@@ -40,7 +41,7 @@ fun OrderItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onEdit() }
+            .clickable { onClick() }
             .padding(vertical = MaterialTheme.spacing.medium)
     ) {
         Column(modifier = Modifier.weight(1f)) {

@@ -1,7 +1,9 @@
 package se.supernovait.doobypro.presentation.order
 
+import se.supernovait.app.core.domain.auth.User
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
+import se.supernovait.doobypro.domain.model.order.OrderTab
 
 /**
  * Events for the order management domain.
@@ -9,6 +11,11 @@ import se.supernovait.doobypro.domain.model.order.OrderStatus
 sealed interface OrderEvent {
     /** Re-fetches the list of all orders. */
     data object LoadOrders : OrderEvent
+
+    /**
+     * Initializes a new order process (starts with customer search).
+     */
+    data object CreateNewOrder : OrderEvent
 
     /**
      * Sets the order that is currently being created or updated.
@@ -31,4 +38,34 @@ sealed interface OrderEvent {
      * Updates the status of an order.
      */
     data class UpdateStatus(val orderId: String, val newStatus: OrderStatus) : OrderEvent
+
+    /**
+     * Selects an operational tab.
+     */
+    data class SelectTab(val tab: OrderTab) : OrderEvent
+
+    /**
+     * Updates the search query for orders.
+     */
+    data class SearchOrders(val query: String) : OrderEvent
+
+    /**
+     * Updates the search query for customers when creating a new order.
+     */
+    data class SearchCustomers(val query: String) : OrderEvent
+
+    /**
+     * Selects a customer for a new order.
+     */
+    data class SelectCustomer(val customer: User) : OrderEvent
+
+    /**
+     * Starts the process of adding a new customer.
+     */
+    data object StartAddingCustomer : OrderEvent
+
+    /**
+     * Saves a new customer record.
+     */
+    data class SaveNewCustomer(val customer: User) : OrderEvent
 }

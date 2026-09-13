@@ -41,6 +41,8 @@ import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.settings.order.OrderSettings
+import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 
 @Composable
@@ -49,6 +51,7 @@ fun OrderFormSheet(
     customers: List<User>,
     services: List<Service>,
     storageLocations: List<StorageLocation>,
+    settings: OrderSettings,
     onSave: (Order) -> Unit,
     onDelete: (() -> Unit)? = null
 ) {
@@ -61,6 +64,7 @@ fun OrderFormSheet(
     var notes by remember { mutableStateOf(order.notes ?: "") }
 
     val isNew = order.id == null
+    val isManualStorage = settings.storageAllocationMode == StorageAllocationMode.MANUAL
 
     val deliveryOptionLabels = DeliveryOption.entries.associateWith { stringResource(it.label) }
     val deliveryMethodLabels = DeliveryMethod.entries.associateWith { stringResource(it.label) }
@@ -121,15 +125,17 @@ fun OrderFormSheet(
             )
         }
 
-        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+        if (isManualStorage) {
+            Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-        SupernovaSelectField(
-            label = Res.string.screen_Order_field_storage,
-            options = storageLocations,
-            selectedOption = selectedLocation,
-            onOptionSelected = { selectedLocation = it },
-            optionLabel = { it.label }
-        )
+            SupernovaSelectField(
+                label = Res.string.screen_Order_field_storage,
+                options = storageLocations,
+                selectedOption = selectedLocation,
+                onOptionSelected = { selectedLocation = it },
+                optionLabel = { it.label }
+            )
+        }
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
@@ -166,6 +172,8 @@ fun OrderFormSheet(
                 Spacer(Modifier.weight(1f))
             }
 
+            val isValid = selectedCustomer.id != null && selectedService.id != null
+
             SupernovaOutlinedButton(
                 label = Res.string.label_save,
                 onClick = { 
@@ -179,7 +187,7 @@ fun OrderFormSheet(
                         notes = notes.ifBlank { null }
                     )) 
                 },
-                enabled = selectedCustomer.id != null && selectedService.id != null,
+                enabled = isValid,
                 shape = MaterialTheme.shapes.extraSmall,
                 modifier = Modifier.weight(1f)
             )

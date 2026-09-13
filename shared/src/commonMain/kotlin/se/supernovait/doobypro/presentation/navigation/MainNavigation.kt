@@ -17,6 +17,8 @@ import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.presentation.order.OrderManagementScreen
 import se.supernovait.doobypro.presentation.order.OrderViewModel
+import se.supernovait.doobypro.presentation.order.details.OrderDetailsScreen
+import se.supernovait.doobypro.presentation.order.details.OrderDetailsViewModel
 import se.supernovait.doobypro.presentation.service.ServiceManagementScreen
 import se.supernovait.doobypro.presentation.service.ServiceViewModel
 import se.supernovait.doobypro.presentation.storage.StorageManagementScreen
@@ -40,28 +42,30 @@ fun NavGraphBuilder.mainGraph(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         OrderManagementScreen(
-            state = uiState,
-            onEvent = viewModel::onEvent
+            uiState = uiState,
+            onEvent = viewModel::onEvent,
+            onOrderClick = { navController.navigate(Route.OrderDetails(it)) }
         )
+    }
+
+    composable<Route.OrderDetails> {
+        val viewModel = koinViewModel<OrderDetailsViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        OrderDetailsScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 
     composable<Route.Services> {
         val viewModel = koinViewModel<ServiceViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        ServiceManagementScreen(
-            state = uiState,
-            onEvent = viewModel::onEvent
-        )
+        ServiceManagementScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 
     composable<Route.StorageManagement> {
         val viewModel = koinViewModel<StorageViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        StorageManagementScreen(
-            state = uiState,
-            onEvent = viewModel::onEvent
-        )
+        StorageManagementScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 }
