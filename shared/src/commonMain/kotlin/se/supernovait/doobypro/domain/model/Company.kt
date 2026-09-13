@@ -28,5 +28,5 @@ data class Company(
     val address: Address? = null,
     val logoUrl: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    val updatedAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 )

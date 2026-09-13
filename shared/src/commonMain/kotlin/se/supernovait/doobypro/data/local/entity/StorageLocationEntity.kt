@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.storage.StorageType
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * Database entity for storage areas in the persistent store.
@@ -17,6 +19,8 @@ import se.supernovait.doobypro.domain.model.storage.StorageType
  * @property occupiedSlots The current number of slots filled by active orders.
  * @property isDefault Whether this is the fallback "Default Storage Area".
  * @property isActive Whether the location is operational.
+ * @property createdAt The timestamp when the storage location record was created.
+ * @property updatedAt The timestamp when the storage location record was last updated.
  */
 @Entity(
     tableName = "storage_locations",
@@ -33,5 +37,7 @@ data class StorageLocationEntity(
     val capacity: Int,
     val occupiedSlots: Int = 0,
     val isDefault: Boolean = false,
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    val createdAt: Instant = Clock.System.now(),
+    val updatedAt: Instant = Clock.System.now()
 )

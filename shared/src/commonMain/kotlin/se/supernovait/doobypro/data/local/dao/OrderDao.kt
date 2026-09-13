@@ -5,8 +5,11 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalDateTime
 import se.supernovait.doobypro.data.local.entity.OrderEntity
+import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.order.OrderStatus
+import kotlin.time.Instant
 
 /**
  * Data Access Object for the "orders" table.
@@ -43,6 +46,24 @@ interface OrderDao {
     fun getByCustomerId(customerId: String): Flow<List<OrderEntity>>
 
     /**
+     * Observes all orders for a specific status.
+     */
+    @Query("SELECT * FROM orders WHERE status = :status")
+    fun getByStatus(status: OrderStatus): Flow<List<OrderEntity>>
+
+    /**
+     * Observes all orders for a specific status and delivery method.
+     */
+    @Query("SELECT * FROM orders WHERE status = :status AND deliveryMethod = :method")
+    fun getByStatusAndMethod(status: OrderStatus, method: DeliveryMethod): Flow<List<OrderEntity>>
+
+    /**
+     * Observes all orders that are in the "Ready Hub" (READY or OUT_FOR_DELIVERY).
+     */
+    @Query("SELECT * FROM orders WHERE status = 'READY' OR status = 'OUT_FOR_DELIVERY'")
+    fun getReadyTabOrders(): Flow<List<OrderEntity>>
+
+    /**
      * Observes all orders for a specific storage location.
      *
      * @param storageLocationId The ID of the storage location.
@@ -50,12 +71,18 @@ interface OrderDao {
      */
     @Query("SELECT * FROM orders WHERE storageLocationId = :storageLocationId")
     fun getByStorageLocationId(storageLocationId: String): Flow<List<OrderEntity>>
+
+    /**
+     * Retrieves orders within a specific date range.
+     */
+    @Query("SELECT * FROM orders WHERE deliveryDatetime BETWEEN :start AND :end")
+    suspend fun getInDateRange(start: LocalDateTime, end: LocalDateTime): List<OrderEntity>
     
     /**
      * Updates the status of an order.
      */
-    @Query("UPDATE orders SET status = :newStatus WHERE id = :orderId")
-    suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus)
+    @Query("UPDATE orders SET status = :newStatus, updatedAt = :timestamp WHERE id = :orderId")
+    suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus, timestamp: Instant)
 
     /**
      * Inserts or updates an order in the database.
@@ -72,4 +99,7 @@ interface OrderDao {
      */
     @Delete
     suspend fun delete(order: OrderEntity)
+
+    @Query("SELECT COUNT(*) FROM orders WHERE status = :status")
+    fun countByStatus(status: OrderStatus): Flow<Int>
 }

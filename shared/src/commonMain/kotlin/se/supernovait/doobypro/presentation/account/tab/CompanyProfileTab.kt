@@ -57,6 +57,7 @@ import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
+import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.sizing
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.Emirate
@@ -75,7 +76,7 @@ import se.supernovait.doobypro.presentation.account.component.AccountField
  */
 @Composable
 fun CompanyProfileTab(
-    state: AccountState,
+    uiState: AccountState,
     onEvent: (AccountEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -99,8 +100,8 @@ fun CompanyProfileTab(
         // Branding Card
         AccountCard(
             title = stringResource(Res.string.Account_CompanyProfileTab_section_branding),
-            isSaving = state.isSaving,
-            isEditing = state.editingCardId == "company-branding",
+            isSaving = uiState.isSaving,
+            isEditing = uiState.editingCardId == "company-branding",
             onEditClick = { onEvent(AccountEvent.EnterEditMode("company-branding")) },
             onCancelClick = { onEvent(AccountEvent.ExitEditMode) },
             onSaveClick = { onEvent(AccountEvent.SaveCompanyProfile) }
@@ -109,7 +110,7 @@ fun CompanyProfileTab(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                val logoUrl = if (state.editingCardId == "company-branding") state.editCompanyLogoUrl else state.account?.company?.logoUrl
+                val logoUrl = if (uiState.editingCardId == "company-branding") uiState.editCompanyLogoUrl else uiState.account?.company?.logoUrl
                 
                 Box(
                     contentAlignment = Alignment.Center,
@@ -130,7 +131,7 @@ fun CompanyProfileTab(
                     }
                 }
                 
-                if (state.editingCardId == "company-branding") {
+                if (uiState.editingCardId == "company-branding") {
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     SupernovaTextAction(
                         label = stringResource(Res.string.Account_CompanyProfileTab_action_change_logo),
@@ -158,32 +159,32 @@ fun CompanyProfileTab(
         // Company Information Card
         AccountCard(
             title = stringResource(Res.string.Account_CompanyProfileTab_section_info),
-            isSaving = state.isSaving,
-            isEditing = state.editingCardId == "company-info",
+            isSaving = uiState.isSaving,
+            isEditing = uiState.editingCardId == "company-info",
             onEditClick = { onEvent(AccountEvent.EnterEditMode("company-info")) },
             onCancelClick = { onEvent(AccountEvent.ExitEditMode) },
             onSaveClick = { onEvent(AccountEvent.SaveCompanyProfile) }
         ) {
-            if (state.editingCardId == "company-info") {
+            if (uiState.editingCardId == "company-info") {
                 // Edit Mode
                 Column {
                     SupernovaTextField(
                         label = stringResource(Res.string.Account_CompanyProfileTab_field_legal_name),
-                        value = state.editCompanyLegalName,
+                        value = uiState.editCompanyLegalName,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyLegalName(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     SupernovaTextField(
                         label = stringResource(Res.string.Account_CompanyProfileTab_field_display_name),
-                        value = state.editCompanyDisplayName,
+                        value = uiState.editCompanyDisplayName,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyDisplayName(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     SupernovaTextField(
                         label = stringResource(Res.string.Account_CompanyProfileTab_field_license_number),
-                        value = state.editCompanyLicenseNumber,
+                        value = uiState.editCompanyLicenseNumber,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyLicenseNumber(value)) },
                         modifier = fieldModifier
                     )
@@ -192,17 +193,17 @@ fun CompanyProfileTab(
                 // Display Mode
                 AccountField(
                     label = stringResource(Res.string.Account_CompanyProfileTab_field_legal_name),
-                    value = state.account?.company?.legalName ?: ""
+                    value = uiState.account?.company?.legalName ?: ""
                 )
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
                 AccountField(
                     label = stringResource(Res.string.Account_CompanyProfileTab_field_display_name),
-                    value = state.account?.company?.displayName ?: ""
+                    value = uiState.account?.company?.displayName ?: ""
                 )
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
                 AccountField(
                     label = stringResource(Res.string.Account_CompanyProfileTab_field_license_number),
-                    value = state.account?.company?.licenseNumber ?: ""
+                    value = uiState.account?.company?.licenseNumber ?: ""
                 )
             }
         }
@@ -212,25 +213,25 @@ fun CompanyProfileTab(
         // Contact Information Card
         AccountCard(
             title = stringResource(Res.string.Account_CompanyProfileTab_section_contact),
-            isSaving = state.isSaving,
-            isEditing = state.editingCardId == "company-contact",
+            isSaving = uiState.isSaving,
+            isEditing = uiState.editingCardId == "company-contact",
             onEditClick = { onEvent(AccountEvent.EnterEditMode("company-contact")) },
             onCancelClick = { onEvent(AccountEvent.ExitEditMode) },
             onSaveClick = { onEvent(AccountEvent.SaveCompanyProfile) }
         ) {
-            if (state.editingCardId == "company-contact") {
+            if (uiState.editingCardId == "company-contact") {
                 // Edit Mode
                 Column {
                     SupernovaTextField(
                         label = stringResource(Res.string.Contact_details_field_email),
-                        value = state.editCompanyEmail,
+                        value = uiState.editCompanyEmail,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyEmail(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     SupernovaTextField(
                         label = stringResource(Res.string.Contact_details_field_phone),
-                        value = state.editCompanyPhone,
+                        value = uiState.editCompanyPhone,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyPhone(value)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = fieldModifier
@@ -240,12 +241,12 @@ fun CompanyProfileTab(
                 // Display Mode
                 AccountField(
                     label = stringResource(Res.string.Contact_details_field_email),
-                    value = state.account?.company?.email ?: ""
+                    value = uiState.account?.company?.email ?: ""
                 )
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
                 AccountField(
                     label = stringResource(Res.string.Contact_details_field_phone),
-                    value = state.account?.company?.phoneNumber ?: ""
+                    value = uiState.account?.company?.phoneNumber ?: ""
                 )
             }
         }
@@ -255,32 +256,32 @@ fun CompanyProfileTab(
         // Address Card
         AccountCard(
             title = stringResource(Res.string.Account_CompanyProfileTab_section_address),
-            isSaving = state.isSaving,
-            isEditing = state.editingCardId == "company-address",
+            isSaving = uiState.isSaving,
+            isEditing = uiState.editingCardId == "company-address",
             onEditClick = { onEvent(AccountEvent.EnterEditMode("company-address")) },
             onCancelClick = { onEvent(AccountEvent.ExitEditMode) },
             onSaveClick = { onEvent(AccountEvent.SaveCompanyProfile) }
         ) {
-            if (state.editingCardId == "company-address") {
+            if (uiState.editingCardId == "company-address") {
                 // Edit Mode
                 Column {
                     SupernovaTextField(
                         label = stringResource(Res.string.Address_field_street),
-                        value = state.editCompanyAddressStreet,
+                        value = uiState.editCompanyAddressStreet,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyAddressStreet(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.small))
                     SupernovaTextField(
                         label = stringResource(Res.string.Address_field_city),
-                        value = state.editCompanyAddressCity,
+                        value = uiState.editCompanyAddressCity,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyAddressCity(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.small))
                     
                     val emirateLabels = Emirate.entries.associateWith { stringResource(it.label) }
-                    val selectedEmirate = Emirate.fromValue(state.editCompanyAddressSubdivision)
+                    val selectedEmirate = Emirate.fromValue(uiState.editCompanyAddressSubdivision)
                     
                     SupernovaSelectField(
                         options = Emirate.entries,
@@ -294,7 +295,7 @@ fun CompanyProfileTab(
                     Spacer(Modifier.height(MaterialTheme.spacing.small))
                     SupernovaTextField(
                         label = stringResource(Res.string.Address_field_postal_code),
-                        value = state.editCompanyAddressPostalCode,
+                        value = uiState.editCompanyAddressPostalCode,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyAddressPostalCode(value)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = fieldModifier
@@ -302,14 +303,14 @@ fun CompanyProfileTab(
                     Spacer(Modifier.height(MaterialTheme.spacing.small))
                     SupernovaTextField(
                         label = stringResource(Res.string.Address_field_country),
-                        value = state.editCompanyAddressCountry,
+                        value = uiState.editCompanyAddressCountry,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyAddressCountry(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.small))
                     SupernovaTextField(
                         label = stringResource(Res.string.Address_field_location_notes),
-                        value = state.editCompanyNotes,
+                        value = uiState.editCompanyNotes,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateCompanyNotes(value)) },
                         modifier = fieldModifier,
                         isMultiline = true
@@ -319,19 +320,19 @@ fun CompanyProfileTab(
                 // Display Mode
                 AccountField(
                     label = stringResource(Res.string.Address_field_street),
-                    value = state.account?.company?.address?.street ?: ""
+                    value = uiState.account?.company?.address?.street ?: ""
                 )
                 Spacer(Modifier.height(MaterialTheme.spacing.small))
                 AccountField(
                     label = stringResource(Res.string.Address_field_city),
-                    value = state.account?.company?.address?.city ?: ""
+                    value = uiState.account?.company?.address?.city ?: ""
                 )
                 Spacer(Modifier.height(MaterialTheme.spacing.small))
                 AccountField(
                     label = stringResource(Res.string.Address_field_emirate),
-                    value = state.account?.company?.address?.subdivision ?: ""
+                    value = uiState.account?.company?.address?.subdivision ?: ""
                 )
-                state.account?.company?.address?.postalCode?.takeIf { it.isNotBlank() }?.let { postalCode ->
+                uiState.account?.company?.address?.postalCode?.takeIf { it.isNotBlank() }?.let { postalCode ->
                     Spacer(Modifier.height(MaterialTheme.spacing.small))
                     AccountField(
                         label = stringResource(Res.string.Address_field_postal_code),
@@ -341,9 +342,9 @@ fun CompanyProfileTab(
                 Spacer(Modifier.height(MaterialTheme.spacing.small))
                 AccountField(
                     label = stringResource(Res.string.Address_field_country),
-                    value = state.account?.company?.address?.country ?: ""
+                    value = uiState.account?.company?.address?.country ?: ""
                 )
-                state.account?.company?.address?.notes?.takeIf { it.isNotBlank() }?.let { notes ->
+                uiState.account?.company?.address?.notes?.takeIf { it.isNotBlank() }?.let { notes ->
                     Spacer(Modifier.height(MaterialTheme.spacing.small))
                     AccountField(
                         label = stringResource(Res.string.Address_field_location_notes),
@@ -364,13 +365,13 @@ fun CompanyProfileTab(
         ) {
             AccountField(
                 label = stringResource(Res.string.Account_CompanyProfileTab_field_company_id),
-                value = state.account?.company?.id ?: "",
+                value = uiState.account?.company?.id ?: "",
                 isLocked = true
             )
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
             AccountField(
                 label = stringResource(Res.string.Account_CompanyProfileTab_label_registered_since),
-                value = state.registeredSince
+                value = uiState.registeredSince
             )
         }
 
@@ -392,10 +393,10 @@ private fun LogoSourcePickerSheet(
             .padding(MaterialTheme.spacing.medium)
             .padding(bottom = MaterialTheme.spacing.large)
     ) {
-        SupernovaLabel(
+        SupernovaTitle(
             text = Res.string.Account_CompanyProfileTab_picker_title,
-            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = MaterialTheme.spacing.medium)
         )
         

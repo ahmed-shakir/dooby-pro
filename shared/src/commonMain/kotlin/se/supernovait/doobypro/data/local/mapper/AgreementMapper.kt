@@ -1,11 +1,15 @@
 package se.supernovait.doobypro.data.local.mapper
 
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.entity.AgreementEntity
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.agreement.Agreement
+import kotlin.time.Clock
 
 /**
  * Extension function to map [AgreementEntity] to [Agreement] domain model.
@@ -24,7 +28,9 @@ fun AgreementEntity.toDomain() = Agreement(
     fee = fee.toDomain(),
     deposit = deposit.toDomain(),
     issueDate = issueDate,
-    cancellationDate = cancellationDate
+    cancellationDate = cancellationDate,
+    createdAt = createdAt.toLocalDateTime(TimeZone.currentSystemDefault()),
+    updatedAt = updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
 )
 
 /**
@@ -44,5 +50,7 @@ fun Agreement.toEntity() = AgreementEntity(
     fee = fee.toEntity(),
     deposit = deposit.toEntity(),
     issueDate = issueDate,
-    cancellationDate = cancellationDate
+    cancellationDate = cancellationDate,
+    createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()),
+    updatedAt = Clock.System.now()
 )

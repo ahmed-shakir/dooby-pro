@@ -39,11 +39,11 @@ import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 
 @Composable
 fun PrinterSettingsScreen(
-    state: SettingsState,
+    uiState: SettingsState,
     onEvent: (SettingsScreenEvent) -> Unit
 ) {
     val connectionMethodLabels = ConnectionMethod.entries.associateWith { stringResource(it.label) }
-    val printer = state.settings.printer
+    val printer = uiState.settings.printer
     val isConnected = printer.printerAddress != null
 
     SettingsScreen {
@@ -103,7 +103,7 @@ fun PrinterSettingsScreen(
             optionLabel = { connectionMethodLabels[it] ?: "" }
         )
 
-        if (state.isSearchingPrinters) {
+        if (uiState.isSearchingPrinters) {
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.CenterHorizontally).size(24.dp),
@@ -111,9 +111,9 @@ fun PrinterSettingsScreen(
             )
         }
 
-        if (state.discoveredPrinters.isNotEmpty()) {
+        if (uiState.discoveredPrinters.isNotEmpty()) {
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
-            state.discoveredPrinters.forEach { discovered ->
+            uiState.discoveredPrinters.forEach { discovered ->
                 SupernovaListItem(
                     title = discovered.name,
                     description = discovered.address,

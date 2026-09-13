@@ -33,7 +33,7 @@ import se.supernovait.doobypro.presentation.service.component.ServiceItem
 
 @Composable
 fun ServiceManagementScreen(
-    state: ServiceState,
+    uiState: ServiceState,
     onEvent: (ServiceEvent) -> Unit
 ) {
     val bottomSheetState = LocalBottomSheetState.current
@@ -54,7 +54,7 @@ fun ServiceManagementScreen(
                 bottomSheetState.show {
                     ServiceFormSheet(
                         service = newServiceTemplate,
-                        currency = state.currency,
+                        currency = uiState.currency,
                         onSave = { title, description, price ->
                             onEvent(ServiceEvent.SaveService(title, description, price))
                             bottomSheetState.hide()
@@ -68,7 +68,7 @@ fun ServiceManagementScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (state.services.isEmpty() && !state.isLoading) {
+        if (uiState.services.isEmpty() && !uiState.isLoading) {
             Box(modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.large), contentAlignment = Alignment.Center) {
                 SupernovaLabel(
                     text = Res.string.screen_Service_empty_state,
@@ -80,7 +80,7 @@ fun ServiceManagementScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = MaterialTheme.spacing.medium)
             ) {
-                items(state.services) { service ->
+                items(uiState.services) { service ->
                     ServiceItem(
                         service = service,
                         onEdit = {
@@ -88,7 +88,7 @@ fun ServiceManagementScreen(
                             bottomSheetState.show {
                                 ServiceFormSheet(
                                     service = service,
-                                    currency = state.currency,
+                                    currency = uiState.currency,
                                     onSave = { title, description, price ->
                                         onEvent(ServiceEvent.SaveService(title, description, price))
                                         bottomSheetState.hide()

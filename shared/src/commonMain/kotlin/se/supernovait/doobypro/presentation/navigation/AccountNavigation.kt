@@ -19,6 +19,6 @@ fun NavGraphBuilder.accountGraph(
         val viewModel = koinViewModel<AccountViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        AccountScreen(state = uiState, onEvent = viewModel::onEvent)
+        AccountScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 }

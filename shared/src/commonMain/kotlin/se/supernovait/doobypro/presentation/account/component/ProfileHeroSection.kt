@@ -28,9 +28,9 @@ import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.presentation.account.AccountState
 
 @Composable
-fun ProfileHeroSection(state: AccountState) {
-    val user = state.account?.user
-    val company = state.account?.company
+fun ProfileHeroSection(uiState: AccountState) {
+    val user = uiState.account?.user
+    val company = uiState.account?.company
 
     Box(
         contentAlignment = Alignment.Center,

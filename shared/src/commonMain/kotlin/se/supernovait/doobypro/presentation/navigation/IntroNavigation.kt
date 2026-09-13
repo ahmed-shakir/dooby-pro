@@ -57,15 +57,10 @@ fun NavGraphBuilder.introGraph(
 
         AppEventHandler(events = viewModel.events)
 
-        AccountSetupWizardScreen(
-            uiState = uiState,
-            onEvent = viewModel::onEvent
-        )
+        AccountSetupWizardScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 
     composable<Route.AppInfo> {
-        AppInfoScreen(
-            onBack = { navController.popBackStack() }
-        )
+        AppInfoScreen(onBack = { navController.popBackStack() })
     }
 }

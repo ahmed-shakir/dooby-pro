@@ -1,11 +1,15 @@
 package se.supernovait.doobypro.data.local.mapper
 
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.model.license.License
 import se.supernovait.doobypro.data.local.entity.AccountEntity
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.domain.model.agreement.Agreement
+import kotlin.time.Clock
 
 /**
  * Extension function to map [AccountEntity] to [Account] domain model.
@@ -23,18 +27,24 @@ fun AccountEntity.toDomain(
     company = company,
     license = license,
     agreements = agreements,
-    deactivatedAt = deactivatedAt,
-    isMarkedForDeletion = isMarkedForDeletion
+    deactivatedAt = deactivatedAt?.toLocalDateTime(TimeZone.currentSystemDefault()),
+    isMarkedForDeletion = isMarkedForDeletion,
+    createdAt = createdAt.toLocalDateTime(TimeZone.currentSystemDefault()),
+    updatedAt = updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
 )
 
 /**
  * Extension function to map [Account] domain model to [AccountEntity].
+ *
+ * @return The mapped [AccountEntity] model.
  */
 fun Account.toEntity() = AccountEntity(
     id = id ?: company.id ?: throw IllegalArgumentException("Account company ID cannot be null"),
     userId = user.id ?: throw IllegalArgumentException("Account user ID cannot be null"),
     licenseId = license?.id,
     agreementIds = agreements.mapNotNull { it.id },
-    deactivatedAt = deactivatedAt,
-    isMarkedForDeletion = isMarkedForDeletion
+    deactivatedAt = deactivatedAt?.toInstant(TimeZone.currentSystemDefault()),
+    isMarkedForDeletion = isMarkedForDeletion,
+    createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()),
+    updatedAt = Clock.System.now()
 )

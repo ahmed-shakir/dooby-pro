@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
+import se.supernovait.doobypro.domain.manager.StorageLocationManager
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.Settings
@@ -25,14 +26,12 @@ class StorageLocationManagerTest {
     private lateinit var manager: StorageLocationManager
     private lateinit var fakeStorageRepo: FakeStorageLocationRepository
     private lateinit var fakeSettingsRepo: FakeSettingsRepository
-    private lateinit var fakeOrderRepo: FakeOrderRepository
 
     @BeforeTest
     fun setUp() {
         fakeStorageRepo = FakeStorageLocationRepository()
         fakeSettingsRepo = FakeSettingsRepository()
-        fakeOrderRepo = FakeOrderRepository()
-        manager = StorageLocationManager(fakeStorageRepo, fakeSettingsRepo, fakeOrderRepo)
+        manager = StorageLocationManager(fakeStorageRepo, fakeSettingsRepo)
     }
 
     @Test
@@ -124,6 +123,6 @@ class StorageLocationManagerTest {
         override suspend fun getOrderById(id: String) = Result.Failure(DataError.NOT_FOUND)
         override suspend fun saveOrder(order: Order) = Result.Success("")
         override suspend fun deleteOrder(order: Order) = Result.Success(Unit)
-        override suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus) = Result.Success(Unit)
+        override suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus): Result<Unit, DataError> = Result.Success(Unit)
     }
 }

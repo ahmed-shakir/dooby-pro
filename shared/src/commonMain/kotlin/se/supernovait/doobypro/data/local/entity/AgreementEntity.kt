@@ -2,6 +2,7 @@ package se.supernovait.doobypro.data.local.entity
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
@@ -9,6 +10,8 @@ import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * Database entity representing an equipment lease agreement for Room persistence.
@@ -25,8 +28,13 @@ import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
  * @property deposit The security deposit, embedded in the table.
  * @property issueDate The date of issue.
  * @property cancellationDate The date of cancellation, if any.
+ * @property createdAt The timestamp when the agreement record was created.
+ * @property updatedAt The timestamp when the agreement record was last updated.
  */
-@Entity(tableName = "agreements")
+@Entity(
+    tableName = "agreements",
+    indices = [Index(value = ["accountId"])]
+)
 data class AgreementEntity(
     @PrimaryKey
     val id: String = SupernovaIdGenerator.generateId(IdType.AGREEMENT.prefix),
@@ -42,5 +50,7 @@ data class AgreementEntity(
     @Embedded(prefix = "deposit_")
     val deposit: AmountEntity,
     val issueDate: LocalDate,
-    val cancellationDate: LocalDate?
+    val cancellationDate: LocalDate?,
+    val createdAt: Instant = Clock.System.now(),
+    val updatedAt: Instant = Clock.System.now()
 )

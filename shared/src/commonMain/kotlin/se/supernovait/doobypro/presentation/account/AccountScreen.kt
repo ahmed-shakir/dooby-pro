@@ -33,29 +33,29 @@ import se.supernovait.doobypro.presentation.account.tab.UserProfileTab
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(
-    state: AccountState,
+    uiState: AccountState,
     onEvent: (AccountEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(
-        initialPage = state.currentTab.ordinal,
+        initialPage = uiState.currentTab.ordinal,
         pageCount = { AccountTab.entries.size }
     )
     val coroutineScope = rememberCoroutineScope()
 
-    // Sync pager when state changes (e.g. from external sources)
-    LaunchedEffect(state.currentTab) {
-        if (pagerState.currentPage != state.currentTab.ordinal) {
-            pagerState.animateScrollToPage(state.currentTab.ordinal)
+    // Sync pager when uiState changes (e.g. from external sources)
+    LaunchedEffect(uiState.currentTab) {
+        if (pagerState.currentPage != uiState.currentTab.ordinal) {
+            pagerState.animateScrollToPage(uiState.currentTab.ordinal)
         }
     }
 
-    // Sync state when pager settles on a new page
+    // Sync uiState when pager settles on a new page
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }
             .distinctUntilChanged()
             .collect { page ->
-                if (state.currentTab.ordinal != page) {
+                if (uiState.currentTab.ordinal != page) {
                     onEvent(AccountEvent.SwitchTab(AccountTab.entries[page]))
                 }
             }
@@ -63,7 +63,7 @@ fun AccountScreen(
 
     Column(modifier = modifier.fillMaxSize()) {
         // Profile Hero Section
-        ProfileHeroSection(state = state)
+        ProfileHeroSection(uiState = uiState)
 
         // Tab Navigation
         PrimaryTabRow(
@@ -112,10 +112,10 @@ fun AccountScreen(
                 .background(MaterialTheme.colorScheme.surface)
         ) { page ->
             when (page) {
-                0 -> UserProfileTab(state = state, onEvent = onEvent)
-                1 -> CompanyProfileTab(state = state, onEvent = onEvent)
-                2 -> LicenseTab(state = state)
-                3 -> AgreementTab(state = state, onEvent = onEvent)
+                0 -> UserProfileTab(uiState = uiState, onEvent = onEvent)
+                1 -> CompanyProfileTab(uiState = uiState, onEvent = onEvent)
+                2 -> LicenseTab(uiState = uiState)
+                3 -> AgreementTab(uiState = uiState, onEvent = onEvent)
             }
         }
     }

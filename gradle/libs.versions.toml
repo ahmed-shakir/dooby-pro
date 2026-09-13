@@ -11,7 +11,7 @@ agp-version = "9.4.0"
 ksp-version = "2.3.10"
 supernova-version = "1.9.21"
 # KOTLIN
-kotlin-version = "2.4.10"
+kotlin-version = "2.4.20"
 kotlinx-datetime-version = "0.8.0"
 kotlinx-coroutines-version = "1.11.0"
 # ANDROID
@@ -20,8 +20,8 @@ androidx-activity-version = "1.13.0"
 androidx-lifecycle-version = "2.11.0"
 androidx-datastore-version = "1.2.1"
 androidx-navigation-version = "2.9.2"
-androidx-room-version = "2.8.4"
-androidx-sqlite-version = "2.7.0"
+androidx-room-version = "2.8.5"
+androidx-sqlite-version = "2.7.1"
 androidx-startup-version = "1.2.0"
 androidx-splashscreen-version = "1.2.0"
 # OTHER
@@ -34,7 +34,7 @@ koin-version = "4.2.2"
 androidx-espresso-version = "3.7.0"
 androidx-test-ext-version = "1.7.0"
 junit-version = "4.13.2"
-compose-test-version = "1.12.0"
+compose-test-version = "1.12.1"
 compose-multiplatform-test-version = "1.12.0"
 
 [libraries]

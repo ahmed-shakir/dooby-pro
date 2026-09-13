@@ -36,10 +36,10 @@ import se.supernovait.doobypro.presentation.app.theme.statusColor
 
 @Composable
 fun LicenseTab(
-    state: AccountState,
+    uiState: AccountState,
     modifier: Modifier = Modifier
 ) {
-    val license = state.account?.license
+    val license = uiState.account?.license
 
     Column(
         modifier = modifier

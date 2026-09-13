@@ -1,6 +1,8 @@
 package se.supernovait.doobypro.domain.model.storage
 
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
+import se.supernovait.app.core.domain.extension.now
 
 /**
  * Domain model representing a physical storage area in the laundry facility.
@@ -16,6 +18,8 @@ import kotlinx.serialization.Serializable
  * @property isDefault If true, this location acts as the global fallback ("Default Storage Area") 
  * when no other slots are available or assigned. The default area typically has unlimited capacity.
  * @property isActive Whether this storage area is currently operational and available for new assignments.
+ * @property createdAt The timestamp when the storage location was created.
+ * @property updatedAt The timestamp when the storage location was last updated.
  */
 @Serializable
 data class StorageLocation(
@@ -25,7 +29,9 @@ data class StorageLocation(
     val capacity: Int = 0,
     val occupiedSlots: Int = 0,
     val isDefault: Boolean = false,
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
     /**
      * Returns true if the location has at least one slot available for a new order.

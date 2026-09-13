@@ -6,8 +6,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
@@ -89,9 +87,9 @@ class AccountRepositoryImpl(
         return withContext(ioContext) {
             try {
                 val entity = accountDao.getById(id) ?: return@withContext Result.Failure(DataError.NOT_FOUND)
-                val datetime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                val timestamp = Clock.System.now()
                 // Soft delete: Mark for deletion and set deactivation timestamp
-                accountDao.upsert(entity.copy(deactivatedAt = datetime, isMarkedForDeletion = true))
+                accountDao.upsert(entity.copy(deactivatedAt = timestamp, isMarkedForDeletion = true))
 
                 val user = userDao.getById(entity.userId)?.toDomain()
                 user?.let { userDao.upsert(it.softDelete().toEntity()) }
@@ -112,7 +110,7 @@ class AccountRepositoryImpl(
                 
                 var purgeCount = 0
                 accountsToPurge.forEach { entity ->
-                    val deactivationInstant = entity.deactivatedAt?.toInstant(TimeZone.currentSystemDefault())
+                    val deactivationInstant = entity.deactivatedAt
                     if (deactivationInstant != null && deactivationInstant < threshold) {
                         hardDeleteAccountStructure(entity)
                         purgeCount++

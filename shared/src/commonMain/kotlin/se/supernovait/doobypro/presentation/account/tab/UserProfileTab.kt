@@ -56,13 +56,13 @@ import se.supernovait.doobypro.presentation.app.theme.statusColor
 /**
  * Tab displaying the user profile information.
  *
- * @param state The current account state.
+ * @param uiState The current account state.
  * @param onEvent Callback to handle UI events.
  * @param modifier The modifier to be applied to the tab content.
  */
 @Composable
 fun UserProfileTab(
-    state: AccountState,
+    uiState: AccountState,
     onEvent: (AccountEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -85,32 +85,32 @@ fun UserProfileTab(
         // Personal Information Card
         AccountCard(
             title = stringResource(Res.string.Account_UserProfileTab_section_personal),
-            isSaving = state.isSaving,
-            isEditing = state.editingCardId == "personal-info",
+            isSaving = uiState.isSaving,
+            isEditing = uiState.editingCardId == "personal-info",
             onEditClick = { onEvent(AccountEvent.EnterEditMode("personal-info")) },
             onCancelClick = { onEvent(AccountEvent.ExitEditMode) },
             onSaveClick = { onEvent(AccountEvent.SaveUserProfile) }
         ) {
-            if (state.editingCardId == "personal-info") {
+            if (uiState.editingCardId == "personal-info") {
                 // Edit Mode
                 Column {
                     SupernovaTextField(
                         label = stringResource(Res.string.Account_UserProfileTab_field_first_name),
-                        value = state.editUserFirstName,
+                        value = uiState.editUserFirstName,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserFirstName(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     SupernovaTextField(
                         label = stringResource(Res.string.Account_UserProfileTab_field_last_name),
-                        value = state.editUserLastName,
+                        value = uiState.editUserLastName,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserLastName(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     SupernovaDateField(
                         label = stringResource(Res.string.Account_UserProfileTab_field_dob),
-                        value = state.editUserBirthDate,
+                        value = uiState.editUserBirthDate,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserBirthDate(value)) },
                         modifier = plainFieldModifier
                     )
@@ -119,14 +119,14 @@ fun UserProfileTab(
                 // Display Mode
                 AccountField(
                     label = stringResource(Res.string.Account_UserProfileTab_field_first_name),
-                    value = state.account?.user?.firstname ?: ""
+                    value = uiState.account?.user?.firstname ?: ""
                 )
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
                 AccountField(
                     label = stringResource(Res.string.Account_UserProfileTab_field_last_name),
-                    value = state.account?.user?.lastname ?: ""
+                    value = uiState.account?.user?.lastname ?: ""
                 )
-                state.account?.user?.birthdate?.toString()?.takeIf { it.isNotBlank() }?.let { dob ->
+                uiState.account?.user?.birthdate?.toString()?.takeIf { it.isNotBlank() }?.let { dob ->
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     AccountField(
                         label = stringResource(Res.string.Account_UserProfileTab_field_dob),
@@ -141,25 +141,25 @@ fun UserProfileTab(
         // Contact Information Card
         AccountCard(
             title = stringResource(Res.string.Account_UserProfileTab_section_contact),
-            isSaving = state.isSaving,
-            isEditing = state.editingCardId == "contact-info",
+            isSaving = uiState.isSaving,
+            isEditing = uiState.editingCardId == "contact-info",
             onEditClick = { onEvent(AccountEvent.EnterEditMode("contact-info")) },
             onCancelClick = { onEvent(AccountEvent.ExitEditMode) },
             onSaveClick = { onEvent(AccountEvent.SaveUserProfile) }
         ) {
-            if (state.editingCardId == "contact-info") {
+            if (uiState.editingCardId == "contact-info") {
                 // Edit Mode
                 Column {
                     SupernovaTextField(
                         label = stringResource(Res.string.Contact_details_field_email),
-                        value = state.editUserEmail,
+                        value = uiState.editUserEmail,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserEmail(value)) },
                         modifier = fieldModifier
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
                     SupernovaTextField(
                         label = stringResource(Res.string.Contact_details_field_phone),
-                        value = state.editUserPhone,
+                        value = uiState.editUserPhone,
                         onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserPhone(value)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = fieldModifier
@@ -169,25 +169,25 @@ fun UserProfileTab(
                 // Display Mode
                 AccountField(
                     label = stringResource(Res.string.Contact_details_field_email),
-                    value = state.account?.user?.email ?: ""
+                    value = uiState.account?.user?.email ?: ""
                 )
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
                 AccountField(
                     label = stringResource(Res.string.Contact_details_field_phone),
-                    value = state.account?.user?.phoneNumber ?: ""
+                    value = uiState.account?.user?.phoneNumber ?: ""
                 )
             }
         }
 
-        val userAddress = state.account?.user?.address
-        val isEditingAddress = state.editingCardId == "user-address"
+        val userAddress = uiState.account?.user?.address
+        val isEditingAddress = uiState.editingCardId == "user-address"
 
         if (userAddress != null || isEditingAddress) {
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
             AccountCard(
                 title = stringResource(Res.string.Account_UserProfileTab_field_address),
-                isSaving = state.isSaving,
+                isSaving = uiState.isSaving,
                 isEditing = isEditingAddress,
                 onEditClick = { onEvent(AccountEvent.EnterEditMode("user-address")) },
                 onCancelClick = { onEvent(AccountEvent.ExitEditMode) },
@@ -197,21 +197,21 @@ fun UserProfileTab(
                     Column {
                         SupernovaTextField(
                             label = stringResource(Res.string.Address_field_street),
-                            value = state.editUserAddressStreet,
+                            value = uiState.editUserAddressStreet,
                             onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserAddressStreet(value)) },
                             modifier = fieldModifier
                         )
                         Spacer(Modifier.height(MaterialTheme.spacing.medium))
                         SupernovaTextField(
                             label = stringResource(Res.string.Address_field_city),
-                            value = state.editUserAddressCity,
+                            value = uiState.editUserAddressCity,
                             onValueChange = { value, _ -> onEvent(AccountEvent.UpdateUserAddressCity(value)) },
                             modifier = fieldModifier
                         )
                         Spacer(Modifier.height(MaterialTheme.spacing.medium))
                         
                         val emirateLabels = Emirate.entries.associateWith { stringResource(it.label) }
-                        val selectedEmirate = Emirate.fromValue(state.editUserAddressSubdivision)
+                        val selectedEmirate = Emirate.fromValue(uiState.editUserAddressSubdivision)
                         
                         SupernovaSelectField(
                             label = stringResource(Res.string.Address_field_emirate),
@@ -256,25 +256,25 @@ fun UserProfileTab(
         ) {
             AccountField(
                 label = stringResource(Res.string.Account_UserProfileTab_field_user_id),
-                value = state.account?.user?.id ?: "",
+                value = uiState.account?.user?.id ?: "",
                 isLocked = true
             )
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
             AccountField(
                 label = stringResource(Res.string.Account_UserProfileTab_field_username),
-                value = state.account?.user?.username ?: ""
+                value = uiState.account?.user?.username ?: ""
             )
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
             AccountField(
                 label = stringResource(Res.string.Account_UserProfileTab_field_role),
-                value = state.account?.user?.role?.toString() ?: ""
+                value = uiState.account?.user?.role?.toString() ?: ""
             )
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
             AccountField(
                 label = stringResource(Res.string.Account_UserProfileTab_field_status),
-                value = state.account?.user?.status?.asString() ?: "",
+                value = uiState.account?.user?.status?.asString() ?: "",
                 isStatus = true,
-                valueColor = when (state.account?.user?.status) {
+                valueColor = when (uiState.account?.user?.status) {
                     is UserStatus.Active -> MaterialTheme.statusColor.success
                     is UserStatus.Deactivated -> MaterialTheme.statusColor.warning
                     is UserStatus.SoftDeleted -> MaterialTheme.statusColor.error
@@ -284,11 +284,11 @@ fun UserProfileTab(
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
             AccountField(
                 label = stringResource(Res.string.Account_UserProfileTab_label_member_since),
-                value = state.memberSince
+                value = uiState.memberSince
             )
         }
 
-        if (state.account?.user?.address == null && !isEditingAddress) {
+        if (uiState.account?.user?.address == null && !isEditingAddress) {
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
             SupernovaTextAction(
                 label = stringResource(Res.string.Account_UserProfileTab_label_add_home_address),

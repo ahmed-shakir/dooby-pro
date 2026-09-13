@@ -27,7 +27,7 @@ import se.supernovait.doobypro.presentation.account.component.AgreementAccordion
 
 @Composable
 fun AgreementTab(
-    state: AccountState,
+    uiState: AccountState,
     onEvent: (AccountEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -37,7 +37,7 @@ fun AgreementTab(
             .verticalScroll(rememberScrollState())
             .padding(MaterialTheme.spacing.medium)
     ) {
-        val agreements = state.account?.agreements ?: emptyList()
+        val agreements = uiState.account?.agreements ?: emptyList()
 
         if (agreements.isEmpty()) {
             SupernovaLabel(
@@ -51,7 +51,7 @@ fun AgreementTab(
                 val id = agreement.id ?: return@forEachIndexed
                 AgreementAccordionItem(
                     agreement = agreement,
-                    isExpanded = state.expandedAgreementIds.contains(id),
+                    isExpanded = uiState.expandedAgreementIds.contains(id),
                     onToggle = { onEvent(AccountEvent.ToggleAgreementExpansion(id)) }
                 )
                 if (index < agreements.size - 1) {

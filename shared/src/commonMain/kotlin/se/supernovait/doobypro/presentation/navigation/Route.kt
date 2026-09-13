@@ -8,6 +8,7 @@ import doobypro.shared.generated.resources.navigation_item_services_label
 import doobypro.shared.generated.resources.navigation_item_settings_label
 import doobypro.shared.generated.resources.navigation_item_storage_label
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 sealed interface Route : NavigationRoute {
 
@@ -86,6 +87,8 @@ sealed interface Route : NavigationRoute {
 
     @Serializable
     data class OrderDetails(val id: String) : Route {
+        @Transient
+        override val label = Res.string.navigation_item_orders_label
         override val isTopLevel = false
     }
 

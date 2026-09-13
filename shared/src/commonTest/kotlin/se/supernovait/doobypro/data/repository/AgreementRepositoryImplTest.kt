@@ -14,6 +14,7 @@ import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 /**
@@ -57,7 +58,8 @@ class AgreementRepositoryImplTest {
         val agreements = repository.getAgreements(accountId)
 
         assertEquals(1, agreements.size)
-        assertEquals(testAgreement, agreements[0])
+        val result = agreements[0]
+        assertEquals(testAgreement.copy(createdAt = result.createdAt, updatedAt = result.updatedAt), result)
     }
 
     @Test
@@ -66,7 +68,8 @@ class AgreementRepositoryImplTest {
 
         val result = repository.getAgreementById(testAgreement.id!!).getOrNull()
 
-        assertEquals(testAgreement, result)
+        assertNotNull(result)
+        assertEquals(testAgreement.copy(createdAt = result!!.createdAt, updatedAt = result.updatedAt), result)
     }
 
     @Test

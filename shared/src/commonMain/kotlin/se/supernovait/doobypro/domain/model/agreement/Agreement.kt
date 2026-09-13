@@ -1,6 +1,8 @@
 package se.supernovait.doobypro.domain.model.agreement
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
 
@@ -19,6 +21,8 @@ import se.supernovait.app.core.domain.model.billing.BillingFrequency
  * @property deposit The security deposit amount required for the lease.
  * @property issueDate The date when the agreement was issued.
  * @property cancellationDate The date when the agreement was cancelled, if applicable.
+ * @property createdAt The timestamp when the agreement was created.
+ * @property updatedAt The timestamp when the agreement was last updated.
  */
 data class Agreement(
     val id: String? = null,
@@ -32,5 +36,7 @@ data class Agreement(
     val fee: Amount,
     val deposit: Amount,
     val issueDate: LocalDate,
-    val cancellationDate: LocalDate? = null
+    val cancellationDate: LocalDate? = null,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 )

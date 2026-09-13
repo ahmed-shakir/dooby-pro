@@ -22,7 +22,7 @@ import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 
 @Composable
 fun NotificationSettingsScreen(
-    state: SettingsState,
+    uiState: SettingsState,
     onEvent: (SettingsScreenEvent) -> Unit
 ) {
     SettingsScreen {
@@ -36,35 +36,35 @@ fun NotificationSettingsScreen(
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_notifications_order_new,
-                    checked = state.settings.notifications.newOrders,
+                    checked = uiState.settings.notifications.newOrders,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateNewOrdersNotification(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_notifications_order_ready,
-                    checked = state.settings.notifications.readyOrders,
+                    checked = uiState.settings.notifications.readyOrders,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateReadyOrdersNotification(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_notifications_order_late,
-                    checked = state.settings.notifications.lateOrders,
+                    checked = uiState.settings.notifications.lateOrders,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateLateOrdersNotification(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_notifications_order_not_picked_up,
-                    checked = state.settings.notifications.orderNotPickedUp,
+                    checked = uiState.settings.notifications.orderNotPickedUp,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateOrderNotPickedUpNotification(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_notifications_order_not_delivered,
-                    checked = state.settings.notifications.orderNotDelivered,
+                    checked = uiState.settings.notifications.orderNotDelivered,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateOrderNotDeliveredNotification(it)) }
                 )
             }
@@ -80,7 +80,7 @@ fun NotificationSettingsScreen(
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_notifications_system_printer_error,
-                    checked = state.settings.notifications.printerErrors,
+                    checked = uiState.settings.notifications.printerErrors,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdatePrinterErrorsNotification(it)) }
                 )
             }

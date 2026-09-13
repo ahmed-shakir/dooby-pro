@@ -1,6 +1,8 @@
 package se.supernovait.doobypro.data.local.entity
 
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
@@ -27,7 +29,9 @@ class OrderEntityTest {
             deliveryOption = DeliveryOption.STANDARD,
             deliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
             isPaymentDone = true,
-            notes = ""
+            notes = "",
+            createdAt = now.toInstant(TimeZone.currentSystemDefault()),
+            updatedAt = now.toInstant(TimeZone.currentSystemDefault())
         )
 
         assertTrue(entity.id.startsWith(IdType.ORDER.prefix), "ID should start with ${IdType.ORDER.prefix}")

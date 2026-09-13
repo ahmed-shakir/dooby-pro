@@ -1,11 +1,15 @@
 package se.supernovait.doobypro.data.local.mapper
 
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Service
+import kotlin.time.Clock
 
 /**
  * Extension function to map [ServiceEntity] to [Service] domain model.
@@ -16,7 +20,9 @@ fun ServiceEntity.toDomain() = Service(
     id = id,
     title = title,
     description = description,
-    price = price.toDomain()
+    price = price.toDomain(),
+    createdAt = createdAt.toLocalDateTime(TimeZone.currentSystemDefault()),
+    updatedAt = updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
 )
 
 /**
@@ -28,5 +34,7 @@ fun Service.toEntity() = ServiceEntity(
     id = id ?: SupernovaIdGenerator.generateId(IdType.SERVICE.prefix),
     title = title,
     description = description,
-    price = price.toEntity()
+    price = price.toEntity(),
+    createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()),
+    updatedAt = Clock.System.now()
 )

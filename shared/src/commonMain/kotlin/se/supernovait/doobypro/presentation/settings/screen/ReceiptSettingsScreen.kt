@@ -39,7 +39,7 @@ import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 
 @Composable
 fun ReceiptSettingsScreen(
-    state: SettingsState,
+    uiState: SettingsState,
     onEvent: (SettingsScreenEvent) -> Unit
 ) {
     SettingsScreen {
@@ -54,35 +54,35 @@ fun ReceiptSettingsScreen(
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_company_logo,
-                    checked = state.settings.receipt.includeCompanyLogo,
+                    checked = uiState.settings.receipt.includeCompanyLogo,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeCompanyLogo(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_company_name,
-                    checked = state.settings.receipt.includeCompanyName,
+                    checked = uiState.settings.receipt.includeCompanyName,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeCompanyName(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_company_address,
-                    checked = state.settings.receipt.includeCompanyAddress,
+                    checked = uiState.settings.receipt.includeCompanyAddress,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeCompanyAddress(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_company_phone,
-                    checked = state.settings.receipt.includeCompanyPhone,
+                    checked = uiState.settings.receipt.includeCompanyPhone,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeCompanyPhone(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_company_email,
-                    checked = state.settings.receipt.includeCompanyEmail,
+                    checked = uiState.settings.receipt.includeCompanyEmail,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeCompanyEmail(it)) }
                 )
             }
@@ -99,7 +99,7 @@ fun ReceiptSettingsScreen(
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_customer_name,
-                    checked = state.settings.receipt.includeCustomerName,
+                    checked = uiState.settings.receipt.includeCustomerName,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeCustomerName(it)) }
                 )
             }
@@ -116,35 +116,35 @@ fun ReceiptSettingsScreen(
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_order_number,
-                    checked = state.settings.receipt.includeOrderNumber,
+                    checked = uiState.settings.receipt.includeOrderNumber,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeOrderNumber(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_order_time,
-                    checked = state.settings.receipt.includeOrderTime,
+                    checked = uiState.settings.receipt.includeOrderTime,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeOrderTime(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_order_items,
-                    checked = state.settings.receipt.includeOrderItems,
+                    checked = uiState.settings.receipt.includeOrderItems,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeOrderItems(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_order_total,
-                    checked = state.settings.receipt.includeOrderTotal,
+                    checked = uiState.settings.receipt.includeOrderTotal,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeOrderTotal(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_order_notes,
-                    checked = state.settings.receipt.includeOrderNotes,
+                    checked = uiState.settings.receipt.includeOrderNotes,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeOrderNotes(it)) }
                 )
             }
@@ -161,21 +161,21 @@ fun ReceiptSettingsScreen(
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_delivery_date,
-                    checked = state.settings.receipt.includeDeliveryDate,
+                    checked = uiState.settings.receipt.includeDeliveryDate,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeDeliveryDate(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_delivery_option,
-                    checked = state.settings.receipt.includeDeliveryOption,
+                    checked = uiState.settings.receipt.includeDeliveryOption,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeDeliveryOption(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_delivery_method,
-                    checked = state.settings.receipt.includeDeliveryMethod,
+                    checked = uiState.settings.receipt.includeDeliveryMethod,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeDeliveryMethod(it)) }
                 )
             }
@@ -192,7 +192,7 @@ fun ReceiptSettingsScreen(
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_receipt_include_terms_and_conditions,
-                    checked = state.settings.receipt.includeTermsAndConditions,
+                    checked = uiState.settings.receipt.includeTermsAndConditions,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeTermsAndConditions(it)) }
                 )
             }
@@ -203,7 +203,7 @@ fun ReceiptSettingsScreen(
         SupernovaSelectField(
             label = Res.string.screen_Settings_receipt_paper_width_label,
             options = PaperWidth.entries,
-            selectedOption = state.settings.receipt.paperWidth,
+            selectedOption = uiState.settings.receipt.paperWidth,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdatePaperWidth(it)) },
             optionLabel = { it.value }
         )

@@ -53,7 +53,9 @@ class OrderTest {
         deliveryOption = DeliveryOption.STANDARD,
         deliveryMethod = deliveryMethod,
         isPaymentDone = false,
-        notes = null
+        notes = null,
+        createdAt = testDateTime,
+        updatedAt = testDateTime
     )
 
     @Test

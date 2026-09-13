@@ -1,6 +1,9 @@
 package se.supernovait.doobypro.data.local.mapper
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
@@ -18,6 +21,8 @@ import kotlin.test.assertEquals
 class AgreementMapperTest {
     private val agreementId = SupernovaIdGenerator.generateId(IdType.AGREEMENT.prefix)
     private val accountId = SupernovaIdGenerator.generateId(IdType.COMPANY.prefix)
+    private val testDateTime = LocalDateTime(2026, 9, 12, 18, 35, 34)
+    private val testInstant = testDateTime.toInstant(TimeZone.currentSystemDefault())
 
     private val testAgreement = Agreement(
         id = agreementId,
@@ -31,7 +36,9 @@ class AgreementMapperTest {
         billingFrequency = BillingFrequency.Monthly,
         deposit = Amount(5000, "AED"),
         issueDate = LocalDate(2026, 8, 15),
-        cancellationDate = null
+        cancellationDate = null,
+        createdAt = testDateTime,
+        updatedAt = testDateTime
     )
 
     private val testAgreementEntity = AgreementEntity(
@@ -46,7 +53,9 @@ class AgreementMapperTest {
         billingFrequency = BillingFrequency.Monthly,
         deposit = AmountEntity(5000, "AED"),
         issueDate = LocalDate(2026, 8, 15),
-        cancellationDate = null
+        cancellationDate = null,
+        createdAt = testInstant,
+        updatedAt = testInstant
     )
 
     @Test
@@ -60,6 +69,6 @@ class AgreementMapperTest {
     fun `toEntity should correctly transform Agreement model to AgreementEntity`() {
         val result = testAgreement.toEntity()
 
-        assertEquals(testAgreementEntity, result)
+        assertEquals(testAgreementEntity.copy(updatedAt = result.updatedAt), result)
     }
 }

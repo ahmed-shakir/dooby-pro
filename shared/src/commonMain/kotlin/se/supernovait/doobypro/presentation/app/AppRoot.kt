@@ -95,7 +95,7 @@ fun AppRoot() {
                 topBarState.title(title)
                 topBarState.icon(icon)
                 topBarState.actions(canNavigateBack = currentScreen != Route.Dashboard)
-                topBarState.onNavigateUp({ navController.navigateUp() })
+                topBarState.onNavigateUp { navController.navigateUp() }
                 topBarState.show()
             } else {
                 topBarState.hide()

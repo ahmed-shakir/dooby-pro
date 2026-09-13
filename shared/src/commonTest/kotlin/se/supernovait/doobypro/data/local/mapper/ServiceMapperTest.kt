@@ -1,5 +1,8 @@
 package se.supernovait.doobypro.data.local.mapper
 
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
 import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
@@ -18,6 +21,8 @@ import kotlin.test.assertEquals
  */
 class ServiceMapperTest {
     private val serviceId = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix)
+    private val testDateTime = LocalDateTime(2026, 9, 12, 18, 35, 34)
+    private val testInstant = testDateTime.toInstant(TimeZone.currentSystemDefault())
 
     private val testAmountEntity = AmountEntity(
         raw = 1000,
@@ -33,14 +38,18 @@ class ServiceMapperTest {
         id = serviceId,
         title = "Test Service",
         description = "This is a test service description",
-        price = testAmountEntity
+        price = testAmountEntity,
+        createdAt = testInstant,
+        updatedAt = testInstant
     )
 
     private val testService = Service(
         id = serviceId,
         title = "Test Service",
         description = "This is a test service description",
-        price = testAmount
+        price = testAmount,
+        createdAt = testDateTime,
+        updatedAt = testDateTime
     )
 
     @Test
@@ -58,11 +67,7 @@ class ServiceMapperTest {
     fun `toEntity should correctly transform Service model to ServiceEntity`() {
         val result = testService.toEntity()
 
-        assertEquals(testServiceEntity.id, result.id)
-        assertEquals(testServiceEntity.title, result.title)
-        assertEquals(testServiceEntity.description, result.description)
-        assertEquals(testServiceEntity.price.raw, result.price.raw)
-        assertEquals(testServiceEntity.price.currency, result.price.currency)
+        assertEquals(testServiceEntity.copy(updatedAt = result.updatedAt), result)
     }
 
     @Test

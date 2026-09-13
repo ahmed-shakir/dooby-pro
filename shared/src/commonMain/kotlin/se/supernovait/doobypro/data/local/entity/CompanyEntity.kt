@@ -36,5 +36,5 @@ data class CompanyEntity(
     val address: AddressEntity?,
     val logoUrl: String?,
     val createdAt: Instant = Clock.System.now(),
-    val updatedAt: Instant = Clock.System.now(),
+    val updatedAt: Instant = Clock.System.now()
 )

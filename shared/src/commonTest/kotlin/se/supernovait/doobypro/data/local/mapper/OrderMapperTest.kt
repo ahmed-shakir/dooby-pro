@@ -2,6 +2,8 @@ package se.supernovait.doobypro.data.local.mapper
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
@@ -25,6 +27,7 @@ class OrderMapperTest {
     private val serviceId = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix)
 
     private val testDateTime = LocalDateTime(2026, 8, 14, 20, 0, 0)
+    private val testInstant = testDateTime.toInstant(TimeZone.currentSystemDefault())
     
     private val testUser = User(
         id = userId,
@@ -58,7 +61,9 @@ class OrderMapperTest {
         deliveryOption = DeliveryOption.EXPRESS,
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
         isPaymentDone = true,
-        notes = "Handle with care"
+        notes = "Handle with care",
+        createdAt = testInstant,
+        updatedAt = testInstant
     )
 
     private val testOrder = Order(
@@ -72,7 +77,9 @@ class OrderMapperTest {
         deliveryOption = DeliveryOption.EXPRESS,
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
         isPaymentDone = true,
-        notes = "Handle with care"
+        notes = "Handle with care",
+        createdAt = testDateTime,
+        updatedAt = testDateTime
     )
 
     @Test
@@ -82,7 +89,7 @@ class OrderMapperTest {
         assertEquals(testOrder.id, result.id)
         assertEquals(testOrder.customer.id, result.customer.id)
         assertEquals(testOrder.service.id, result.service.id)
-        assertEquals(testOrder.storageLocation.id, result.storageLocation.id)
+        assertEquals(testOrder.storageLocation?.id, result.storageLocation?.id)
         assertEquals(testOrder.status, result.status)
         assertEquals(testOrder.orderDatetime, result.orderDatetime)
         assertEquals(testOrder.deliveryDatetime, result.deliveryDatetime)
@@ -90,6 +97,8 @@ class OrderMapperTest {
         assertEquals(testOrder.deliveryMethod, result.deliveryMethod)
         assertEquals(testOrder.isPaymentDone, result.isPaymentDone)
         assertEquals(testOrder.notes, result.notes)
+        assertEquals(testOrder.createdAt, result.createdAt)
+        assertEquals(testOrder.updatedAt, result.updatedAt)
     }
 
     @Test
@@ -103,16 +112,6 @@ class OrderMapperTest {
     fun `toEntity should correctly transform Order model to OrderEntity`() {
         val result = testOrder.toEntity()
 
-        assertEquals(testOrderEntity.id, result.id)
-        assertEquals(testOrderEntity.customerId, result.customerId)
-        assertEquals(testOrderEntity.serviceId, result.serviceId)
-        assertEquals(testOrderEntity.storageLocationId, result.storageLocationId)
-        assertEquals(testOrderEntity.status, result.status)
-        assertEquals(testOrderEntity.orderDatetime, result.orderDatetime)
-        assertEquals(testOrderEntity.deliveryDatetime, result.deliveryDatetime)
-        assertEquals(testOrderEntity.deliveryOption, result.deliveryOption)
-        assertEquals(testOrderEntity.deliveryMethod, result.deliveryMethod)
-        assertEquals(testOrderEntity.isPaymentDone, result.isPaymentDone)
-        assertEquals(testOrderEntity.notes, result.notes)
+        assertEquals(testOrderEntity.copy(updatedAt = result.updatedAt), result)
     }
 }

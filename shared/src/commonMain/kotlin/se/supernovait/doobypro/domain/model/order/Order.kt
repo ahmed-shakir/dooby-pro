@@ -2,6 +2,7 @@ package se.supernovait.doobypro.domain.model.order
 
 import kotlinx.datetime.LocalDateTime
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.extension.now
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
@@ -24,19 +25,23 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
  * @property deliveryMethod The chosen delivery method (e.g., Home Delivery, Pickup).
  * @property isPaymentDone Whether the order has been paid for.
  * @property notes Optional internal or customer-provided notes.
+ * @property createdAt The timestamp when the order was first created.
+ * @property updatedAt The timestamp when the order was last modified.
  */
 data class Order(
     val id: String? = null,
     val customer: User,
     val service: Service,
     val storageLocation: StorageLocation,
-    val status: OrderStatus,
-    val orderDatetime: LocalDateTime,
-    val deliveryDatetime: LocalDateTime,
-    val deliveryOption: DeliveryOption,
-    val deliveryMethod: DeliveryMethod,
-    val isPaymentDone: Boolean,
-    val notes: String?
+    val status: OrderStatus = OrderStatus.NEW,
+    val orderDatetime: LocalDateTime = LocalDateTime.now(),
+    val deliveryDatetime: LocalDateTime = LocalDateTime.now(),
+    val deliveryOption: DeliveryOption = DeliveryOption.STANDARD,
+    val deliveryMethod: DeliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
+    val isPaymentDone: Boolean = false,
+    val notes: String? = null,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
     /**
      * Determines the next logical status in the workflow based on the current state.

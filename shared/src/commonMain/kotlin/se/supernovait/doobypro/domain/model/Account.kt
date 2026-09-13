@@ -2,6 +2,7 @@ package se.supernovait.doobypro.domain.model
 
 import kotlinx.datetime.LocalDateTime
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.model.license.License
 import se.supernovait.doobypro.domain.model.agreement.Agreement
 
@@ -18,6 +19,8 @@ import se.supernovait.doobypro.domain.model.agreement.Agreement
  * @property agreements The list of equipment lease or support [Agreement]s associated with this account.
  * @property deactivatedAt The timestamp when the account was deactivated, if any.
  * @property isMarkedForDeletion Whether the account is pending permanent deletion.
+ * @property createdAt The timestamp when the account was created.
+ * @property updatedAt The timestamp when the account was last updated.
  */
 data class Account(
     val id: String? = null,
@@ -26,7 +29,9 @@ data class Account(
     val license: License? = null,
     val agreements: List<Agreement> = emptyList(),
     val deactivatedAt: LocalDateTime? = null,
-    val isMarkedForDeletion: Boolean = false
+    val isMarkedForDeletion: Boolean = false,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
     /**
      * Returns whether the account is currently active.

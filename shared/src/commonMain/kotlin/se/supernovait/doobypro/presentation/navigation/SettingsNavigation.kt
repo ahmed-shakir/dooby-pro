@@ -34,31 +34,31 @@ fun NavGraphBuilder.settingsGraph(
 
     composable<Route.SettingsCommon> {
         val viewModel = koinViewModel<SettingsViewModel>()
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
-        CommonSettingsScreen(state, viewModel::onEvent)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        CommonSettingsScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 
     composable<Route.SettingsOrder> {
         val viewModel = koinViewModel<SettingsViewModel>()
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
-        OrderSettingsScreen(state, viewModel::onEvent)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        OrderSettingsScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 
     composable<Route.SettingsReceipt> {
         val viewModel = koinViewModel<SettingsViewModel>()
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
-        ReceiptSettingsScreen(state, viewModel::onEvent)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        ReceiptSettingsScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 
     composable<Route.SettingsPrinter> {
         val viewModel = koinViewModel<SettingsViewModel>()
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
-        PrinterSettingsScreen(state, viewModel::onEvent)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        PrinterSettingsScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 
     composable<Route.SettingsNotifications> {
         val viewModel = koinViewModel<SettingsViewModel>()
-        val state by viewModel.uiState.collectAsStateWithLifecycle()
-        NotificationSettingsScreen(state, viewModel::onEvent)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        NotificationSettingsScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 }

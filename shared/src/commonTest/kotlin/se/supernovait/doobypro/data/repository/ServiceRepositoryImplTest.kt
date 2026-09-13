@@ -12,6 +12,7 @@ import se.supernovait.doobypro.domain.model.Service
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -45,16 +46,18 @@ class ServiceRepositoryImplTest {
         val services = repository.getServices().first()
 
         assertEquals(1, services.size)
-        assertEquals(testService, services[0])
+        val result = services[0]
+        assertEquals(testService.copy(createdAt = result.createdAt, updatedAt = result.updatedAt), result)
     }
 
     @Test
     fun `getServiceById should return mapped model if found`() = runTest(testDispatcher) {
         repository.saveService(testService)
 
-        val result = repository.getServiceById(testService.id!!)
+        val result = repository.getServiceById(testService.id!!).getOrNull()
 
-        assertEquals(testService, result.getOrNull())
+        assertNotNull(result)
+        assertEquals(testService.copy(createdAt = result!!.createdAt, updatedAt = result!!.updatedAt), result)
     }
 
     @Test

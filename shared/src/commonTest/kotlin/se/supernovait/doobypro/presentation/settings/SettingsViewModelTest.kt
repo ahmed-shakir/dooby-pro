@@ -70,12 +70,12 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `onEvent UpdateDefaultHandlingTimeDays should update state`() = runTest(testDispatcher) {
+    fun `onEvent UpdateDefaultDeliveryDaysOffset should update state`() = runTest(testDispatcher) {
         val collectJob = launch { viewModel.uiState.collect {} }
-        viewModel.onEvent(SettingsScreenEvent.UpdateDefaultHandlingTimeDays(5))
+        viewModel.onEvent(SettingsScreenEvent.UpdateDefaultDeliveryDaysOffset(5))
         
-        val state = viewModel.uiState.filter { it.settings.order.defaultHandlingTimeDays == 5 }.first()
-        assertEquals(5, state.settings.order.defaultHandlingTimeDays)
+        val state = viewModel.uiState.filter { it.settings.order.defaultDeliveryDaysOffset == 5 }.first()
+        assertEquals(5, state.settings.order.defaultDeliveryDaysOffset)
         collectJob.cancel()
     }
 

@@ -25,6 +25,7 @@ import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Clock
 
 /**
  * Implementation of [OrderRepository] using the Assembly Pattern.
@@ -130,13 +131,13 @@ class OrderRepositoryImpl(
         return withContext(ioContext) {
             try {
                 val order = orderDao.getById(orderId) ?: return@withContext Result.Failure(DataError.NOT_FOUND)
-                
+
                 // If transitioning to a terminal status, release the storage slot
                 if (newStatus.isTerminal()) {
                     storageLocationDao.decrementOccupiedSlots(order.storageLocationId)
                 }
 
-                orderDao.updateOrderStatus(orderId, newStatus)
+                orderDao.updateOrderStatus(orderId, newStatus, Clock.System.now())
                 Result.Success(Unit)
             } catch (_: Exception) {
                 Result.Failure(DataError.DATABASE_ERROR)

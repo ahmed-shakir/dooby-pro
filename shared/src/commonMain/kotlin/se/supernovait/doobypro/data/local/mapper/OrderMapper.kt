@@ -1,5 +1,8 @@
 package se.supernovait.doobypro.data.local.mapper
 
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.entity.OrderEntity
@@ -7,6 +10,7 @@ import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
+import kotlin.time.Clock
 
 /**
  * Extension function to map [OrderEntity] to [Order] domain model.
@@ -31,7 +35,9 @@ fun OrderEntity.toDomain(
     deliveryOption = deliveryOption,
     deliveryMethod = deliveryMethod,
     isPaymentDone = isPaymentDone,
-    notes = notes
+    notes = notes,
+    createdAt = createdAt.toLocalDateTime(TimeZone.currentSystemDefault()),
+    updatedAt = updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
 )
 
 /**
@@ -43,12 +49,14 @@ fun Order.toEntity() = OrderEntity(
     id = id ?: SupernovaIdGenerator.generateId(IdType.ORDER.prefix),
     customerId = customer.id!!,
     serviceId = service.id!!,
-    storageLocationId = storageLocation.id!!,
+    storageLocationId = storageLocation.id ?: throw IllegalStateException("Storage location ID is required for persistence."),
     status = status,
     orderDatetime = orderDatetime,
     deliveryDatetime = deliveryDatetime,
     deliveryOption = deliveryOption,
     deliveryMethod = deliveryMethod,
     isPaymentDone = isPaymentDone,
-    notes = notes
+    notes = notes,
+    createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()),
+    updatedAt = Clock.System.now()
 )

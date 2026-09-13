@@ -33,7 +33,7 @@ import se.supernovait.doobypro.presentation.storage.component.StorageLocationIte
 
 @Composable
 fun StorageManagementScreen(
-    state: StorageState,
+    uiState: StorageState,
     onEvent: (StorageEvent) -> Unit
 ) {
     val bottomSheetState = LocalBottomSheetState.current
@@ -67,7 +67,7 @@ fun StorageManagementScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (state.locations.isEmpty() && !state.isLoading) {
+        if (uiState.locations.isEmpty() && !uiState.isLoading) {
             Box(modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.large), contentAlignment = Alignment.Center) {
                 SupernovaLabel(
                     text = Res.string.screen_Storage_empty_state,
@@ -79,7 +79,7 @@ fun StorageManagementScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = MaterialTheme.spacing.medium)
             ) {
-                items(state.locations) { location ->
+                items(uiState.locations) { location ->
                     StorageLocationItem(
                         location = location,
                         onEdit = {

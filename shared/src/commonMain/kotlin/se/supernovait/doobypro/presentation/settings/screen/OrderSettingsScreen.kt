@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.screen_Settings_order_auto_print_receipts_label
+import doobypro.shared.generated.resources.screen_Settings_order_auto_print_storage_tag_label
 import doobypro.shared.generated.resources.screen_Settings_order_behavior_label
 import doobypro.shared.generated.resources.screen_Settings_order_default_service_label
 import doobypro.shared.generated.resources.screen_Settings_order_default_storage_label
@@ -33,22 +34,22 @@ import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 
 @Composable
 fun OrderSettingsScreen(
-    state: SettingsState,
+    uiState: SettingsState,
     onEvent: (SettingsScreenEvent) -> Unit
 ) {
-    val selectedService = state.services.find { it.id == state.settings.order.defaultServiceId }
+    val selectedService = uiState.services.find { it.id == uiState.settings.order.defaultServiceId }
     val deliveryOptionLabels = DeliveryOption.entries.associateWith { stringResource(it.label) }
     val deliveryMethodLabels = DeliveryMethod.entries.associateWith { stringResource(it.label) }
     
     val allocationModeLabels = StorageAllocationMode.entries.associateWith { stringResource(it.label) }
-    val selectedStorageLocation = state.activeStorageLocations.find { it.id == state.settings.order.defaultStorageLocationId }
+    val selectedStorageLocation = uiState.activeStorageLocations.find { it.id == uiState.settings.order.defaultStorageLocationId }
 
     SettingsScreen {
         Spacer(Modifier.height(MaterialTheme.spacing.small))
 
         SupernovaSelectField(
             label = Res.string.screen_Settings_order_default_service_label,
-            options = state.services,
+            options = uiState.services,
             selectedOption = selectedService,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateDefaultServiceId(it.id)) },
             optionLabel = { it.title }
@@ -58,7 +59,7 @@ fun OrderSettingsScreen(
         SupernovaSelectField(
             label = Res.string.screen_Settings_order_delivery_option_label,
             options = DeliveryOption.entries,
-            selectedOption = state.settings.order.defaultDeliveryOption,
+            selectedOption = uiState.settings.order.defaultDeliveryOption,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateDefaultDeliveryOption(it)) },
             optionLabel = { deliveryOptionLabels[it] ?: "" }
         )
@@ -67,7 +68,7 @@ fun OrderSettingsScreen(
         SupernovaSelectField(
             label = Res.string.screen_Settings_order_delivery_method_label,
             options = DeliveryMethod.entries,
-            selectedOption = state.settings.order.defaultDeliveryMethod,
+            selectedOption = uiState.settings.order.defaultDeliveryMethod,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateDefaultDeliveryMethod(it)) },
             optionLabel = { deliveryMethodLabels[it] ?: "" }
         )
@@ -75,10 +76,10 @@ fun OrderSettingsScreen(
 
         SupernovaTextField(
             label = stringResource(Res.string.screen_Settings_order_handling_time_label),
-            value = state.settings.order.defaultHandlingTimeDays.toString(),
+            value = uiState.settings.order.defaultDeliveryDaysOffset.toString(),
             onValueChange = { newValue, _ ->
                 newValue.toIntOrNull()?.let {
-                    onEvent(SettingsScreenEvent.UpdateDefaultHandlingTimeDays(it))
+                    onEvent(SettingsScreenEvent.UpdateDefaultDeliveryDaysOffset(it))
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -94,8 +95,14 @@ fun OrderSettingsScreen(
 
         SupernovaToggle(
             label = Res.string.screen_Settings_order_auto_print_receipts_label,
-            checked = state.settings.order.autoPrintReceipts,
+            checked = uiState.settings.order.autoPrintReceipts,
             onCheckedChange = { onEvent(SettingsScreenEvent.UpdateAutoPrintReceipts(it)) }
+        )
+
+        SupernovaToggle(
+            label = Res.string.screen_Settings_order_auto_print_storage_tag_label,
+            checked = uiState.settings.order.autoPrintStorageLocationTag,
+            onCheckedChange = { onEvent(SettingsScreenEvent.UpdateAutoPrintStorageLocationTag(it)) }
         )
 
         SupernovaLabel(
@@ -108,7 +115,7 @@ fun OrderSettingsScreen(
         SupernovaSelectField(
             label = Res.string.screen_Settings_order_storage_allocation_label,
             options = StorageAllocationMode.entries,
-            selectedOption = state.settings.order.storageAllocationMode,
+            selectedOption = uiState.settings.order.storageAllocationMode,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateStorageAllocationMode(it)) },
             optionLabel = { allocationModeLabels[it] ?: "" }
         )
@@ -116,7 +123,7 @@ fun OrderSettingsScreen(
 
         SupernovaSelectField(
             label = Res.string.screen_Settings_order_default_storage_label,
-            options = state.activeStorageLocations,
+            options = uiState.activeStorageLocations,
             selectedOption = selectedStorageLocation,
             onOptionSelected = { it.id?.let { id -> onEvent(SettingsScreenEvent.UpdateDefaultStorageLocationId(id)) } },
             optionLabel = { it.label }

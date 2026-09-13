@@ -65,8 +65,9 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateDefaultServiceId -> updateSettings { it.copy(order = it.order.copy(defaultServiceId = event.serviceId)) }
             is SettingsScreenEvent.UpdateDefaultDeliveryOption -> updateSettings { it.copy(order = it.order.copy(defaultDeliveryOption = event.option)) }
             is SettingsScreenEvent.UpdateDefaultDeliveryMethod -> updateSettings { it.copy(order = it.order.copy(defaultDeliveryMethod = event.method)) }
-            is SettingsScreenEvent.UpdateDefaultHandlingTimeDays -> updateSettings { it.copy(order = it.order.copy(defaultHandlingTimeDays = event.days)) }
+            is SettingsScreenEvent.UpdateDefaultDeliveryDaysOffset -> updateSettings { it.copy(order = it.order.copy(defaultDeliveryDaysOffset = event.days)) }
             is SettingsScreenEvent.UpdateAutoPrintReceipts -> updateSettings { it.copy(order = it.order.copy(autoPrintReceipts = event.enabled)) }
+            is SettingsScreenEvent.UpdateAutoPrintStorageLocationTag -> updateSettings { it.copy(order = it.order.copy(autoPrintStorageLocationTag = event.enabled)) }
             is SettingsScreenEvent.UpdateStorageAllocationMode -> updateSettings { it.copy(order = it.order.copy(storageAllocationMode = event.mode)) }
             is SettingsScreenEvent.UpdateDefaultStorageLocationId -> updateSettings { it.copy(order = it.order.copy(defaultStorageLocationId = event.id)) }
             // Receipt settings

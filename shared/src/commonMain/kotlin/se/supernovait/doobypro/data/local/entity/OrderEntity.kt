@@ -1,6 +1,7 @@
 package se.supernovait.doobypro.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.datetime.LocalDateTime
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
@@ -8,6 +9,8 @@ import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.OrderStatus
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * Database entity representing an order in the persistent store.
@@ -23,8 +26,18 @@ import se.supernovait.doobypro.domain.model.order.OrderStatus
  * @property deliveryMethod The chosen delivery method (e.g., [DeliveryMethod.HOME_DELIVERY], [DeliveryMethod.IN_STORE_PICKUP]).
  * @property isPaymentDone Whether the order has been paid for.
  * @property notes Optional notes provided by the customer.
+ * @property createdAt The timestamp when the order was first created.
+ * @property updatedAt The timestamp when the order was last modified.
  */
-@Entity(tableName = "orders")
+@Entity(
+    tableName = "orders",
+    indices = [
+        Index(value = ["customerId", "status"]),
+        Index(value = ["status"]),
+        Index(value = ["storageLocationId"]),
+        Index(value = ["deliveryDatetime"])
+    ]
+)
 data class OrderEntity(
     @PrimaryKey
     val id: String = SupernovaIdGenerator.generateId(IdType.ORDER.prefix),
@@ -37,5 +50,7 @@ data class OrderEntity(
     val deliveryOption: DeliveryOption,
     val deliveryMethod: DeliveryMethod,
     val isPaymentDone: Boolean,
-    val notes: String?
+    val notes: String?,
+    val createdAt: Instant = Clock.System.now(),
+    val updatedAt: Instant = Clock.System.now()
 )

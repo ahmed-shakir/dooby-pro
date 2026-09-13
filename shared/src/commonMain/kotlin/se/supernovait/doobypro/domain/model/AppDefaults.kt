@@ -16,6 +16,7 @@ import se.supernovait.app.core.domain.model.license.Tier
 object AppDefaults {
     const val COUNTRY = "UAE"
     const val COUNTRY_CODE = "+971"
+    const val DEFAULT_STORAGE_LOCATION_ID = "default"
 
     suspend fun license(accountId: String) = License(
         id = SupernovaIdGenerator.generateId(IdType.LICENSE.prefix),

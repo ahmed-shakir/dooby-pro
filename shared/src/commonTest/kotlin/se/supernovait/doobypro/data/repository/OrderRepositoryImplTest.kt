@@ -1,6 +1,7 @@
 package se.supernovait.doobypro.data.repository
 
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
@@ -8,7 +9,9 @@ import kotlinx.datetime.LocalDateTime
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
 import se.supernovait.app.core.data.persistence.entity.UserEntity
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
+import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.dao.FakeOrderDao
@@ -24,6 +27,7 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
+import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,6 +49,7 @@ class OrderRepositoryImplTest {
     private lateinit var fakeServiceDao: FakeServiceDao
     private lateinit var fakeUserDao: FakeUserDao
     private lateinit var fakeStorageDao: FakeStorageLocationDao
+    private lateinit var fakeStorageRepo: FakeStorageLocationRepository
     private lateinit var repository: OrderRepositoryImpl
     private val testDispatcher = StandardTestDispatcher()
 
@@ -101,7 +106,9 @@ class OrderRepositoryImplTest {
         deliveryOption = DeliveryOption.EXPRESS,
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
         isPaymentDone = true,
-        notes = "Test note"
+        notes = "Test note",
+        createdAt = testDateTime,
+        updatedAt = testDateTime
     )
 
     @BeforeTest
@@ -110,6 +117,7 @@ class OrderRepositoryImplTest {
         fakeServiceDao = FakeServiceDao()
         fakeUserDao = FakeUserDao()
         fakeStorageDao = FakeStorageLocationDao()
+        fakeStorageRepo = FakeStorageLocationRepository()
         
         repository = OrderRepositoryImpl(
             userDao = fakeUserDao,
@@ -137,7 +145,7 @@ class OrderRepositoryImplTest {
         assertEquals(testOrder.id, order.id)
         assertEquals(testUser.id, order.customer.id)
         assertEquals(testService.id, order.service.id)
-        assertEquals(testStorage.id, order.storageLocation.id)
+        assertEquals(testStorage.id, order.storageLocation?.id)
         assertEquals(OrderStatus.NEW, order.status)
     }
 
@@ -164,7 +172,7 @@ class OrderRepositoryImplTest {
         assertNotNull(result)
         assertEquals(testOrder.id, result.id)
         assertEquals(testUser.username, result.customer.username)
-        assertEquals(testStorage.label, result.storageLocation.label)
+        assertEquals(testStorage.label, result.storageLocation?.label)
     }
 
     @Test
@@ -209,5 +217,29 @@ class OrderRepositoryImplTest {
         
         val location = fakeStorageDao.getById(testStorage.id!!)
         assertEquals(0, location?.occupiedSlots)
+    }
+
+    private class FakeStorageLocationRepository : StorageLocationRepository {
+        val locations = mutableMapOf<String, StorageLocation>()
+        var decrementCount = 0
+        
+        override fun getActiveLocations() = flowOf(locations.values.toList())
+        
+        override suspend fun getLocationById(id: String): Result<StorageLocation, DataError> {
+            return locations[id]?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
+        }
+        
+        override suspend fun getDefaultLocation(): Result<StorageLocation, DataError> {
+            return locations.values.firstOrNull { it.isDefault }?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
+        }
+        
+        override suspend fun saveLocation(location: StorageLocation): Result<String, DataError> {
+            locations[location.id!!] = location
+            return Result.Success(location.id!!)
+        }
+        
+        override suspend fun deleteLocation(location: StorageLocation) = Result.Success(Unit)
+        override suspend fun incrementOccupiedSlots(id: String) {}
+        override suspend fun decrementOccupiedSlots(id: String) { decrementCount++ }
     }
 }
