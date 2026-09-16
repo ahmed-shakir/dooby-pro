@@ -30,12 +30,9 @@ class CompanyRepositoryImpl(
 
     override suspend fun getCompanyById(id: String): Result<Company, DataError> {
         return withContext(ioContext) {
-            val company = companyDao.getById(id)
-            if (company != null) {
-                Result.Success(company.toDomain())
-            } else {
-                Result.Failure(DataError.NOT_FOUND)
-            }
+            companyDao.getById(id)?.toDomain()?.let {
+                Result.Success(it)
+            } ?: Result.Failure(DataError.NOT_FOUND)
         }
     }
 

@@ -30,12 +30,9 @@ class LicenseRepositoryImpl(
 
     override suspend fun getLicenseById(id: String): Result<License, DataError> {
         return withContext(ioContext) {
-            val license = licenseDao.getById(id)
-            if (license != null) {
-                Result.Success(license.toDomain())
-            } else {
-                Result.Failure(DataError.NOT_FOUND)
-            }
+            licenseDao.getById(id)?.toDomain()?.let {
+                Result.Success(it)
+            } ?: Result.Failure(DataError.NOT_FOUND)
         }
     }
 

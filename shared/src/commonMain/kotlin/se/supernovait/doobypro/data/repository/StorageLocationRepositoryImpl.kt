@@ -27,12 +27,9 @@ class StorageLocationRepositoryImpl(
 
     override suspend fun getLocationById(id: String): Result<StorageLocation, DataError> {
         return withContext(ioContext) {
-            val location = storageLocationDao.getById(id)
-            if (location != null) {
-                Result.Success(location.toDomain())
-            } else {
-                Result.Failure(DataError.NOT_FOUND)
-            }
+            storageLocationDao.getById(id)?.toDomain()?.let {
+                Result.Success(it)
+            } ?: Result.Failure(DataError.NOT_FOUND)
         }
     }
 

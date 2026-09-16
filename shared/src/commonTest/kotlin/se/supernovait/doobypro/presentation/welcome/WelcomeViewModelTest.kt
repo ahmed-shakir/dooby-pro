@@ -11,7 +11,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.event.AppEvent
-import se.supernovait.doobypro.data.repository.FakeAuthRepository
+import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

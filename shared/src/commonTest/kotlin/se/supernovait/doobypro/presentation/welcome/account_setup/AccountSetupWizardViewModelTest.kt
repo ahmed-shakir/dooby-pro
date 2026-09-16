@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
-import se.supernovait.doobypro.data.repository.FakeAccountRepository
+import se.supernovait.doobypro.data.repository.fake.FakeAccountRepository
 import se.supernovait.doobypro.domain.model.AppDefaults
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest

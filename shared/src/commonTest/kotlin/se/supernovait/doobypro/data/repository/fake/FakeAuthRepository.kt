@@ -1,4 +1,4 @@
-package se.supernovait.doobypro.data.repository
+package se.supernovait.doobypro.data.repository.fake
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

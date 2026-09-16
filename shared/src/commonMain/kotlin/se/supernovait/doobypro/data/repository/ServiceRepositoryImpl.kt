@@ -30,12 +30,9 @@ class ServiceRepositoryImpl(
 
     override suspend fun getServiceById(id: String): Result<Service, DataError> {
         return withContext(ioContext) {
-            val service = serviceDao.getById(id)
-            if (service != null) {
-                Result.Success(service.toDomain())
-            } else {
-                Result.Failure(DataError.NOT_FOUND)
-            }
+            serviceDao.getById(id)?.toDomain()?.let {
+                Result.Success(it)
+            } ?: Result.Failure(DataError.NOT_FOUND)
         }
     }
 

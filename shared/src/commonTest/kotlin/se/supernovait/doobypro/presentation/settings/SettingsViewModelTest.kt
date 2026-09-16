@@ -11,9 +11,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
 import se.supernovait.doobypro.data.local.preferences.FakeDataStore
-import se.supernovait.doobypro.data.repository.FakeServiceRepository
-import se.supernovait.doobypro.data.repository.FakeStorageLocationRepository
 import se.supernovait.doobypro.data.repository.SettingsRepositoryImpl
+import se.supernovait.doobypro.data.repository.fake.FakeServiceRepository
+import se.supernovait.doobypro.data.repository.fake.FakeStorageLocationRepository
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.common.Currency
 import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode

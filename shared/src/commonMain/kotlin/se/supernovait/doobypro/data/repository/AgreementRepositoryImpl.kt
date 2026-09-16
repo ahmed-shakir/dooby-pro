@@ -34,12 +34,9 @@ class AgreementRepositoryImpl(
 
     override suspend fun getAgreementById(id: String): Result<Agreement, DataError> {
         return withContext(ioContext) {
-            val agreement = agreementDao.getById(id)
-            if (agreement != null) {
-                Result.Success(agreement.toDomain())
-            } else {
-                Result.Failure(DataError.NOT_FOUND)
-            }
+            agreementDao.getById(id)?.toDomain()?.let {
+                Result.Success(it)
+            } ?: Result.Failure(DataError.NOT_FOUND)
         }
     }
 

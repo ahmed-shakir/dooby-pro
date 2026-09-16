@@ -18,10 +18,10 @@ import se.supernovait.app.core.domain.model.license.Tier
 import se.supernovait.doobypro.data.local.dao.FakeAccountDao
 import se.supernovait.doobypro.data.local.dao.FakeUserDao
 import se.supernovait.doobypro.data.repository.AccountRepositoryImpl
-import se.supernovait.doobypro.data.repository.FakeAgreementRepository
-import se.supernovait.doobypro.data.repository.FakeAuthRepository
-import se.supernovait.doobypro.data.repository.FakeCompanyRepository
-import se.supernovait.doobypro.data.repository.FakeLicenseRepository
+import se.supernovait.doobypro.data.repository.fake.FakeAgreementRepository
+import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
+import se.supernovait.doobypro.data.repository.fake.FakeCompanyRepository
+import se.supernovait.doobypro.data.repository.fake.FakeLicenseRepository
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.util.FakeFileStorage

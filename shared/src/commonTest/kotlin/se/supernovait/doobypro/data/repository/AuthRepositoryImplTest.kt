@@ -8,6 +8,7 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.doobypro.data.local.dao.FakeAccountDao
 import se.supernovait.doobypro.data.local.dao.FakeUserDao
+import se.supernovait.doobypro.data.repository.fake.FakeSessionRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
