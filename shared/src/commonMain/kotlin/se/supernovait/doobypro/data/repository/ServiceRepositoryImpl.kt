@@ -23,7 +23,9 @@ class ServiceRepositoryImpl(
     private val ioContext: CoroutineContext = Dispatchers.IO
 
     override fun getServices(): Flow<List<Service>> {
-        return serviceDao.getAll().map { services -> services.map { it.toDomain() } }
+        return serviceDao.getAll().map { services ->
+            services.map { it.toDomain() }
+        }
     }
 
     override suspend fun getServiceById(id: String): Result<Service, DataError> {

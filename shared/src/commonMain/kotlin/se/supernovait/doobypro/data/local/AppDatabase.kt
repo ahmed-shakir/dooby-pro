@@ -7,9 +7,6 @@ import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import androidx.room.execSQL
 import androidx.room.useWriterConnection
-import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.storage_label_uncategorized
-import org.jetbrains.compose.resources.getString
 import se.supernovait.app.core.data.persistence.RoomConverters
 import se.supernovait.app.core.data.persistence.dao.LicenseDao
 import se.supernovait.app.core.data.persistence.dao.UserDao
@@ -29,6 +26,7 @@ import se.supernovait.doobypro.data.local.entity.OrderEntity
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
 import se.supernovait.doobypro.data.local.entity.StorageLocationEntity
 import se.supernovait.doobypro.domain.model.AppDefaults.DEFAULT_STORAGE_LOCATION_ID
+import se.supernovait.doobypro.domain.model.AppDefaults.DEFAULT_STORAGE_LOCATION_LABEL
 import se.supernovait.doobypro.domain.model.storage.StorageType
 
 @Database(
@@ -66,7 +64,7 @@ abstract class AppDatabase : RoomDatabase(), InitializableDatabase {
             dao.upsert(
                 StorageLocationEntity(
                     id = DEFAULT_STORAGE_LOCATION_ID,
-                    label = getString(Res.string.storage_label_uncategorized),
+                    label = DEFAULT_STORAGE_LOCATION_LABEL,
                     type = StorageType.OTHER,
                     capacity = 0, // Unlimited
                     isDefault = true,

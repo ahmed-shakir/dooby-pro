@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import doobypro.shared.generated.resources.Res
@@ -44,6 +48,10 @@ fun OrderSettingsScreen(
     val allocationModeLabels = StorageAllocationMode.entries.associateWith { stringResource(it.label) }
     val selectedStorageLocation = uiState.activeStorageLocations.find { it.id == uiState.settings.order.defaultStorageLocationId }
 
+    var deliveryDaysText by remember(uiState.settings.order.defaultDeliveryDaysOffset) {
+        mutableStateOf(uiState.settings.order.defaultDeliveryDaysOffset.toString())
+    }
+
     SettingsScreen {
         Spacer(Modifier.height(MaterialTheme.spacing.small))
 
@@ -76,14 +84,15 @@ fun OrderSettingsScreen(
 
         SupernovaTextField(
             label = stringResource(Res.string.screen_Settings_order_handling_time_label),
-            value = uiState.settings.order.defaultDeliveryDaysOffset.toString(),
+            value = deliveryDaysText,
             onValueChange = { newValue, _ ->
+                deliveryDaysText = newValue
                 newValue.toIntOrNull()?.let {
                     onEvent(SettingsScreenEvent.UpdateDefaultDeliveryDaysOffset(it))
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth().padding(vertical = MaterialTheme.spacing.extraSmall, horizontal = MaterialTheme.spacing.extraSmall)
+            modifier = Modifier.fillMaxWidth().padding(vertical = MaterialTheme.spacing.extraSmall)
         )
 
         SupernovaLabel(

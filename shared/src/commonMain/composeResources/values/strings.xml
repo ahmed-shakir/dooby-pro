@@ -77,7 +77,6 @@
     <string name="label_actions">Actions</string>
     <string name="label_payment_status_paid">Paid</string>
     <string name="label_payment_status_pending">Pending</string>
-    <string name="label_storage_uncategorized">Uncategorized</string>
     <string name="label_role_admin">Administrator</string>
     <string name="label_role_user">Staff Member</string>
 
@@ -310,6 +309,7 @@
     <string name="screen_Order_field_service">Service</string>
     <string name="screen_Order_field_delivery_option">Priority</string>
     <string name="screen_Order_field_delivery_method">Delivery Method</string>
+    <string name="screen_Order_field_delivery_date">Delivery Date</string>
     <string name="screen_Order_field_storage">Storage Location</string>
     <string name="screen_Order_field_payment_status">Payment Done</string>
     <string name="screen_Order_field_notes">Notes</string>
@@ -382,6 +382,4 @@
     <!-- Storage Allocation Mode -->
     <string name="storage_allocation_mode_manual">Manual</string>
     <string name="storage_allocation_mode_auto">Automatic</string>
-
-    <string name="storage_label_uncategorized">Uncategorized</string>
 </resources>

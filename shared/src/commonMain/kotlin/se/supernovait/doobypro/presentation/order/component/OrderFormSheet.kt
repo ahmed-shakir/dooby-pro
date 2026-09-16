@@ -23,15 +23,18 @@ import doobypro.shared.generated.resources.label_edit
 import doobypro.shared.generated.resources.label_save
 import doobypro.shared.generated.resources.screen_Order_action_add_order
 import doobypro.shared.generated.resources.screen_Order_field_customer
+import doobypro.shared.generated.resources.screen_Order_field_delivery_date
 import doobypro.shared.generated.resources.screen_Order_field_delivery_method
 import doobypro.shared.generated.resources.screen_Order_field_delivery_option
 import doobypro.shared.generated.resources.screen_Order_field_notes
 import doobypro.shared.generated.resources.screen_Order_field_payment_status
 import doobypro.shared.generated.resources.screen_Order_field_service
 import doobypro.shared.generated.resources.screen_Order_field_storage
+import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
+import se.supernovait.app.core.ui.component.input.SupernovaDateField
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
@@ -58,6 +61,7 @@ fun OrderFormSheet(
     var selectedCustomer by remember { mutableStateOf(order.customer) }
     var selectedService by remember { mutableStateOf(order.service) }
     var selectedLocation by remember { mutableStateOf(order.storageLocation) }
+    var deliveryDatetime by remember { mutableStateOf(order.deliveryDatetime) }
     var deliveryOption by remember { mutableStateOf(order.deliveryOption) }
     var deliveryMethod by remember { mutableStateOf(order.deliveryMethod) }
     var isPaymentDone by remember { mutableStateOf(order.isPaymentDone) }
@@ -83,6 +87,7 @@ fun OrderFormSheet(
         )
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
+        // 1. customer
         SupernovaSelectField(
             label = Res.string.screen_Order_field_customer,
             options = customers,
@@ -93,6 +98,7 @@ fun OrderFormSheet(
         
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
+        // 2. service
         SupernovaSelectField(
             label = Res.string.screen_Order_field_service,
             options = services,
@@ -103,42 +109,57 @@ fun OrderFormSheet(
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
-        ) {
-            SupernovaSelectField(
-                label = Res.string.screen_Order_field_delivery_option,
-                options = DeliveryOption.entries,
-                selectedOption = deliveryOption,
-                onOptionSelected = { deliveryOption = it },
-                optionLabel = { deliveryOptionLabels[it] ?: it.name },
-                modifier = Modifier.weight(1f)
-            )
-            SupernovaSelectField(
-                label = Res.string.screen_Order_field_delivery_method,
-                options = DeliveryMethod.entries,
-                selectedOption = deliveryMethod,
-                onOptionSelected = { deliveryMethod = it },
-                optionLabel = { deliveryMethodLabels[it] ?: it.name },
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        if (isManualStorage) {
-            Spacer(Modifier.height(MaterialTheme.spacing.medium))
-
-            SupernovaSelectField(
-                label = Res.string.screen_Order_field_storage,
-                options = storageLocations,
-                selectedOption = selectedLocation,
-                onOptionSelected = { selectedLocation = it },
-                optionLabel = { it.label }
-            )
-        }
+        // 3. storageLocation
+        SupernovaSelectField(
+            label = Res.string.screen_Order_field_storage,
+            options = storageLocations,
+            selectedOption = selectedLocation,
+            onOptionSelected = { selectedLocation = it },
+            optionLabel = { it.label },
+            enabled = isManualStorage || !isNew
+        )
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
+        // 4. deliveryDatetime
+        SupernovaDateField(
+            value = deliveryDatetime.date,
+            onValueChange = { date, isValid ->
+                if (isValid && date != null) {
+                    deliveryDatetime = LocalDateTime(
+                        date = date,
+                        time = deliveryDatetime.time
+                    )
+                }
+            },
+            label = stringResource(Res.string.screen_Order_field_delivery_date)
+        )
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        // 5. deliveryOption
+        SupernovaSelectField(
+            label = Res.string.screen_Order_field_delivery_option,
+            options = DeliveryOption.entries,
+            selectedOption = deliveryOption,
+            onOptionSelected = { deliveryOption = it },
+            optionLabel = { deliveryOptionLabels[it] ?: it.name }
+        )
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        // 6. deliveryMethod
+        SupernovaSelectField(
+            label = Res.string.screen_Order_field_delivery_method,
+            options = DeliveryMethod.entries,
+            selectedOption = deliveryMethod,
+            onOptionSelected = { deliveryMethod = it },
+            optionLabel = { deliveryMethodLabels[it] ?: it.name }
+        )
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        // 7. isPaymentDone
         SupernovaToggle(
             label = Res.string.screen_Order_field_payment_status,
             checked = isPaymentDone,
@@ -147,6 +168,7 @@ fun OrderFormSheet(
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
+        // 8. notes
         SupernovaTextField(
             label = stringResource(Res.string.screen_Order_field_notes),
             value = notes,
@@ -181,6 +203,7 @@ fun OrderFormSheet(
                         customer = selectedCustomer,
                         service = selectedService,
                         storageLocation = selectedLocation,
+                        deliveryDatetime = deliveryDatetime,
                         deliveryOption = deliveryOption,
                         deliveryMethod = deliveryMethod,
                         isPaymentDone = isPaymentDone,

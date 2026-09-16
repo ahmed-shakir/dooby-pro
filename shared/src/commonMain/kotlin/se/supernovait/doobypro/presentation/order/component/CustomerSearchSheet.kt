@@ -24,7 +24,7 @@ import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.ui.component.action.SupernovaIconButton
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
-import se.supernovait.app.core.ui.component.input.SupernovaTextField
+import se.supernovait.app.core.ui.component.input.SupernovaSearchField
 import se.supernovait.app.core.ui.component.list.SupernovaListItem
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
@@ -44,9 +44,9 @@ fun CustomerSearchSheet(
             .padding(MaterialTheme.spacing.medium)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
             SupernovaTitle(
                 text = stringResource(Res.string.screen_Order_search_customer_title),
@@ -62,20 +62,21 @@ fun CustomerSearchSheet(
         
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-        SupernovaTextField(
+        SupernovaSearchField(
             value = searchQuery,
-            onValueChange = { v, _ -> onSearch(v) },
-            label = stringResource(Res.string.screen_Order_search_customer_hint),
+            onValueChange = { onSearch(it) },
+            onSearch = { onSearch(it) },
+            placeholder = stringResource(Res.string.screen_Order_search_customer_hint),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
         LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp),
-            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
+                .height(300.dp)
         ) {
             items(customers) { customer ->
                 SupernovaListItem(

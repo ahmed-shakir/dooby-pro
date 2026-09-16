@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.first
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.error.DataError
+import se.supernovait.doobypro.domain.model.AppDefaults.DEFAULT_STORAGE_LOCATION_ID
+import se.supernovait.doobypro.domain.model.AppDefaults.DEFAULT_STORAGE_LOCATION_LABEL
 import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.model.storage.StorageType
@@ -92,8 +94,8 @@ class StorageLocationManager(
         if (result is Result.Failure && result.error == DataError.NOT_FOUND) {
             storageLocationRepository.saveLocation(
                 StorageLocation(
-                    id = "default",
-                    label = "Uncategorized",
+                    id = DEFAULT_STORAGE_LOCATION_ID,
+                    label = DEFAULT_STORAGE_LOCATION_LABEL,
                     type = StorageType.OTHER,
                     capacity = 0, // Unlimited
                     isDefault = true

@@ -17,6 +17,7 @@ object AppDefaults {
     const val COUNTRY = "UAE"
     const val COUNTRY_CODE = "+971"
     const val DEFAULT_STORAGE_LOCATION_ID = "default"
+    const val DEFAULT_STORAGE_LOCATION_LABEL = "Uncategorized"
 
     suspend fun license(accountId: String) = License(
         id = SupernovaIdGenerator.generateId(IdType.LICENSE.prefix),

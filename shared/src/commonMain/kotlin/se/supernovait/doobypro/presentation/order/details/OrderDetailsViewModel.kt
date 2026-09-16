@@ -21,7 +21,7 @@ import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.presentation.navigation.Route
 
 class OrderDetailsViewModel(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val orderRepository: OrderRepository,
     private val orderManager: OrderManager
 ) : ViewModel() {

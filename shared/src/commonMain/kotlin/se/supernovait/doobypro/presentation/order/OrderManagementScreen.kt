@@ -36,7 +36,7 @@ import doobypro.shared.generated.resources.screen_Order_empty_state
 import doobypro.shared.generated.resources.screen_Order_search_hint
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.fab.LocalFabState
-import se.supernovait.app.core.ui.component.input.SupernovaTextField
+import se.supernovait.app.core.ui.component.input.SupernovaSearchField
 import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
@@ -65,6 +65,11 @@ fun OrderManagementScreen(
     val tabLabels = OrderTab.entries.associateWith { stringResource(it.label) }
 
     var showCustomerSheet by remember { mutableStateOf(false) }
+    
+    // Track the latest uiState in a State object so that the bottom sheet lambdas
+    // can reactively update without needing to call show() again.
+    val currentOrderUiState = remember { mutableStateOf(uiState) }
+    currentOrderUiState.value = uiState
 
     DisposableEffect(Unit) {
         fabState.set(
@@ -78,18 +83,20 @@ fun OrderManagementScreen(
         onDispose {}
     }
 
-    LaunchedEffect(showCustomerSheet, uiState.isAddingCustomer) {
+    LaunchedEffect(showCustomerSheet) {
         if (showCustomerSheet) {
             bottomSheetState.show {
-                if (uiState.isAddingCustomer) {
+                val state = currentOrderUiState.value
+                
+                if (state.isAddingCustomer) {
                     CustomerFormSheet(
                         onSave = { onEvent(OrderEvent.SaveNewCustomer(it)) },
-                        onCancel = { onEvent(OrderEvent.CreateNewOrder) } // Reset to search
+                        onCancel = { onEvent(OrderEvent.CreateNewOrder) }
                     )
                 } else {
                     CustomerSearchSheet(
-                        customers = uiState.customers,
-                        searchQuery = uiState.customerSearchQuery,
+                        customers = state.customers,
+                        searchQuery = state.customerSearchQuery,
                         onSearch = { onEvent(OrderEvent.SearchCustomers(it)) },
                         onSelect = {
                             onEvent(OrderEvent.SelectCustomer(it))
@@ -110,12 +117,15 @@ fun OrderManagementScreen(
     LaunchedEffect(uiState.editingOrder) {
         if (uiState.editingOrder != null && uiState.editingOrder.id == null) {
             bottomSheetState.show {
+                val state = currentOrderUiState.value
+                val editingOrder = state.editingOrder ?: return@show
+
                 OrderFormSheet(
-                    order = uiState.editingOrder,
-                    customers = uiState.customers,
-                    services = uiState.services,
-                    storageLocations = uiState.storageLocations,
-                    settings = uiState.settings,
+                    order = editingOrder,
+                    customers = state.customers,
+                    services = state.services,
+                    storageLocations = state.storageLocations,
+                    settings = state.settings,
                     onSave = { 
                         onEvent(OrderEvent.SaveOrder(it))
                         bottomSheetState.hide()
@@ -127,10 +137,11 @@ fun OrderManagementScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        SupernovaTextField(
+        SupernovaSearchField(
             value = uiState.searchQuery,
-            onValueChange = { v, _ -> onEvent(OrderEvent.SearchOrders(v)) },
-            label = stringResource(Res.string.screen_Order_search_hint),
+            onValueChange = { onEvent(OrderEvent.SearchOrders(it)) },
+            onSearch = { onEvent(OrderEvent.SearchOrders(it)) },
+            placeholder = stringResource(Res.string.screen_Order_search_hint),
             modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.medium)
         )
 
@@ -183,12 +194,13 @@ fun OrderManagementScreen(
                             onEdit = {
                                 onEvent(OrderEvent.EditOrder(order))
                                 bottomSheetState.show {
+                                    val state = currentOrderUiState.value
                                     OrderFormSheet(
                                         order = order,
-                                        customers = uiState.customers,
-                                        services = uiState.services,
-                                        storageLocations = uiState.storageLocations,
-                                        settings = uiState.settings,
+                                        customers = state.customers,
+                                        services = state.services,
+                                        storageLocations = state.storageLocations,
+                                        settings = state.settings,
                                         onSave = { 
                                             onEvent(OrderEvent.SaveOrder(it))
                                             bottomSheetState.hide()
