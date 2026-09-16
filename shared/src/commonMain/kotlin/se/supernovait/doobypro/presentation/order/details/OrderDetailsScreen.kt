@@ -25,6 +25,7 @@ import doobypro.shared.generated.resources.screen_Order_dialog_cancel_title
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_message
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_title
 import doobypro.shared.generated.resources.screen_Order_field_customer
+import doobypro.shared.generated.resources.screen_Order_field_delivery_date
 import doobypro.shared.generated.resources.screen_Order_field_delivery_method
 import doobypro.shared.generated.resources.screen_Order_field_delivery_option
 import doobypro.shared.generated.resources.screen_Order_field_notes
@@ -62,12 +63,15 @@ fun OrderDetailsScreen(
     }
 
     val dialogState = LocalDialogState.current
-    val colors = MaterialTheme.statusColor
     val deleteColor = MaterialTheme.colorScheme.error
     val deleteTitle = stringResource(Res.string.screen_Order_dialog_delete_title)
     val deleteMessage = stringResource(Res.string.screen_Order_dialog_delete_message)
     val cancelTitle = stringResource(Res.string.screen_Order_dialog_cancel_title)
     val cancelMessage = stringResource(Res.string.screen_Order_dialog_cancel_message)
+
+    val statusColors = MaterialTheme.statusColor
+    val paymentStatusText = if (order.isPaymentDone) stringResource(Res.string.label_payment_status_paid) else stringResource(Res.string.label_payment_status_pending)
+    val paymentStatusColor = if (order.isPaymentDone) statusColors.success else statusColors.error
 
     Column(
         modifier = Modifier
@@ -108,9 +112,11 @@ fun OrderDetailsScreen(
                 )
             }
         }
-        
-        val paymentStatusText = if (order.isPaymentDone) stringResource(Res.string.label_payment_status_paid) else stringResource(Res.string.label_payment_status_pending)
-        val paymentStatusColor = if (order.isPaymentDone) colors.success else colors.error
+
+        DetailSection(
+            label = stringResource(Res.string.screen_Order_field_delivery_date),
+            value = order.deliveryDatetime.toString().replace("T", " ")
+        )
 
         DetailSection(
             label = stringResource(Res.string.screen_Order_field_payment_status),
