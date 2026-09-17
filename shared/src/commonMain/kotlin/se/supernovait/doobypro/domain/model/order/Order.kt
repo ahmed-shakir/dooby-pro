@@ -59,4 +59,11 @@ data class Order(
      * Checks if the order can be permanently deleted from the active list.
      */
     fun canDelete(): Boolean = status.canBeDeleted()
+
+    /**
+     * Checks if the order is considered late based on the current time.
+     */
+    fun isLate(): Boolean {
+        return deliveryDatetime < LocalDateTime.now() && !status.isTerminal()
+    }
 }

@@ -16,6 +16,7 @@ import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_edit_square
 import doobypro.shared.generated.resources.ic_refresh
 import doobypro.shared.generated.resources.label_edit
+import doobypro.shared.generated.resources.label_late
 import doobypro.shared.generated.resources.screen_Order_action_reissue_order
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.action.SupernovaIconButton
@@ -62,6 +63,15 @@ fun OrderItem(
                     contentColor = statusColor,
                     style = MaterialTheme.typography.labelSmall
                 )
+                if (order.isLate()) {
+                    Spacer(Modifier.width(MaterialTheme.spacing.small))
+                    SupernovaTag(
+                        text = Res.string.label_late,
+                        containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
+                        contentColor = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
             }
             SupernovaLabel(
                 text = order.service.title,
@@ -83,7 +93,7 @@ fun OrderItem(
                 SupernovaLabel(
                     text = order.deliveryDatetime.toString().replace("T", " "), // Basic formatting for now
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (order.isLate()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

@@ -15,9 +15,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.label_cancel
 import doobypro.shared.generated.resources.label_delete
+import doobypro.shared.generated.resources.label_late
 import doobypro.shared.generated.resources.label_payment_status_paid
 import doobypro.shared.generated.resources.label_payment_status_pending
 import doobypro.shared.generated.resources.screen_Order_dialog_cancel_message
@@ -115,7 +117,9 @@ fun OrderDetailsScreen(
 
         DetailSection(
             label = stringResource(Res.string.screen_Order_field_delivery_date),
-            value = order.deliveryDatetime.toString().replace("T", " ")
+            value = order.deliveryDatetime.toString().replace("T", " "),
+            status = if (order.isLate()) stringResource(Res.string.label_late) else null,
+            valueColor = if (order.isLate()) MaterialTheme.colorScheme.error else Color.Unspecified
         )
 
         DetailSection(

@@ -77,6 +77,7 @@
     <string name="label_actions">Actions</string>
     <string name="label_payment_status_paid">Paid</string>
     <string name="label_payment_status_pending">Pending</string>
+    <string name="label_late">Late</string>
     <string name="label_role_admin">Administrator</string>
     <string name="label_role_user">Staff Member</string>
 
