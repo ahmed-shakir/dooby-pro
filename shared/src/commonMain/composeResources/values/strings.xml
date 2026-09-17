@@ -14,6 +14,7 @@
 
     <!-- Route labels -->
     <string name="navigation_item_menu_label">Menu</string>
+    <string name="navigation_item_app_info_label">About Dooby Pro</string>
     <string name="navigation_item_dashboard_label">Dashboard</string>
     <string name="navigation_item_orders_label">Orders</string>
     <string name="navigation_item_cancelled_orders_label">Cancelled orders</string>
@@ -100,7 +101,6 @@
     <string name="screen_Welcome_subtitle">Manage your laundry orders and staff operations</string>
     <string name="screen_Welcome_action_sign_in_label">Sign in</string>
     <string name="screen_Welcome_action_sign_up_label">Create account</string>
-    <string name="screen_Welcome_action_app_info_label">About Dooby Pro</string>
 
     <!-- Account Setup Wizard -->
     <string name="screen_AccountSetup_step_indicator">Step %1$d of %2$d</string>

@@ -17,6 +17,8 @@ import doobypro.shared.generated.resources.app_name
 import doobypro.shared.generated.resources.ic_app_icon
 import doobypro.shared.generated.resources.ic_dashboard
 import doobypro.shared.generated.resources.ic_dashboard_selected
+import doobypro.shared.generated.resources.ic_info
+import doobypro.shared.generated.resources.ic_info_selected
 import doobypro.shared.generated.resources.ic_logout
 import doobypro.shared.generated.resources.ic_menu
 import doobypro.shared.generated.resources.ic_menu_selected
@@ -181,6 +183,13 @@ fun AppRoot() {
                         icon = Res.drawable.ic_user_account,
                         selectedIcon = Res.drawable.ic_user_account_selected,
                         onClick = { navController.navigateWithRules(Route.Account) }
+                    ),
+                    NavigationItem(
+                        id = Route.AppInfo.name,
+                        label = Route.AppInfo.label ?: Res.string.app_name,
+                        icon = Res.drawable.ic_info,
+                        selectedIcon = Res.drawable.ic_info_selected,
+                        onClick = { navController.navigateWithRules(Route.AppInfo) }
                     ),
                     NavigationItem(
                         id = Route.Settings.name,

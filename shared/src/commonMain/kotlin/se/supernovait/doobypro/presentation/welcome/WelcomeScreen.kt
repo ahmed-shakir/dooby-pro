@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.app_logo_content_description
 import doobypro.shared.generated.resources.ic_app_icon
-import doobypro.shared.generated.resources.screen_Welcome_action_app_info_label
+import doobypro.shared.generated.resources.navigation_item_app_info_label
 import doobypro.shared.generated.resources.screen_Welcome_action_sign_in_label
 import doobypro.shared.generated.resources.screen_Welcome_action_sign_up_label
 import doobypro.shared.generated.resources.screen_Welcome_subtitle
@@ -107,7 +107,7 @@ private fun InfoFooter(onEvent: (WelcomeScreenEvent) -> Unit) {
         HorizontalDivider()
 
         SupernovaTextButton(
-            label = stringResource(Res.string.screen_Welcome_action_app_info_label),
+            label = stringResource(Res.string.navigation_item_app_info_label),
             onClick = { onEvent(WelcomeScreenEvent.NavigateToAppInfo) }
         )
     }
