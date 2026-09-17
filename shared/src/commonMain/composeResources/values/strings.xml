@@ -16,10 +16,17 @@
     <string name="navigation_item_menu_label">Menu</string>
     <string name="navigation_item_dashboard_label">Dashboard</string>
     <string name="navigation_item_orders_label">Orders</string>
+    <string name="navigation_item_cancelled_orders_label">Cancelled orders</string>
     <string name="navigation_item_services_label">Services</string>
     <string name="navigation_item_storage_label">Storage</string>
     <string name="navigation_item_account_label">Account</string>
     <string name="navigation_item_settings_label">Settings</string>
+    <string name="navigation_item_settings_common_label">Common settings</string>
+    <string name="navigation_item_settings_order_label">Order settings</string>
+    <string name="navigation_item_settings_storage_label">Storage settings</string>
+    <string name="navigation_item_settings_receipt_label">Receipt settings</string>
+    <string name="navigation_item_settings_printer_label">Printer settings</string>
+    <string name="navigation_item_settings_notification_label">Notification Settings</string>
 
     <!-- Delivery -->
     <string name="delivery_option_express">Express</string>
@@ -71,13 +78,13 @@
     <string name="label_cancel">Cancel</string>
     <string name="label_locked">Locked</string>
     <string name="label_default">Default</string>
+    <string name="label_late">Late</string>
     <string name="label_user_default">User</string>
     <string name="label_not_authenticated">Not authenticated</string>
     <string name="label_sign_out">Sign Out</string>
     <string name="label_actions">Actions</string>
     <string name="label_payment_status_paid">Paid</string>
     <string name="label_payment_status_pending">Pending</string>
-    <string name="label_late">Late</string>
     <string name="label_role_admin">Administrator</string>
     <string name="label_role_user">Staff Member</string>
 
@@ -147,6 +154,8 @@
     <string name="screen_Settings_common_description">Currency, date format, language and theme</string>
     <string name="screen_Settings_order_label">Order</string>
     <string name="screen_Settings_order_description">Defaults and behavior</string>
+    <string name="screen_Settings_storage_label">Storage</string>
+    <string name="screen_Settings_storage_description">Defaults and behavior</string>
     <string name="screen_Settings_receipt_label">Receipt</string>
     <string name="screen_Settings_receipt_description">Content, style, formatting</string>
     <string name="screen_Settings_printer_label">Printer</string>
@@ -168,8 +177,10 @@
     <string name="screen_Settings_order_behavior_label">Order Behavior</string>
     <string name="screen_Settings_order_auto_print_receipts_label">Auto-print receipts</string>
     <string name="screen_Settings_order_auto_print_storage_tag_label">Auto-print storage tags</string>
-    <string name="screen_Settings_order_storage_allocation_label">Storage allocation mode</string>
-    <string name="screen_Settings_order_default_storage_label">Default storage area</string>
+
+    <!-- Order settings -->
+    <string name="screen_Settings_storage_allocation_mode_label">Storage allocation mode</string>
+    <string name="screen_Settings_storage_default_storage_label">Default storage area</string>
 
     <!-- Printer settings -->
     <string name="screen_Settings_printer_connection_status_connected">Connected</string>
@@ -326,7 +337,6 @@
     <string name="screen_Order_action_next_status_ready_pickup">Mark as Picked Up</string>
     <string name="screen_Order_action_next_status_ready_delivery">Dispatch for Delivery</string>
     <string name="screen_Order_action_next_status_out_for_delivery">Deliver Order</string>
-    <string name="screen_Order_action_view_cancelled">Cancelled orders</string>
     <string name="screen_Order_error_save_failed">Failed to save order</string>
     <string name="screen_Order_error_delete_failed">Failed to delete order</string>
     <string name="screen_Order_error_not_found">Order not found</string>
@@ -361,7 +371,6 @@
     <string name="screen_Service_empty_state">No services configured. Add your first service like "Wash &amp; Fold" or "Dry Cleaning" to get started.</string>
 
     <!-- Storage Management -->
-    <string name="screen_Storage_title">Storage Management</string>
     <string name="screen_Storage_action_add_location">Add Storage Area</string>
     <string name="screen_Storage_label_capacity">Capacity: %1$d slots</string>
     <string name="screen_Storage_label_occupancy">%1$d / %2$d slots used</string>

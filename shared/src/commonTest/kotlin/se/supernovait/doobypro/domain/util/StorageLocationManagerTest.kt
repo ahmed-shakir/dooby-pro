@@ -11,7 +11,7 @@ import se.supernovait.doobypro.domain.manager.StorageLocationManager
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.Settings
-import se.supernovait.doobypro.domain.model.settings.order.OrderSettings
+import se.supernovait.doobypro.domain.model.settings.storage.StorageSettings
 import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.OrderRepository
@@ -38,7 +38,7 @@ class StorageLocationManagerTest {
     fun `assignStorageLocation - MANUAL mode - valid selection`() = runTest {
         val location = StorageLocation(id = "l1", label = "L1", capacity = 10)
         fakeStorageRepo.saveLocation(location)
-        fakeSettingsRepo.updateOrderSettings(OrderSettings(storageAllocationMode = StorageAllocationMode.MANUAL))
+        fakeSettingsRepo.updateStorageSettings(StorageSettings(storageAllocationMode = StorageAllocationMode.MANUAL))
 
         val assignedId = manager.assignStorageLocation("l1")
 
@@ -48,7 +48,7 @@ class StorageLocationManagerTest {
 
     @Test
     fun `assignStorageLocation - MANUAL mode - missing selection fails`() = runTest {
-        fakeSettingsRepo.updateOrderSettings(OrderSettings(storageAllocationMode = StorageAllocationMode.MANUAL))
+        fakeSettingsRepo.updateStorageSettings(StorageSettings(storageAllocationMode = StorageAllocationMode.MANUAL))
 
         assertFailsWith<IllegalArgumentException> {
             manager.assignStorageLocation(null)
@@ -61,7 +61,7 @@ class StorageLocationManagerTest {
         val l2 = StorageLocation(id = "l2", label = "L2", capacity = 5, occupiedSlots = 0)
         fakeStorageRepo.saveLocation(l1)
         fakeStorageRepo.saveLocation(l2)
-        fakeSettingsRepo.updateOrderSettings(OrderSettings(storageAllocationMode = StorageAllocationMode.AUTO))
+        fakeSettingsRepo.updateStorageSettings(StorageSettings(storageAllocationMode = StorageAllocationMode.AUTO))
 
         val assignedId = manager.assignStorageLocation(null)
 
@@ -75,7 +75,7 @@ class StorageLocationManagerTest {
         val defaultLoc = StorageLocation(id = "default", label = "Def", isDefault = true)
         fakeStorageRepo.saveLocation(l1)
         fakeStorageRepo.saveLocation(defaultLoc)
-        fakeSettingsRepo.updateOrderSettings(OrderSettings(storageAllocationMode = StorageAllocationMode.AUTO))
+        fakeSettingsRepo.updateStorageSettings(StorageSettings(storageAllocationMode = StorageAllocationMode.AUTO))
 
         val assignedId = manager.assignStorageLocation(null)
 
@@ -112,8 +112,8 @@ class StorageLocationManagerTest {
         override val settings = _settings.asStateFlow()
         override suspend fun updateSettings(settings: Settings) { _settings.value = settings }
         override suspend fun resetSettings() { _settings.value = Settings() }
-        fun updateOrderSettings(new: OrderSettings) { 
-            _settings.update { it.copy(order = new) }
+        fun updateStorageSettings(new: StorageSettings) {
+            _settings.update { it.copy(storage = new) }
         }
     }
 

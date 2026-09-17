@@ -68,8 +68,9 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateDefaultDeliveryDaysOffset -> updateSettings { it.copy(order = it.order.copy(defaultDeliveryDaysOffset = event.days)) }
             is SettingsScreenEvent.UpdateAutoPrintReceipts -> updateSettings { it.copy(order = it.order.copy(autoPrintReceipts = event.enabled)) }
             is SettingsScreenEvent.UpdateAutoPrintStorageLocationTag -> updateSettings { it.copy(order = it.order.copy(autoPrintStorageLocationTag = event.enabled)) }
-            is SettingsScreenEvent.UpdateStorageAllocationMode -> updateSettings { it.copy(order = it.order.copy(storageAllocationMode = event.mode)) }
-            is SettingsScreenEvent.UpdateDefaultStorageLocationId -> updateSettings { it.copy(order = it.order.copy(defaultStorageLocationId = event.id)) }
+            // Storage settings
+            is SettingsScreenEvent.UpdateStorageAllocationMode -> updateSettings { it.copy(storage = it.storage.copy(storageAllocationMode = event.mode)) }
+            is SettingsScreenEvent.UpdateDefaultStorageLocationId -> updateSettings { it.copy(storage = it.storage.copy(defaultStorageLocationId = event.id)) }
             // Receipt settings
             is SettingsScreenEvent.UpdateIncludeCompanyLogo -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyLogo = event.include)) }
             is SettingsScreenEvent.UpdateIncludeCompanyName -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyName = event.include)) }
@@ -93,12 +94,12 @@ class SettingsViewModel(
             is SettingsScreenEvent.SearchPrinters -> searchPrinters()
             is SettingsScreenEvent.ConnectPrinter -> updateSettings { it.copy(printer = it.printer.copy(printerAddress = event.address, printerName = event.name)) }
             // Notification settings
-            is SettingsScreenEvent.UpdateNewOrdersNotification -> updateSettings { it.copy(notifications = it.notifications.copy(newOrders = event.enabled)) }
-            is SettingsScreenEvent.UpdateReadyOrdersNotification -> updateSettings { it.copy(notifications = it.notifications.copy(readyOrders = event.enabled)) }
-            is SettingsScreenEvent.UpdateLateOrdersNotification -> updateSettings { it.copy(notifications = it.notifications.copy(lateOrders = event.enabled)) }
-            is SettingsScreenEvent.UpdateOrderNotPickedUpNotification -> updateSettings { it.copy(notifications = it.notifications.copy(orderNotPickedUp = event.enabled)) }
-            is SettingsScreenEvent.UpdateOrderNotDeliveredNotification -> updateSettings { it.copy(notifications = it.notifications.copy(orderNotDelivered = event.enabled)) }
-            is SettingsScreenEvent.UpdatePrinterErrorsNotification -> updateSettings { it.copy(notifications = it.notifications.copy(printerErrors = event.enabled)) }
+            is SettingsScreenEvent.UpdateNewOrdersNotification -> updateSettings { it.copy(notification = it.notification.copy(newOrders = event.enabled)) }
+            is SettingsScreenEvent.UpdateReadyOrdersNotification -> updateSettings { it.copy(notification = it.notification.copy(readyOrders = event.enabled)) }
+            is SettingsScreenEvent.UpdateLateOrdersNotification -> updateSettings { it.copy(notification = it.notification.copy(lateOrders = event.enabled)) }
+            is SettingsScreenEvent.UpdateOrderNotPickedUpNotification -> updateSettings { it.copy(notification = it.notification.copy(orderNotPickedUp = event.enabled)) }
+            is SettingsScreenEvent.UpdateOrderNotDeliveredNotification -> updateSettings { it.copy(notification = it.notification.copy(orderNotDelivered = event.enabled)) }
+            is SettingsScreenEvent.UpdatePrinterErrorsNotification -> updateSettings { it.copy(notification = it.notification.copy(printerErrors = event.enabled)) }
         }
     }
 

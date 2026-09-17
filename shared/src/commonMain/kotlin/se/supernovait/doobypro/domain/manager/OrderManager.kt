@@ -2,6 +2,7 @@ package se.supernovait.doobypro.domain.manager
 
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
@@ -9,6 +10,7 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.error.DataError
+import se.supernovait.app.core.domain.extension.now
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
@@ -34,19 +36,20 @@ class OrderManager(
      * Creates a new order template populated with default values from settings.
      */
     suspend fun createOrderTemplate(customer: User): Order {
-        val settings = settingsRepository.settings.first().order
-        val orderDatetime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val orderSettings = settingsRepository.settings.first().order
+        val storageSettings = settingsRepository.settings.first().storage
+        val orderDatetime = LocalDateTime.now()
         val deliveryDatetime = Clock.System.now()
-            .plus(settings.defaultDeliveryDaysOffset, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            .plus(orderSettings.defaultDeliveryDaysOffset, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             .toLocalDateTime(TimeZone.currentSystemDefault())
 
-        val defaultService = settings.defaultServiceId?.let { id ->
+        val defaultService = orderSettings.defaultServiceId?.let { id ->
             serviceRepository.getServiceById(id).let { result ->
                 if (result is Result.Success) result.data else null
             }
         } ?: Service()
 
-        val defaultStorage = storageLocationRepository.getLocationById(settings.defaultStorageLocationId).getOrNull()
+        val defaultStorage = storageLocationRepository.getLocationById(storageSettings.defaultStorageLocationId).getOrNull()
             ?: storageLocationRepository.getDefaultLocation().getOrNull()
             ?: StorageLocation()
 
@@ -57,8 +60,8 @@ class OrderManager(
             status = OrderStatus.NEW,
             orderDatetime = orderDatetime,
             deliveryDatetime = deliveryDatetime,
-            deliveryOption = settings.defaultDeliveryOption,
-            deliveryMethod = settings.defaultDeliveryMethod,
+            deliveryOption = orderSettings.defaultDeliveryOption,
+            deliveryMethod = orderSettings.defaultDeliveryMethod,
             isPaymentDone = false,
             notes = null
         )

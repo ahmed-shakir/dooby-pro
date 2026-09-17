@@ -1,7 +1,6 @@
 package se.supernovait.doobypro.presentation.settings.screen
 
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,12 +17,9 @@ import doobypro.shared.generated.resources.screen_Settings_order_auto_print_rece
 import doobypro.shared.generated.resources.screen_Settings_order_auto_print_storage_tag_label
 import doobypro.shared.generated.resources.screen_Settings_order_behavior_label
 import doobypro.shared.generated.resources.screen_Settings_order_default_service_label
-import doobypro.shared.generated.resources.screen_Settings_order_default_storage_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_method_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_option_label
 import doobypro.shared.generated.resources.screen_Settings_order_handling_time_label
-import doobypro.shared.generated.resources.screen_Settings_order_storage_allocation_label
-import doobypro.shared.generated.resources.screen_Storage_title
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
@@ -32,7 +28,6 @@ import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
-import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.presentation.settings.SettingsState
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 
@@ -44,9 +39,6 @@ fun OrderSettingsScreen(
     val selectedService = uiState.services.find { it.id == uiState.settings.order.defaultServiceId }
     val deliveryOptionLabels = DeliveryOption.entries.associateWith { stringResource(it.label) }
     val deliveryMethodLabels = DeliveryMethod.entries.associateWith { stringResource(it.label) }
-    
-    val allocationModeLabels = StorageAllocationMode.entries.associateWith { stringResource(it.label) }
-    val selectedStorageLocation = uiState.activeStorageLocations.find { it.id == uiState.settings.order.defaultStorageLocationId }
 
     var deliveryDaysText by remember(uiState.settings.order.defaultDeliveryDaysOffset) {
         mutableStateOf(uiState.settings.order.defaultDeliveryDaysOffset.toString())
@@ -91,8 +83,7 @@ fun OrderSettingsScreen(
                     onEvent(SettingsScreenEvent.UpdateDefaultDeliveryDaysOffset(it))
                 }
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth().padding(vertical = MaterialTheme.spacing.extraSmall)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
         SupernovaLabel(
@@ -112,30 +103,6 @@ fun OrderSettingsScreen(
             label = Res.string.screen_Settings_order_auto_print_storage_tag_label,
             checked = uiState.settings.order.autoPrintStorageLocationTag,
             onCheckedChange = { onEvent(SettingsScreenEvent.UpdateAutoPrintStorageLocationTag(it)) }
-        )
-
-        SupernovaLabel(
-            text = Res.string.screen_Storage_title,
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(top = MaterialTheme.spacing.large, bottom = MaterialTheme.spacing.small)
-        )
-
-        SupernovaSelectField(
-            label = Res.string.screen_Settings_order_storage_allocation_label,
-            options = StorageAllocationMode.entries,
-            selectedOption = uiState.settings.order.storageAllocationMode,
-            onOptionSelected = { onEvent(SettingsScreenEvent.UpdateStorageAllocationMode(it)) },
-            optionLabel = { allocationModeLabels[it] ?: "" }
-        )
-        Spacer(Modifier.height(MaterialTheme.spacing.medium))
-
-        SupernovaSelectField(
-            label = Res.string.screen_Settings_order_default_storage_label,
-            options = uiState.activeStorageLocations,
-            selectedOption = selectedStorageLocation,
-            onOptionSelected = { it.id?.let { id -> onEvent(SettingsScreenEvent.UpdateDefaultStorageLocationId(id)) } },
-            optionLabel = { it.label }
         )
     }
 }

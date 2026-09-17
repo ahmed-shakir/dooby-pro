@@ -28,6 +28,7 @@ sealed interface SettingsScreenEvent {
     data class UpdateDefaultDeliveryDaysOffset(val days: Int) : SettingsScreenEvent
     data class UpdateAutoPrintReceipts(val enabled: Boolean) : SettingsScreenEvent
     data class UpdateAutoPrintStorageLocationTag(val enabled: Boolean) : SettingsScreenEvent
+    // Storage settings
     data class UpdateStorageAllocationMode(val mode: StorageAllocationMode) : SettingsScreenEvent
     data class UpdateDefaultStorageLocationId(val id: String) : SettingsScreenEvent
     

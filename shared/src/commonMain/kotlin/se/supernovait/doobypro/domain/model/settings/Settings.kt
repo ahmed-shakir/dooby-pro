@@ -6,12 +6,14 @@ import se.supernovait.doobypro.domain.model.settings.notification.NotificationSe
 import se.supernovait.doobypro.domain.model.settings.order.OrderSettings
 import se.supernovait.doobypro.domain.model.settings.printer.PrinterSettings
 import se.supernovait.doobypro.domain.model.settings.receipt.ReceiptSettings
+import se.supernovait.doobypro.domain.model.settings.storage.StorageSettings
 
 @Serializable
 data class Settings(
     val common: CommonSettings = CommonSettings(),
     val order: OrderSettings = OrderSettings(),
+    val storage: StorageSettings = StorageSettings(),
     val receipt: ReceiptSettings = ReceiptSettings(),
     val printer: PrinterSettings = PrinterSettings(),
-    val notifications: NotificationSettings = NotificationSettings()
+    val notification: NotificationSettings = NotificationSettings()
 )

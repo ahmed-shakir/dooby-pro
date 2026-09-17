@@ -5,7 +5,6 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderTab
-import se.supernovait.doobypro.domain.model.settings.order.OrderSettings
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 
 data class OrderState(
@@ -17,7 +16,7 @@ data class OrderState(
     val customers: List<User> = emptyList(),
     val services: List<Service> = emptyList(),
     val storageLocations: List<StorageLocation> = emptyList(),
-    val settings: OrderSettings = OrderSettings(),
+    val isManualStorageMode: Boolean = false,
     val editingOrder: Order? = null,
     val error: StringResource? = null,
     val isAddingCustomer: Boolean = false,

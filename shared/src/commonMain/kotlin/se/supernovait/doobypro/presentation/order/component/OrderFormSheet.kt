@@ -44,8 +44,6 @@ import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
-import se.supernovait.doobypro.domain.model.settings.order.OrderSettings
-import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 
 @Composable
@@ -54,7 +52,7 @@ fun OrderFormSheet(
     customers: List<User>,
     services: List<Service>,
     storageLocations: List<StorageLocation>,
-    settings: OrderSettings,
+    isManualStorageMode: Boolean,
     onSave: (Order) -> Unit,
     onDelete: (() -> Unit)? = null
 ) {
@@ -68,7 +66,6 @@ fun OrderFormSheet(
     var notes by remember { mutableStateOf(order.notes ?: "") }
 
     val isNew = order.id == null
-    val isManualStorage = settings.storageAllocationMode == StorageAllocationMode.MANUAL
 
     val deliveryOptionLabels = DeliveryOption.entries.associateWith { stringResource(it.label) }
     val deliveryMethodLabels = DeliveryMethod.entries.associateWith { stringResource(it.label) }
@@ -116,7 +113,7 @@ fun OrderFormSheet(
             selectedOption = selectedLocation,
             onOptionSelected = { selectedLocation = it },
             optionLabel = { it.label },
-            enabled = isManualStorage || !isNew
+            enabled = isManualStorageMode || !isNew
         )
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))

@@ -24,6 +24,7 @@ import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.order.OrderTab
 import se.supernovait.doobypro.domain.model.settings.Settings
+import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.CustomerRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
@@ -114,9 +115,9 @@ class OrderViewModel(
             searchQuery = orderQuery,
             customerSearchQuery = customerQuery,
             lateOrderCountPerTab = lateCounts,
-            settings = settings.order,
             services = services,
             storageLocations = locations,
+            isManualStorageMode = settings.storage.storageAllocationMode == StorageAllocationMode.MANUAL,
             customers = filteredCustomers,
             editingOrder = editing,
             error = error,

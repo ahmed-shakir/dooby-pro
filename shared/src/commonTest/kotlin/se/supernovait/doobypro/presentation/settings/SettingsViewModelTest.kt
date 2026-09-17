@@ -154,8 +154,8 @@ class SettingsViewModelTest {
         val collectJob = launch { viewModel.uiState.collect {} }
         viewModel.onEvent(SettingsScreenEvent.UpdateLateOrdersNotification(false))
         
-        val state = viewModel.uiState.filter { !it.settings.notifications.lateOrders }.first()
-        assertEquals(false, state.settings.notifications.lateOrders)
+        val state = viewModel.uiState.filter { !it.settings.notification.lateOrders }.first()
+        assertEquals(false, state.settings.notification.lateOrders)
         collectJob.cancel()
     }
 
@@ -164,8 +164,8 @@ class SettingsViewModelTest {
         val collectJob = launch { viewModel.uiState.collect {} }
         viewModel.onEvent(SettingsScreenEvent.UpdateStorageAllocationMode(StorageAllocationMode.AUTO))
         
-        val state = viewModel.uiState.filter { it.settings.order.storageAllocationMode == StorageAllocationMode.AUTO }.first()
-        assertEquals(StorageAllocationMode.AUTO, state.settings.order.storageAllocationMode)
+        val state = viewModel.uiState.filter { it.settings.storage.storageAllocationMode == StorageAllocationMode.AUTO }.first()
+        assertEquals(StorageAllocationMode.AUTO, state.settings.storage.storageAllocationMode)
         collectJob.cancel()
     }
 
@@ -175,8 +175,8 @@ class SettingsViewModelTest {
         val locationId = "shelf_a"
         viewModel.onEvent(SettingsScreenEvent.UpdateDefaultStorageLocationId(locationId))
         
-        val state = viewModel.uiState.filter { it.settings.order.defaultStorageLocationId == locationId }.first()
-        assertEquals(locationId, state.settings.order.defaultStorageLocationId)
+        val state = viewModel.uiState.filter { it.settings.storage.defaultStorageLocationId == locationId }.first()
+        assertEquals(locationId, state.settings.storage.defaultStorageLocationId)
         collectJob.cancel()
     }
 }

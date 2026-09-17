@@ -17,6 +17,8 @@ import doobypro.shared.generated.resources.screen_Settings_printer_description
 import doobypro.shared.generated.resources.screen_Settings_printer_label
 import doobypro.shared.generated.resources.screen_Settings_receipt_description
 import doobypro.shared.generated.resources.screen_Settings_receipt_label
+import doobypro.shared.generated.resources.screen_Settings_storage_description
+import doobypro.shared.generated.resources.screen_Settings_storage_label
 import se.supernovait.app.core.ui.component.list.SupernovaListItem
 import se.supernovait.doobypro.presentation.settings.event.SettingsNavigationEvent
 
@@ -40,6 +42,11 @@ fun SettingsMenuScreen(
             title = Res.string.screen_Settings_order_label,
             description = Res.string.screen_Settings_order_description,
             onClick = { onNavigation(SettingsNavigationEvent.NavigateToOrder) }
+        )
+        SupernovaListItem(
+            title = Res.string.screen_Settings_storage_label,
+            description = Res.string.screen_Settings_storage_description,
+            onClick = { onNavigation(SettingsNavigationEvent.NavigateToStorage) }
         )
         SupernovaListItem(
             title = Res.string.screen_Settings_receipt_label,

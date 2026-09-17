@@ -24,8 +24,8 @@ import doobypro.shared.generated.resources.ic_add
 import doobypro.shared.generated.resources.ic_archive
 import doobypro.shared.generated.resources.label_cancel
 import doobypro.shared.generated.resources.label_delete
+import doobypro.shared.generated.resources.navigation_item_cancelled_orders_label
 import doobypro.shared.generated.resources.screen_Order_action_add_order
-import doobypro.shared.generated.resources.screen_Order_action_view_cancelled
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_message
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_title
 import org.jetbrains.compose.resources.stringResource
@@ -56,7 +56,7 @@ fun OrderManagementScreen(
     val deleteTitle = stringResource(Res.string.screen_Order_dialog_delete_title)
     val deleteMessage = stringResource(Res.string.screen_Order_dialog_delete_message)
 
-    val archiveLabel = stringResource(Res.string.screen_Order_action_view_cancelled)
+    val archiveLabel = stringResource(Res.string.navigation_item_cancelled_orders_label)
     val tabLabels = OrderTab.entries.associateWith { stringResource(it.label) }
 
     var showCustomerSheet by remember { mutableStateOf(false) }
@@ -134,7 +134,7 @@ fun OrderManagementScreen(
                     customers = state.customers,
                     services = state.services,
                     storageLocations = state.storageLocations,
-                    settings = state.settings,
+                    isManualStorageMode = state.isManualStorageMode,
                     onSave = { 
                         onEvent(OrderEvent.SaveOrder(it))
                         bottomSheetState.hide()
@@ -201,7 +201,7 @@ fun OrderManagementScreen(
                         customers = state.customers,
                         services = state.services,
                         storageLocations = state.storageLocations,
-                        settings = state.settings,
+                        isManualStorageMode = state.isManualStorageMode,
                         onSave = { 
                             onEvent(OrderEvent.SaveOrder(it))
                             bottomSheetState.hide()

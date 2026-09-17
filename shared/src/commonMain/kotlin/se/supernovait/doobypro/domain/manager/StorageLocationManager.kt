@@ -24,9 +24,9 @@ class StorageLocationManager(
      */
     suspend fun assignStorageLocation(selectedLocationId: String?): String {
         val appSettings = settingsRepository.settings.first()
-        val orderSettings = appSettings.order
+        val storageSettings = appSettings.storage
 
-        return when (orderSettings.storageAllocationMode) {
+        return when (storageSettings.storageAllocationMode) {
             StorageAllocationMode.MANUAL -> {
                 if (selectedLocationId == null) {
                     throw IllegalArgumentException("Storage location is required in manual mode.")
@@ -37,7 +37,7 @@ class StorageLocationManager(
 
                 // If selected is full, try the user's preferred default from settings
                 if (!location.hasCapacity()) {
-                    val preferredDefault = storageLocationRepository.getLocationById(orderSettings.defaultStorageLocationId).getOrNull()
+                    val preferredDefault = storageLocationRepository.getLocationById(storageSettings.defaultStorageLocationId).getOrNull()
                     
                     val fallback = if (preferredDefault != null && preferredDefault.hasCapacity()) {
                         preferredDefault
@@ -55,14 +55,14 @@ class StorageLocationManager(
             }
             StorageAllocationMode.AUTO -> {
                 // 1. Try user's preferred default from settings if slots available
-                val preferredDefault = storageLocationRepository.getLocationById(orderSettings.defaultStorageLocationId).getOrNull()
+                val preferredDefault = storageLocationRepository.getLocationById(storageSettings.defaultStorageLocationId).getOrNull()
                 
                 var target = if (preferredDefault != null && preferredDefault.hasCapacity()) {
                     preferredDefault
                 } else {
                     // 2. Try first available non-default location
                     storageLocationRepository.getActiveLocations().first()
-                        .filter { !it.isDefault && it.id != orderSettings.defaultStorageLocationId }
+                        .filter { !it.isDefault && it.id != storageSettings.defaultStorageLocationId }
                         .firstOrNull { it.hasCapacity() }
                 }
 

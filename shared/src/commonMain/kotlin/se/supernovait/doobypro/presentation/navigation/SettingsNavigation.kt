@@ -14,6 +14,7 @@ import se.supernovait.doobypro.presentation.settings.screen.OrderSettingsScreen
 import se.supernovait.doobypro.presentation.settings.screen.PrinterSettingsScreen
 import se.supernovait.doobypro.presentation.settings.screen.ReceiptSettingsScreen
 import se.supernovait.doobypro.presentation.settings.screen.SettingsMenuScreen
+import se.supernovait.doobypro.presentation.settings.screen.StorageSettingsScreen
 
 fun NavGraphBuilder.settingsGraph(
     navController: NavHostController
@@ -24,9 +25,10 @@ fun NavGraphBuilder.settingsGraph(
                 when (event) {
                     SettingsNavigationEvent.NavigateToCommon -> navController.navigate(Route.SettingsCommon)
                     SettingsNavigationEvent.NavigateToOrder -> navController.navigate(Route.SettingsOrder)
+                    SettingsNavigationEvent.NavigateToStorage -> navController.navigate(Route.SettingsStorage)
                     SettingsNavigationEvent.NavigateToReceipt -> navController.navigate(Route.SettingsReceipt)
                     SettingsNavigationEvent.NavigateToPrinter -> navController.navigate(Route.SettingsPrinter)
-                    SettingsNavigationEvent.NavigateToNotifications -> navController.navigate(Route.SettingsNotifications)
+                    SettingsNavigationEvent.NavigateToNotifications -> navController.navigate(Route.SettingsNotification)
                 }
             }
         )
@@ -44,6 +46,12 @@ fun NavGraphBuilder.settingsGraph(
         OrderSettingsScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 
+    composable<Route.SettingsStorage> {
+        val viewModel = koinViewModel<SettingsViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        StorageSettingsScreen(uiState = uiState, onEvent = viewModel::onEvent)
+    }
+
     composable<Route.SettingsReceipt> {
         val viewModel = koinViewModel<SettingsViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -56,7 +64,7 @@ fun NavGraphBuilder.settingsGraph(
         PrinterSettingsScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 
-    composable<Route.SettingsNotifications> {
+    composable<Route.SettingsNotification> {
         val viewModel = koinViewModel<SettingsViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         NotificationSettingsScreen(uiState = uiState, onEvent = viewModel::onEvent)
