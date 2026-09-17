@@ -11,7 +11,7 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
 data class OrderState(
     val orders: List<Order> = emptyList(),
     val activeTab: OrderTab = OrderTab.NEW,
-    val orderCountPerTab: Map<OrderTab, Int> = emptyMap(),
+    val lateOrderCountPerTab: Map<OrderTab, Int> = emptyMap(),
     val searchQuery: String = "",
     val customerSearchQuery: String = "",
     val customers: List<User> = emptyList(),
@@ -21,6 +21,7 @@ data class OrderState(
     val editingOrder: Order? = null,
     val error: StringResource? = null,
     val isAddingCustomer: Boolean = false,
+    val isArchive: Boolean = false,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false
 )

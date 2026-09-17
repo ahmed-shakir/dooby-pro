@@ -163,7 +163,8 @@ fun OrderDetailsScreen(
                     },
                     onDismiss = { dialogState.hide() }
                 )
-            }
+            },
+            onReissue = { onEvent(OrderDetailsEvent.ReissueOrder) }
         )
     }
 }

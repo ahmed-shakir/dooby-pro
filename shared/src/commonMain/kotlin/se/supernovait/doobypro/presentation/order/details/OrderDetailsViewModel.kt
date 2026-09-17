@@ -44,6 +44,7 @@ class OrderDetailsViewModel(
             OrderDetailsEvent.TransitionToNextStatus -> transitionStatus()
             OrderDetailsEvent.CancelOrder -> cancelOrder()
             OrderDetailsEvent.DeleteOrder -> deleteOrder()
+            OrderDetailsEvent.ReissueOrder -> { /* Handled by navigation */ }
             is OrderDetailsEvent.SaveOrder -> saveOrder(event.updatedOrder)
             is OrderDetailsEvent.ToggleEdit -> _uiState.update { it.copy(isEditing = event.editing) }
         }

@@ -14,7 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_edit_square
+import doobypro.shared.generated.resources.ic_refresh
 import doobypro.shared.generated.resources.label_edit
+import doobypro.shared.generated.resources.screen_Order_action_reissue_order
+import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.action.SupernovaIconButton
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.component.text.SupernovaTag
@@ -27,7 +30,8 @@ import se.supernovait.doobypro.domain.model.order.OrderStatus
 fun OrderItem(
     order: Order,
     onClick: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onReissue: (() -> Unit)? = null
 ) {
     val statusColor = when (order.status) {
         OrderStatus.NEW -> MaterialTheme.statusColor.info
@@ -84,10 +88,20 @@ fun OrderItem(
             }
         }
 
-        SupernovaIconButton(
-            icon = Res.drawable.ic_edit_square,
-            contentDescription = Res.string.label_edit,
-            onClick = onEdit
-        )
+        if (onReissue != null) {
+            SupernovaIconButton(
+                icon = Res.drawable.ic_refresh,
+                contentDescription = stringResource(Res.string.screen_Order_action_reissue_order),
+                onClick = onReissue
+            )
+        }
+
+        if (!order.status.isTerminal()) {
+            SupernovaIconButton(
+                icon = Res.drawable.ic_edit_square,
+                contentDescription = Res.string.label_edit,
+                onClick = onEdit
+            )
+        }
     }
 }

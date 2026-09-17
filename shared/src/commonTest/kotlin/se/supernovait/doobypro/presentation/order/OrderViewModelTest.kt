@@ -1,5 +1,6 @@
 package se.supernovait.doobypro.presentation.order
 
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -87,7 +88,15 @@ class OrderViewModelTest {
         orderManager = OrderManager(fakeOrderRepo, fakeServiceRepo, storageManager, fakeStorageRepo, fakeSettingsRepo)
         orderQueryManager = OrderQueryManager(fakeOrderRepo)
         
-        viewModel = OrderViewModel(fakeOrderRepo, fakeServiceRepo, fakeStorageRepo, fakeSettingsRepo, fakeCustomerRepo, orderManager, orderQueryManager)
+        viewModel = OrderViewModel(
+            savedStateHandle = SavedStateHandle(),
+            serviceRepository = fakeServiceRepo,
+            storageLocationRepository = fakeStorageRepo,
+            settingsRepository = fakeSettingsRepo,
+            customerRepository = fakeCustomerRepo,
+            orderManager = orderManager,
+            orderQueryManager = orderQueryManager
+        )
     }
 
     @AfterTest
@@ -128,6 +137,40 @@ class OrderViewModelTest {
     fun `UpdateStatus should call repository`() = runTest(testDispatcher) {
         viewModel.onEvent(OrderEvent.UpdateStatus("o1", OrderStatus.READY))
         assertEquals(OrderStatus.READY, fakeOrderRepo.updatedStatus)
+    }
+
+    @Test
+    fun `ReissueOrder should update editing state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        
+        viewModel.onEvent(OrderEvent.ReissueOrder(testOrder))
+        
+        assertNotNull(viewModel.uiState.value.editingOrder)
+        assertEquals(testOrder.customer.id, viewModel.uiState.value.editingOrder?.customer?.id)
+        assertEquals(testOrder.service.id, viewModel.uiState.value.editingOrder?.service?.id)
+        
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `SavedStateHandle reissue_order should trigger editing state`() = runTest(testDispatcher) {
+        val savedStateHandle = SavedStateHandle(mapOf("reissue_order" to testOrder))
+        val vm = OrderViewModel(
+            savedStateHandle = savedStateHandle,
+            serviceRepository = fakeServiceRepo,
+            storageLocationRepository = fakeStorageRepo,
+            settingsRepository = fakeSettingsRepo,
+            customerRepository = fakeCustomerRepo,
+            orderManager = orderManager,
+            orderQueryManager = orderQueryManager
+        )
+        
+        val collectJob = launch { vm.uiState.collect {} }
+        
+        assertNotNull(vm.uiState.value.editingOrder)
+        assertEquals(testOrder.customer.id, vm.uiState.value.editingOrder?.customer?.id)
+        
+        collectJob.cancel()
     }
 
     private class FakeOrderRepository : OrderRepository {

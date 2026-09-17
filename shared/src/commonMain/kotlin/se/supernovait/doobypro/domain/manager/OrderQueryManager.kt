@@ -2,6 +2,8 @@ package se.supernovait.doobypro.domain.manager
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.LocalDateTime
+import se.supernovait.app.core.domain.extension.now
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.order.OrderTab
@@ -28,17 +30,33 @@ class OrderQueryManager(
     }
 
     /**
-     * Calculates the count of orders in each operational tab.
+     * Observes only cancelled orders.
      */
-    fun getOrderCountPerTab(): Flow<Map<OrderTab, Int>> {
+    fun getCancelledOrders(): Flow<List<Order>> {
         return orderRepository.getOrders().map { orders ->
+            orders.filter { it.status == OrderStatus.CANCELLED }
+        }
+    }
+
+    /**
+     * Calculates the count of late orders in each operational tab.
+     * An order is considered late if its delivery deadline has passed.
+     */
+    fun getLateOrderCountPerTab(): Flow<Map<OrderTab, Int>> {
+        return orderRepository.getOrders().map { orders ->
+            val now = LocalDateTime.now()
             OrderTab.entries.associateWith { tab ->
-                when (tab) {
-                    OrderTab.NEW -> orders.count { it.status == OrderStatus.NEW }
-                    OrderTab.IN_PROGRESS -> orders.count { it.status == OrderStatus.IN_PROGRESS }
-                    OrderTab.READY -> orders.count { it.status == OrderStatus.READY || it.status == OrderStatus.OUT_FOR_DELIVERY }
-                    OrderTab.COMPLETED -> orders.count { it.status == OrderStatus.PICKED_UP || it.status == OrderStatus.DELIVERED }
-                }
+                orders
+                    .filter { it.deliveryDatetime < now }
+                    .filter { !it.status.isTerminal() }
+                    .count { order ->
+                        when (tab) {
+                            OrderTab.NEW -> order.status == OrderStatus.NEW
+                            OrderTab.IN_PROGRESS -> order.status == OrderStatus.IN_PROGRESS
+                            OrderTab.READY -> order.status == OrderStatus.READY || order.status == OrderStatus.OUT_FOR_DELIVERY
+                            OrderTab.COMPLETED -> false
+                        }
+                    }
             }
         }
     }

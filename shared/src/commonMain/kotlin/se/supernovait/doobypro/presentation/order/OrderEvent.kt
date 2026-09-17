@@ -18,6 +18,11 @@ sealed interface OrderEvent {
     data object CreateNewOrder : OrderEvent
 
     /**
+     * Re-issues a cancelled order by creating a new template with the same details.
+     */
+    data class ReissueOrder(val order: Order) : OrderEvent
+
+    /**
      * Sets the order that is currently being created or updated.
      *
      * @param order The order instance to load into the form.
@@ -68,4 +73,19 @@ sealed interface OrderEvent {
      * Saves a new customer record.
      */
     data class SaveNewCustomer(val customer: User) : OrderEvent
+
+    /**
+     * Toggles whether we are viewing the archive (cancelled orders).
+     */
+    data class ToggleArchive(val isArchive: Boolean) : OrderEvent
+
+    /**
+     * Triggers navigation to view order details.
+     */
+    data class ViewOrderDetails(val id: String) : OrderEvent
+
+    /**
+     * Triggers navigation to view cancelled orders.
+     */
+    data object ViewCancelledOrders : OrderEvent
 }

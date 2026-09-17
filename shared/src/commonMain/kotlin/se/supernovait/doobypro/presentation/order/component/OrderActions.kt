@@ -15,6 +15,7 @@ import doobypro.shared.generated.resources.screen_Order_action_next_status_new
 import doobypro.shared.generated.resources.screen_Order_action_next_status_out_for_delivery
 import doobypro.shared.generated.resources.screen_Order_action_next_status_ready_delivery
 import doobypro.shared.generated.resources.screen_Order_action_next_status_ready_pickup
+import doobypro.shared.generated.resources.screen_Order_action_reissue_order
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.action.SupernovaButton
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
@@ -28,7 +29,8 @@ fun OrderActions(
     order: Order,
     onNextStatus: () -> Unit,
     onCancel: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onReissue: () -> Unit
 ) {
     val nextStatusLabel = when (order.status) {
         OrderStatus.NEW -> Res.string.screen_Order_action_next_status_new
@@ -49,6 +51,15 @@ fun OrderActions(
             SupernovaButton(
                 label = stringResource(nextStatusLabel),
                 onClick = onNextStatus,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.extraSmall
+            )
+        }
+
+        if (order.status == OrderStatus.CANCELLED) {
+            SupernovaButton(
+                label = stringResource(Res.string.screen_Order_action_reissue_order),
+                onClick = onReissue,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.extraSmall
             )

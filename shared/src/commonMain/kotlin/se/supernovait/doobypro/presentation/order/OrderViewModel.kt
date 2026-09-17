@@ -1,5 +1,6 @@
 package se.supernovait.doobypro.presentation.order
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import doobypro.shared.generated.resources.Res
@@ -25,14 +26,13 @@ import se.supernovait.doobypro.domain.model.order.OrderTab
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.CustomerRepository
-import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OrderViewModel(
-    private val orderRepository: OrderRepository,
+    private val savedStateHandle: SavedStateHandle,
     private val serviceRepository: ServiceRepository,
     private val storageLocationRepository: StorageLocationRepository,
     private val settingsRepository: SettingsRepository,
@@ -41,6 +41,7 @@ class OrderViewModel(
     private val orderQueryManager: OrderQueryManager
 ) : ViewModel() {
     private val _activeTab = MutableStateFlow(OrderTab.NEW)
+    private val _isArchive = MutableStateFlow(false)
     private val _orderSearchQuery = MutableStateFlow("")
     private val _customerSearchQuery = MutableStateFlow("")
     private val _isSaving = MutableStateFlow(false)
@@ -49,11 +50,14 @@ class OrderViewModel(
     private val _error = MutableStateFlow<StringResource?>(null)
 
     val uiState: StateFlow<OrderState> = combine(
-        _activeTab.flatMapLatest { orderQueryManager.getOrdersForTab(it) },
+        combine(_activeTab, _isArchive) { tab, archive ->
+            if (archive) orderQueryManager.getCancelledOrders() else orderQueryManager.getOrdersForTab(tab)
+        }.flatMapLatest { it },
         _activeTab,
+        _isArchive,
         _orderSearchQuery,
         _customerSearchQuery,
-        orderQueryManager.getOrderCountPerTab(),
+        orderQueryManager.getLateOrderCountPerTab(),
         settingsRepository.settings,
         serviceRepository.getServices(),
         storageLocationRepository.getActiveLocations(),
@@ -66,17 +70,18 @@ class OrderViewModel(
         @Suppress("UNCHECKED_CAST")
         val orders = args[0] as List<Order>
         val tab = args[1] as OrderTab
-        val orderQuery = args[2] as String
-        val customerQuery = args[3] as String
-        val counts = args[4] as Map<OrderTab, Int>
-        val settings = args[5] as Settings
-        val services = args[6] as List<Service>
-        val locations = args[7] as List<StorageLocation>
-        val allCustomers = args[8] as List<User>
-        val editing = args[9] as Order?
-        val addingCustomer = args[10] as Boolean
-        val saving = args[11] as Boolean
-        val error = args[12] as StringResource?
+        val archive = args[2] as Boolean
+        val orderQuery = args[3] as String
+        val customerQuery = args[4] as String
+        val lateCounts = args[5] as Map<OrderTab, Int>
+        val settings = args[6] as Settings
+        val services = args[7] as List<Service>
+        val locations = args[8] as List<StorageLocation>
+        val allCustomers = args[9] as List<User>
+        val editing = args[10] as Order?
+        val addingCustomer = args[11] as Boolean
+        val saving = args[12] as Boolean
+        val error = args[13] as StringResource?
 
         val filteredOrders = if (orderQuery.isBlank()) {
             orders
@@ -105,9 +110,10 @@ class OrderViewModel(
         OrderState(
             orders = filteredOrders,
             activeTab = tab,
+            isArchive = archive,
             searchQuery = orderQuery,
             customerSearchQuery = customerQuery,
-            orderCountPerTab = counts,
+            lateOrderCountPerTab = lateCounts,
             settings = settings.order,
             services = services,
             storageLocations = locations,
@@ -124,10 +130,23 @@ class OrderViewModel(
         initialValue = OrderState(isLoading = true)
     )
 
+    init {
+        // Observe reissue requests from navigation results
+        viewModelScope.launch {
+            savedStateHandle.getStateFlow<Order?>("reissue_order", null).collect { order ->
+                if (order != null) {
+                    reissueOrder(order)
+                    savedStateHandle["reissue_order"] = null // Clear result
+                }
+            }
+        }
+    }
+
     fun onEvent(event: OrderEvent) {
         when (event) {
             OrderEvent.LoadOrders -> { /* Handled by Flow */ }
             OrderEvent.CreateNewOrder -> startNewOrder()
+            is OrderEvent.ReissueOrder -> reissueOrder(event.order)
             is OrderEvent.EditOrder -> _editingOrder.value = event.order
             is OrderEvent.SaveOrder -> saveOrder(event.order)
             is OrderEvent.DeleteOrder -> deleteOrder(event.order)
@@ -138,6 +157,9 @@ class OrderViewModel(
             is OrderEvent.SelectCustomer -> selectCustomer(event.customer)
             OrderEvent.StartAddingCustomer -> _isAddingCustomer.value = true
             is OrderEvent.SaveNewCustomer -> saveNewCustomer(event.customer)
+            is OrderEvent.ViewOrderDetails -> { /* Handled by navigation */ }
+            OrderEvent.ViewCancelledOrders -> { /* Handled by navigation */ }
+            is OrderEvent.ToggleArchive -> _isArchive.value = event.isArchive
         }
     }
 
@@ -145,6 +167,13 @@ class OrderViewModel(
         _editingOrder.value = null
         _customerSearchQuery.value = ""
         _isAddingCustomer.value = false
+    }
+
+    private fun reissueOrder(order: Order) {
+        viewModelScope.launch {
+            val template = orderManager.reissueOrder(order)
+            _editingOrder.value = template
+        }
     }
 
     private fun selectCustomer(customer: User) {

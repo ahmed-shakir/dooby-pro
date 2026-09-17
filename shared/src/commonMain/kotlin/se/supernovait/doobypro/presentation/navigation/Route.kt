@@ -7,6 +7,7 @@ import doobypro.shared.generated.resources.navigation_item_orders_label
 import doobypro.shared.generated.resources.navigation_item_services_label
 import doobypro.shared.generated.resources.navigation_item_settings_label
 import doobypro.shared.generated.resources.navigation_item_storage_label
+import doobypro.shared.generated.resources.screen_Order_action_view_cancelled
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -86,6 +87,12 @@ sealed interface Route : NavigationRoute {
     }
 
     @Serializable
+    data object CancelledOrders : Route {
+        override val label = Res.string.screen_Order_action_view_cancelled
+        override val isTopLevel = false
+    }
+
+    @Serializable
     data class OrderDetails(val id: String) : Route {
         @Transient
         override val label = Res.string.navigation_item_orders_label
@@ -113,7 +120,7 @@ sealed interface Route : NavigationRoute {
         private val routes = listOf(
             Welcome, AccountSetup, AppInfo, Account, Support, Settings,
             SettingsCommon, SettingsOrder, SettingsReceipt, SettingsPrinter, SettingsNotifications,
-            Dashboard, Orders, OrderDetails(""), Services, ServiceDetails(""), StorageManagement
+            Dashboard, Orders, CancelledOrders, OrderDetails(""), Services, ServiceDetails(""), StorageManagement
         ).associateBy { it.name }
 
         fun startScreen(isAuthenticated: Boolean): Route {

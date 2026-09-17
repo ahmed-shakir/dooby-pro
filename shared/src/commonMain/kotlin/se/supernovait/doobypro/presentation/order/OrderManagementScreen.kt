@@ -1,21 +1,15 @@
 package se.supernovait.doobypro.presentation.order
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -23,49 +17,50 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_add
+import doobypro.shared.generated.resources.ic_archive
 import doobypro.shared.generated.resources.label_cancel
 import doobypro.shared.generated.resources.label_delete
 import doobypro.shared.generated.resources.screen_Order_action_add_order
+import doobypro.shared.generated.resources.screen_Order_action_view_cancelled
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_message
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_title
-import doobypro.shared.generated.resources.screen_Order_empty_state
-import doobypro.shared.generated.resources.screen_Order_search_hint
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.fab.LocalFabState
-import se.supernovait.app.core.ui.component.input.SupernovaSearchField
 import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
-import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.app.core.ui.component.topbar.LocalTopBarState
+import se.supernovait.app.core.ui.component.topbar.TopBarAction
 import se.supernovait.doobypro.domain.model.order.OrderTab
 import se.supernovait.doobypro.presentation.order.component.CustomerFormSheet
 import se.supernovait.doobypro.presentation.order.component.CustomerSearchSheet
 import se.supernovait.doobypro.presentation.order.component.OrderFormSheet
-import se.supernovait.doobypro.presentation.order.component.OrderItem
+import se.supernovait.doobypro.presentation.order.component.OrderListContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderManagementScreen(
     uiState: OrderState,
-    onEvent: (OrderEvent) -> Unit,
-    onOrderClick: (String) -> Unit
+    onEvent: (OrderEvent) -> Unit
 ) {
     val bottomSheetState = LocalBottomSheetState.current
     val fabState = LocalFabState.current
     val dialogState = LocalDialogState.current
+    val topBarState = LocalTopBarState.current
 
     val deleteColor = MaterialTheme.colorScheme.error
     val deleteTitle = stringResource(Res.string.screen_Order_dialog_delete_title)
     val deleteMessage = stringResource(Res.string.screen_Order_dialog_delete_message)
 
+    val archiveLabel = stringResource(Res.string.screen_Order_action_view_cancelled)
     val tabLabels = OrderTab.entries.associateWith { stringResource(it.label) }
 
     var showCustomerSheet by remember { mutableStateOf(false) }
-    
+
     // Track the latest uiState in a State object so that the bottom sheet lambdas
     // can reactively update without needing to call show() again.
     val currentOrderUiState = remember { mutableStateOf(uiState) }
@@ -80,7 +75,21 @@ fun OrderManagementScreen(
                 showCustomerSheet = true
             }
         )
-        onDispose {}
+        
+        topBarState.actions(
+            listOf(
+                TopBarAction(
+                    icon = Res.drawable.ic_archive,
+                    label = archiveLabel,
+                    contentDescription = archiveLabel,
+                    onClick = { onEvent(OrderEvent.ViewCancelledOrders) }
+                )
+            )
+        )
+
+        onDispose {
+            topBarState.actions(emptyList())
+        }
     }
 
     LaunchedEffect(showCustomerSheet) {
@@ -137,36 +146,39 @@ fun OrderManagementScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        SupernovaSearchField(
-            value = uiState.searchQuery,
-            onValueChange = { onEvent(OrderEvent.SearchOrders(it)) },
-            onSearch = { onEvent(OrderEvent.SearchOrders(it)) },
-            placeholder = stringResource(Res.string.screen_Order_search_hint),
-            modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.medium)
-        )
-
         PrimaryTabRow(
             selectedTabIndex = OrderTab.entries.indexOf(uiState.activeTab),
             containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.fillMaxWidth(),
             divider = {}
         ) {
             OrderTab.entries.forEach { tab ->
-                val count = uiState.orderCountPerTab[tab] ?: 0
+                val lateCount = uiState.lateOrderCountPerTab[tab] ?: 0
+                
                 Tab(
                     selected = uiState.activeTab == tab,
                     onClick = { onEvent(OrderEvent.SelectTab(tab)) },
                     text = {
                         BadgedBox(
                             badge = {
-                                if (count > 0) {
-                                    Badge { SupernovaLabel(text = count.toString()) }
+                                if (lateCount > 0) {
+                                    Badge(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                    ) {
+                                        Text(
+                                            text = lateCount.toString(),
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        )
+                                    }
                                 }
                             }
                         ) {
                             SupernovaLabel(
                                 text = tabLabels[tab] ?: tab.name,
-                                style = MaterialTheme.typography.labelLarge
+                                style = MaterialTheme.typography.labelSmall
                             )
                         }
                     }
@@ -174,61 +186,44 @@ fun OrderManagementScreen(
             }
         }
 
-        Box(modifier = Modifier.weight(1f)) {
-            if (uiState.orders.isEmpty() && !uiState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.large), contentAlignment = Alignment.Center) {
-                    SupernovaLabel(
-                        text = Res.string.screen_Order_empty_state,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyLarge
+        OrderListContent(
+            orders = uiState.orders,
+            isLoading = uiState.isLoading,
+            searchQuery = uiState.searchQuery,
+            onSearchChange = { onEvent(OrderEvent.SearchOrders(it)) },
+            onOrderClick = { onEvent(OrderEvent.ViewOrderDetails(it)) },
+            onEditOrder = { order ->
+                onEvent(OrderEvent.EditOrder(order))
+                bottomSheetState.show {
+                    val state = currentOrderUiState.value
+                    OrderFormSheet(
+                        order = order,
+                        customers = state.customers,
+                        services = state.services,
+                        storageLocations = state.storageLocations,
+                        settings = state.settings,
+                        onSave = { 
+                            onEvent(OrderEvent.SaveOrder(it))
+                            bottomSheetState.hide()
+                        },
+                        onDelete = {
+                            dialogState.showConfirmation(
+                                title = deleteTitle,
+                                message = deleteMessage,
+                                confirmLabel = Res.string.label_delete,
+                                dismissLabel = Res.string.label_cancel,
+                                primaryActionColor = deleteColor,
+                                onConfirm = {
+                                    onEvent(OrderEvent.DeleteOrder(order))
+                                    bottomSheetState.hide()
+                                    dialogState.hide()
+                                },
+                                onDismiss = { dialogState.hide() }
+                            )
+                        }
                     )
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = MaterialTheme.spacing.medium)
-                ) {
-                    items(uiState.orders) { order ->
-                        OrderItem(
-                            order = order,
-                            onClick = { onOrderClick(order.id!!) },
-                            onEdit = {
-                                onEvent(OrderEvent.EditOrder(order))
-                                bottomSheetState.show {
-                                    val state = currentOrderUiState.value
-                                    OrderFormSheet(
-                                        order = order,
-                                        customers = state.customers,
-                                        services = state.services,
-                                        storageLocations = state.storageLocations,
-                                        settings = state.settings,
-                                        onSave = { 
-                                            onEvent(OrderEvent.SaveOrder(it))
-                                            bottomSheetState.hide()
-                                        },
-                                        onDelete = {
-                                            dialogState.showConfirmation(
-                                                title = deleteTitle,
-                                                message = deleteMessage,
-                                                confirmLabel = Res.string.label_delete,
-                                                dismissLabel = Res.string.label_cancel,
-                                                primaryActionColor = deleteColor,
-                                                onConfirm = {
-                                                    onEvent(OrderEvent.DeleteOrder(order))
-                                                    bottomSheetState.hide()
-                                                    dialogState.hide()
-                                                },
-                                                onDismiss = { dialogState.hide() }
-                                            )
-                                        }
-                                    )
-                                }
-                            }
-                        )
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                    }
-                    item { Spacer(Modifier.height(MaterialTheme.spacing.x5Large)) }
-                }
             }
-        }
+        )
     }
 }

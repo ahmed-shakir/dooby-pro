@@ -65,6 +65,19 @@ class OrderManager(
     }
 
     /**
+     * Creates a new order based on an existing order (re-issue pattern).
+     */
+    suspend fun reissueOrder(originalOrder: Order): Order {
+        val template = createOrderTemplate(originalOrder.customer)
+        return template.copy(
+            service = originalOrder.service,
+            deliveryOption = originalOrder.deliveryOption,
+            deliveryMethod = originalOrder.deliveryMethod,
+            notes = originalOrder.notes
+        )
+    }
+
+    /**
      * Creates a new order, assigning storage and calculating expected times.
      */
     suspend fun createOrder(order: Order): Result<String, DataError> {
