@@ -11,7 +11,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_add
@@ -22,10 +21,10 @@ import doobypro.shared.generated.resources.screen_Storage_dialog_delete_message
 import doobypro.shared.generated.resources.screen_Storage_dialog_delete_title
 import doobypro.shared.generated.resources.screen_Storage_empty_state
 import org.jetbrains.compose.resources.stringResource
+import se.supernovait.app.core.ui.component.SupernovaEmptyState
 import se.supernovait.app.core.ui.component.fab.LocalFabState
 import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
-import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.presentation.storage.component.StorageLocationFormSheet
@@ -68,13 +67,9 @@ fun StorageManagementScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (uiState.locations.isEmpty() && !uiState.isLoading) {
-            Box(modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.large), contentAlignment = Alignment.Center) {
-                SupernovaLabel(
-                    text = Res.string.screen_Storage_empty_state,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+            SupernovaEmptyState(
+                titleRes = Res.string.screen_Storage_empty_state
+            )
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = MaterialTheme.spacing.medium)

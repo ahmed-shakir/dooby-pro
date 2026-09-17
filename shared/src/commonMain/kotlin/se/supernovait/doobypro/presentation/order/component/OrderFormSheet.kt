@@ -30,11 +30,10 @@ import doobypro.shared.generated.resources.screen_Order_field_notes
 import doobypro.shared.generated.resources.screen_Order_field_payment_status
 import doobypro.shared.generated.resources.screen_Order_field_service
 import doobypro.shared.generated.resources.screen_Order_field_storage
-import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
-import se.supernovait.app.core.ui.component.input.SupernovaDateField
+import se.supernovait.app.core.ui.component.input.SupernovaDatetimeField
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
@@ -119,17 +118,14 @@ fun OrderFormSheet(
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
         // 4. deliveryDatetime
-        SupernovaDateField(
-            value = deliveryDatetime.date,
-            onValueChange = { date, isValid ->
-                if (isValid && date != null) {
-                    deliveryDatetime = LocalDateTime(
-                        date = date,
-                        time = deliveryDatetime.time
-                    )
+        SupernovaDatetimeField(
+            label = stringResource(Res.string.screen_Order_field_delivery_date),
+            value = deliveryDatetime,
+            onValueChange = { datetime, isValid ->
+                if (isValid && datetime != null) {
+                    deliveryDatetime = datetime
                 }
-            },
-            label = stringResource(Res.string.screen_Order_field_delivery_date)
+            }
         )
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))

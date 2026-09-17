@@ -12,14 +12,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.screen_Order_empty_state
 import doobypro.shared.generated.resources.screen_Order_search_hint
 import org.jetbrains.compose.resources.stringResource
+import se.supernovait.app.core.ui.component.SupernovaEmptyState
 import se.supernovait.app.core.ui.component.input.SupernovaSearchField
-import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.order.Order
 
@@ -45,16 +44,9 @@ fun OrderListContent(
 
         Box(modifier = Modifier.weight(1f)) {
             if (orders.isEmpty() && !isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.large),
-                    contentAlignment = Alignment.Center
-                ) {
-                    SupernovaLabel(
-                        text = Res.string.screen_Order_empty_state,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+                SupernovaEmptyState(
+                    titleRes = Res.string.screen_Order_empty_state
+                )
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = MaterialTheme.spacing.medium)
