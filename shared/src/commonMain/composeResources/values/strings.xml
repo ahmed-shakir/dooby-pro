@@ -5,6 +5,7 @@
     <string name="app_developer_name">Ahmed Shakir</string>
 
     <string name="app_logo_content_description">App logo</string>
+    <string name="company_logo_content_description">Company Logo</string>
 
     <string name="app_action_back_label">Back</string>
 
@@ -340,6 +341,7 @@
     <string name="screen_Order_error_save_failed">Failed to save order</string>
     <string name="screen_Order_error_delete_failed">Failed to delete order</string>
     <string name="screen_Order_error_not_found">Order not found</string>
+    <string name="screen_Order_error_customer_save_failed">Failed to save customer details</string>
     <string name="screen_Order_empty_state">No orders yet. Create your first order to start tracking laundry progress.</string>
     <string name="screen_Order_search_hint">Search by ID or customer...</string>
     <string name="screen_Order_search_customer_title">Search Customer</string>

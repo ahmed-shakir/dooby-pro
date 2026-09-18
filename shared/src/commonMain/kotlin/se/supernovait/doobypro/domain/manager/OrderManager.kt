@@ -11,6 +11,7 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.extension.now
+import se.supernovait.app.core.domain.extension.truncateToMinutes
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
@@ -38,10 +39,11 @@ class OrderManager(
     suspend fun createOrderTemplate(customer: User): Order {
         val orderSettings = settingsRepository.settings.first().order
         val storageSettings = settingsRepository.settings.first().storage
-        val orderDatetime = LocalDateTime.now()
+        val orderDatetime = LocalDateTime.now().truncateToMinutes()
         val deliveryDatetime = Clock.System.now()
             .plus(orderSettings.defaultDeliveryDaysOffset, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             .toLocalDateTime(TimeZone.currentSystemDefault())
+            .truncateToMinutes()
 
         val defaultService = orderSettings.defaultServiceId?.let { id ->
             serviceRepository.getServiceById(id).let { result ->

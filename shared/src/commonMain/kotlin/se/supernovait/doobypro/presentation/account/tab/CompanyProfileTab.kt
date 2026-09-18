@@ -16,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -66,11 +65,12 @@ import se.supernovait.doobypro.presentation.account.AccountEvent
 import se.supernovait.doobypro.presentation.account.AccountState
 import se.supernovait.doobypro.presentation.account.component.AccountCard
 import se.supernovait.doobypro.presentation.account.component.AccountField
+import se.supernovait.doobypro.presentation.account.component.LogoImage
 
 /**
  * Tab displaying the company profile information, including branding, basic info, and contact details.
  *
- * @param state The current account state.
+ * @param uiState The current account state.
  * @param onEvent Callback to handle UI events.
  * @param modifier The modifier to be applied to the tab content.
  */
@@ -120,8 +120,10 @@ fun CompanyProfileTab(
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     if (logoUrl != null) {
-                        // TODO: use an image loader to display the actual logo image
-                        Text("Logo", style = MaterialTheme.typography.labelSmall)
+                        LogoImage(
+                            logoUrl = logoUrl,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     } else {
                         SupernovaIcon(
                             icon = Res.drawable.ic_info,

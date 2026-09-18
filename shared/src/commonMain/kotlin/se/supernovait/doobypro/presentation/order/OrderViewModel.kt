@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.screen_Order_error_customer_save_failed
 import doobypro.shared.generated.resources.screen_Order_error_delete_failed
 import doobypro.shared.generated.resources.screen_Order_error_save_failed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -193,7 +194,7 @@ class OrderViewModel(
                 _isAddingCustomer.value = false
                 selectCustomer(newUser)
             } else {
-                // TODO: Handle customer save error
+                _error.value = Res.string.screen_Order_error_customer_save_failed
             }
             _isSaving.value = false
         }

@@ -2,6 +2,7 @@ package se.supernovait.doobypro.presentation.navigation
 
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.navigation_item_account_label
+import doobypro.shared.generated.resources.navigation_item_app_info_label
 import doobypro.shared.generated.resources.navigation_item_cancelled_orders_label
 import doobypro.shared.generated.resources.navigation_item_dashboard_label
 import doobypro.shared.generated.resources.navigation_item_orders_label
@@ -36,6 +37,7 @@ sealed interface Route : NavigationRoute {
 
     @Serializable
     data object AppInfo : Route {
+        override val label = Res.string.navigation_item_app_info_label
         override val showTopBar = false
         override val showBottomBar = false
     }

@@ -31,7 +31,7 @@ fun DetailSection(
         )
 
         Row(
-            verticalAlignment = Alignment.Top,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
         ) {
             SupernovaLabel(
