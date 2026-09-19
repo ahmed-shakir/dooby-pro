@@ -29,6 +29,7 @@ import se.supernovait.app.core.domain.model.license.LicenseStatus
 import se.supernovait.app.core.ui.component.action.SupernovaButton
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.doobypro.presentation.account.AccountEvent
 import se.supernovait.doobypro.presentation.account.AccountState
 import se.supernovait.doobypro.presentation.account.component.AccountCard
 import se.supernovait.doobypro.presentation.account.component.AccountField
@@ -37,6 +38,7 @@ import se.supernovait.doobypro.presentation.app.theme.statusColor
 @Composable
 fun LicenseTab(
     uiState: AccountState,
+    onEvent: (AccountEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val license = uiState.account?.license
@@ -132,7 +134,7 @@ fun LicenseTab(
                 SupernovaButton(
                     icon = Res.drawable.ic_download,
                     label = Res.string.Account_LicenseTab_label_download_license,
-                    onClick = { /* TODO: add PDF download action */ },
+                    onClick = { onEvent(AccountEvent.DownloadLicensePdf) },
                     shape = MaterialTheme.shapes.extraSmall,
                     modifier = Modifier.fillMaxWidth()
                 )

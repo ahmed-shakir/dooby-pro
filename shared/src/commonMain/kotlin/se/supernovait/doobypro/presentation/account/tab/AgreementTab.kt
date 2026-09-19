@@ -72,7 +72,7 @@ fun AgreementTab(
             SupernovaButton(
                 icon = Res.drawable.ic_download,
                 label = Res.string.Account_AgreementTab_label_download_all,
-                onClick = { /* TODO: add PDF download action */ },
+                onClick = { onEvent(AccountEvent.DownloadAgreementsPdf) },
                 shape = MaterialTheme.shapes.extraSmall,
                 enabled = agreements.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth()

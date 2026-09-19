@@ -51,6 +51,9 @@ sealed interface AccountEvent {
     // Account Actions
     data object SignOut : AccountEvent
     data object DeactivateAccount : AccountEvent
+    data object DownloadAgreementsPdf : AccountEvent
+    data object DownloadLicensePdf : AccountEvent
+    data object ClearInfoMessage : AccountEvent
 
     // UI Events
     data class ToggleAgreementExpansion(val agreementId: String) : AccountEvent

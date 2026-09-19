@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.label_not_authenticated
+import doobypro.shared.generated.resources.screen_Account_agreements_download_success
 import doobypro.shared.generated.resources.screen_Account_error_delete_failed
 import doobypro.shared.generated.resources.screen_Account_error_load_failed
 import doobypro.shared.generated.resources.screen_Account_error_save_company_failed
 import doobypro.shared.generated.resources.screen_Account_error_save_user_failed
+import doobypro.shared.generated.resources.screen_Account_license_download_success
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +21,9 @@ import se.supernovait.app.core.domain.location.Address
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.repository.AccountRepository
 import se.supernovait.doobypro.domain.util.FileStorage
+import se.supernovait.doobypro.domain.util.PdfGenerator
+import se.supernovait.doobypro.domain.util.PdfSection
+import kotlin.time.Clock
 
 /**
  * ViewModel for managing account-related operations, including user profile updates,
@@ -27,7 +32,8 @@ import se.supernovait.doobypro.domain.util.FileStorage
 class AccountViewModel(
     private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository,
-    private val fileStorage: FileStorage
+    private val fileStorage: FileStorage,
+    private val pdfGenerator: PdfGenerator
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountState())
     val uiState: StateFlow<AccountState> = _uiState.asStateFlow()
@@ -73,7 +79,10 @@ class AccountViewModel(
             
             AccountEvent.SignOut -> signOut()
             AccountEvent.DeactivateAccount -> deactivateAccount()
+            AccountEvent.DownloadAgreementsPdf -> downloadAgreementsPdf()
+            AccountEvent.DownloadLicensePdf -> downloadLicensePdf()
             is AccountEvent.ToggleAgreementExpansion -> toggleAgreement(event.agreementId)
+            AccountEvent.ClearInfoMessage -> _uiState.update { it.copy(infoMessage = null) }
         }
     }
 
@@ -245,6 +254,77 @@ class AccountViewModel(
                 state.expandedAgreementIds + id
             }
             state.copy(expandedAgreementIds = newSet)
+        }
+    }
+
+    private fun downloadAgreementsPdf() {
+        val account = _uiState.value.account ?: return
+        val agreements = account.agreements
+        if (agreements.isEmpty()) return
+
+        viewModelScope.launch {
+            val sections = mutableListOf<PdfSection>()
+            sections.add(PdfSection.Header("User Information"))
+            sections.add(PdfSection.KeyValue("Name", "${account.user.firstname} ${account.user.lastname}"))
+            sections.add(PdfSection.KeyValue("Email", account.user.email))
+
+            sections.add(PdfSection.Header("Company Information"))
+            sections.add(PdfSection.KeyValue("Company", account.company.legalName))
+            sections.add(PdfSection.KeyValue("License", account.company.licenseNumber))
+
+            sections.add(PdfSection.Header("Agreements"))
+            agreements.forEach { agreement ->
+                sections.add(PdfSection.Header("Agreement ID: ${agreement.id}"))
+                sections.add(PdfSection.KeyValue("Status", agreement.status.toString()))
+                sections.add(PdfSection.KeyValue("Issue Date", agreement.issueDate.toString()))
+                agreement.cancellationDate?.let { sections.add(PdfSection.KeyValue("Cancellation Date", it.toString())) }
+                sections.add(PdfSection.KeyValue("Fee", agreement.fee.formatted))
+            }
+
+            val path = pdfGenerator.generatePdf(
+                fileName = "agreements_${account.id}.pdf",
+                title = "Dooby Pro Equipment Lease Agreements",
+                sections = sections
+            )
+            if (path != null) {
+                _uiState.update { it.copy(infoMessage = Res.string.screen_Account_agreements_download_success) }
+            }
+        }
+    }
+
+    private fun downloadLicensePdf() {
+        val account = _uiState.value.account ?: return
+        val license = account.license ?: return
+
+        viewModelScope.launch {
+            val sections = mutableListOf<PdfSection>()
+            sections.add(PdfSection.Header("User Information"))
+            sections.add(PdfSection.KeyValue("Name", "${account.user.firstname} ${account.user.lastname}"))
+            sections.add(PdfSection.KeyValue("Email", account.user.email))
+
+            sections.add(PdfSection.Header("Company Information"))
+            sections.add(PdfSection.KeyValue("Company", account.company.legalName))
+            sections.add(PdfSection.KeyValue("License", account.company.licenseNumber))
+
+            sections.add(PdfSection.Header("License Details"))
+            sections.add(PdfSection.KeyValue("License ID", license.id))
+            sections.add(PdfSection.KeyValue("Tier", license.tier.toString()))
+            sections.add(PdfSection.KeyValue("Status", license.licenseStatus.toString()))
+            sections.add(PdfSection.KeyValue("Issue Date", license.issueDate.toString()))
+            sections.add(PdfSection.KeyValue("Expiry Date", license.expiryDate.toString()))
+
+            sections.add(PdfSection.Header("Description"))
+            sections.add(PdfSection.Text(license.description))
+
+            val timestamp = Clock.System.now().toEpochMilliseconds()
+            val path = pdfGenerator.generatePdf(
+                fileName = "license_${account.id}_$timestamp.pdf",
+                title = license.title,
+                sections = sections
+            )
+            if (path != null) {
+                _uiState.update { it.copy(infoMessage = Res.string.screen_Account_license_download_success) }
+            }
         }
     }
 }

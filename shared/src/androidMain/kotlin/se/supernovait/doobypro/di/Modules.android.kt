@@ -4,9 +4,12 @@ import androidx.room.RoomDatabase
 import org.koin.dsl.module
 import se.supernovait.app.core.data.persistence.AndroidDatabaseManager
 import se.supernovait.doobypro.data.local.AppDatabase
+import se.supernovait.doobypro.domain.util.AndroidPdfGenerator
+import se.supernovait.doobypro.domain.util.PdfGenerator
 import se.supernovait.doobypro.domain.util.applicationContext
 
 actual val platformModule = module {
+    single<PdfGenerator> { AndroidPdfGenerator() }
     single<RoomDatabase.Builder<AppDatabase>> {
         val builder: RoomDatabase.Builder<AppDatabase> = AndroidDatabaseManager.createDatabaseBuilder(
             context = applicationContext,

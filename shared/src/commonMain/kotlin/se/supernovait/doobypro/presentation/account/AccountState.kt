@@ -40,6 +40,7 @@ data class AccountState(
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val error: StringResource? = null,
+    val infoMessage: StringResource? = null,
     
     // Form states (editable copies)
     val editUserFirstName: String = "",

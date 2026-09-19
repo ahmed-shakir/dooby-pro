@@ -23,6 +23,8 @@ import doobypro.shared.generated.resources.screen_Account_license_label
 import doobypro.shared.generated.resources.screen_Account_user_profile_label
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import se.supernovait.app.core.ui.component.snackbar.LocalSnackbarState
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.doobypro.presentation.account.component.ProfileHeroSection
 import se.supernovait.doobypro.presentation.account.tab.AgreementTab
@@ -42,6 +44,15 @@ fun AccountScreen(
         pageCount = { AccountTab.entries.size }
     )
     val coroutineScope = rememberCoroutineScope()
+    val snackbarState = LocalSnackbarState.current
+    val infoMessage = uiState.infoMessage?.let { stringResource(it) }
+
+    LaunchedEffect(infoMessage) {
+        infoMessage?.let {
+            snackbarState.show(it)
+            onEvent(AccountEvent.ClearInfoMessage)
+        }
+    }
 
     // Sync pager when uiState changes (e.g. from external sources)
     LaunchedEffect(uiState.currentTab) {
@@ -114,7 +125,7 @@ fun AccountScreen(
             when (page) {
                 0 -> UserProfileTab(uiState = uiState, onEvent = onEvent)
                 1 -> CompanyProfileTab(uiState = uiState, onEvent = onEvent)
-                2 -> LicenseTab(uiState = uiState)
+                2 -> LicenseTab(uiState = uiState, onEvent = onEvent)
                 3 -> AgreementTab(uiState = uiState, onEvent = onEvent)
             }
         }

@@ -1,5 +1,8 @@
 package se.supernovait.doobypro.presentation.account
 
+import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.screen_Account_agreements_download_success
+import doobypro.shared.generated.resources.screen_Account_license_download_success
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -12,6 +15,8 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.location.Address
+import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.domain.model.billing.BillingFrequency
 import se.supernovait.app.core.domain.model.license.License
 import se.supernovait.app.core.domain.model.license.LicenseStatus
 import se.supernovait.app.core.domain.model.license.Tier
@@ -24,7 +29,10 @@ import se.supernovait.doobypro.data.repository.fake.FakeCompanyRepository
 import se.supernovait.doobypro.data.repository.fake.FakeLicenseRepository
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.Company
+import se.supernovait.doobypro.domain.model.agreement.Agreement
+import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import se.supernovait.doobypro.util.FakeFileStorage
+import se.supernovait.doobypro.util.FakePdfGenerator
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -36,8 +44,10 @@ class AccountViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     
     private lateinit var authRepository: FakeAuthRepository
+    private lateinit var agreementRepository: FakeAgreementRepository
     private lateinit var accountRepository: AccountRepositoryImpl
     private lateinit var fileStorage: FakeFileStorage
+    private lateinit var pdfGenerator: FakePdfGenerator
     private lateinit var viewModel: AccountViewModel
 
     private val testUser = User(
@@ -71,16 +81,32 @@ class AccountViewModelTest {
         expiryDate = LocalDate(2027, 1, 1)
     )
 
+    private val testAgreement = Agreement(
+        id = "agr-123",
+        accountId = "comp-123",
+        status = AgreementStatus.ACTIVE,
+        equipmentId = "EQ-001",
+        equipmentModel = "SuperWasher 3000",
+        title = "Washer Lease",
+        description = "Lease for high-capacity washer",
+        billingFrequency = BillingFrequency.Monthly,
+        fee = Amount(100, "AED"),
+        deposit = Amount(500, "AED"),
+        issueDate = LocalDate(2026, 1, 1)
+    )
+
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         authRepository = FakeAuthRepository()
         fileStorage = FakeFileStorage()
+        pdfGenerator = FakePdfGenerator()
+        agreementRepository = FakeAgreementRepository()
         accountRepository = AccountRepositoryImpl(
             authRepository = authRepository,
             companyRepository = FakeCompanyRepository(),
             licenseRepository = FakeLicenseRepository(),
-            agreementRepository = FakeAgreementRepository(),
+            agreementRepository = agreementRepository,
             accountDao = FakeAccountDao(),
             userDao = FakeUserDao()
         )
@@ -88,10 +114,23 @@ class AccountViewModelTest {
         // Seed initial data for "current user"
         runTest(testDispatcher) {
             authRepository.signUp(testUser)
-            accountRepository.saveAccount(Account(user = testUser, company = testCompany, license = testLicense))
+            agreementRepository.saveAgreement(testAgreement)
+            accountRepository.saveAccount(
+                Account(
+                    user = testUser, 
+                    company = testCompany, 
+                    license = testLicense,
+                    agreements = listOf(testAgreement)
+                )
+            )
         }
 
-        viewModel = AccountViewModel(authRepository, accountRepository, fileStorage)
+        viewModel = AccountViewModel(authRepository, accountRepository, fileStorage, pdfGenerator)
+        
+        // Wait for initial load to start
+        runTest(testDispatcher) {
+            advanceUntilIdle()
+        }
     }
 
     @AfterTest
@@ -214,6 +253,60 @@ class AccountViewModelTest {
         viewModel.onEvent(AccountEvent.ExitEditMode)
         state = viewModel.uiState.first { it.editingCardId == null }
         assertEquals(null, state.editingCardId)
+        
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `DownloadAgreementsPdf event should call pdfGenerator`() = runTest(testDispatcher) {
+        // Wait for initial load with agreements
+        viewModel.uiState.first { it.account != null && it.account.agreements.isNotEmpty() }
+        val accountId = viewModel.uiState.value.account?.id ?: ""
+
+        viewModel.onEvent(AccountEvent.DownloadAgreementsPdf)
+        
+        val stateWithInfo = viewModel.uiState.first { it.infoMessage != null }
+
+        assertEquals(1, pdfGenerator.generatePdfCalledCount)
+        val fileName = pdfGenerator.lastGeneratedFileName ?: ""
+        assertEquals(true, fileName.startsWith("agreements_$accountId"))
+        assertEquals(true, fileName.endsWith(".pdf"))
+        assertEquals("Dooby Pro Equipment Lease Agreements", pdfGenerator.lastGeneratedTitle)
+        assertEquals(Res.string.screen_Account_agreements_download_success, stateWithInfo.infoMessage)
+    }
+
+    @Test
+    fun `DownloadLicensePdf event should call pdfGenerator`() = runTest(testDispatcher) {
+        // Wait for initial load
+        viewModel.uiState.first { it.account != null }
+        val accountId = viewModel.uiState.value.account?.id ?: ""
+
+        viewModel.onEvent(AccountEvent.DownloadLicensePdf)
+        
+        val stateWithInfo = viewModel.uiState.first { it.infoMessage != null }
+
+        assertEquals(1, pdfGenerator.generatePdfCalledCount)
+        val fileName = pdfGenerator.lastGeneratedFileName ?: ""
+        assertEquals(true, fileName.startsWith("license_$accountId"))
+        assertEquals(true, fileName.endsWith(".pdf"))
+        assertEquals(viewModel.uiState.value.account?.license?.title, pdfGenerator.lastGeneratedTitle)
+        assertEquals(Res.string.screen_Account_license_download_success, stateWithInfo.infoMessage)
+    }
+
+    @Test
+    fun `ClearInfoMessage event should reset infoMessage`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        
+        // Wait for account load
+        viewModel.uiState.first { it.account != null }
+        
+        viewModel.onEvent(AccountEvent.DownloadLicensePdf)
+        val stateWithInfo = viewModel.uiState.first { it.infoMessage != null }
+        assertNotNull(stateWithInfo.infoMessage)
+        
+        viewModel.onEvent(AccountEvent.ClearInfoMessage)
+        val stateCleared = viewModel.uiState.first { it.infoMessage == null }
+        assertEquals(null, stateCleared.infoMessage)
         
         collectJob.cancel()
     }

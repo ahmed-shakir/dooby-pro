@@ -246,6 +246,10 @@
     <string name="screen_Account_error_save_company_failed">Failed to save company profile</string>
     <string name="screen_Account_error_delete_failed">Failed to delete account</string>
 
+    <!-- Account Success Messages -->
+    <string name="screen_Account_agreements_download_success">Agreements PDF downloaded successfully</string>
+    <string name="screen_Account_license_download_success">License PDF downloaded successfully</string>
+
     <!-- Account User Profile -->
     <string name="Account_UserProfileTab_section_account">Account Information</string>
     <string name="Account_UserProfileTab_section_personal">Personal Information</string>
