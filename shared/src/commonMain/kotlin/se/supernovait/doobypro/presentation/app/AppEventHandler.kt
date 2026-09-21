@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.event.AppEvent
+import se.supernovait.app.core.domain.navigation.navigateWithRules
 import se.supernovait.app.core.ui.util.HandleAppEvents
 import se.supernovait.doobypro.presentation.navigation.Route
-import se.supernovait.doobypro.presentation.navigation.navigateWithRules
 
 @Composable
 fun AppEventHandler(

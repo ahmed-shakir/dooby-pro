@@ -58,16 +58,18 @@ fun NotificationScreen(
     val topBarState = LocalTopBarState.current
     val markAllReadLabel = stringResource(Res.string.screen_Notification_action_mark_all_read)
 
-    DisposableEffect(markAllReadLabel) {
+    DisposableEffect(uiState.notifications) {
         topBarState.actions(
-            listOf(
-                TopBarAction(
-                    icon = Res.drawable.ic_check_circle,
-                    label = markAllReadLabel,
-                    contentDescription = markAllReadLabel,
-                    onClick = { onEvent(NotificationEvent.MarkAllAsRead) }
+            if (uiState.notifications.isNotEmpty()) {
+                listOf(
+                    TopBarAction(
+                        icon = Res.drawable.ic_check_circle,
+                        label = markAllReadLabel,
+                        contentDescription = markAllReadLabel,
+                        onClick = { onEvent(NotificationEvent.MarkAllAsRead) }
+                    )
                 )
-            )
+            } else emptyList()
         )
         onDispose {
             topBarState.actions(emptyList())

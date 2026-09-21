@@ -9,7 +9,7 @@ app-version-name = "1.0.0"
 ###########################
 agp-version = "9.4.1"
 ksp-version = "2.3.10"
-supernova-version = "1.11.2"
+supernova-version = "1.11.4"
 # KOTLIN
 kotlin-version = "2.4.20"
 kotlinx-datetime-version = "0.8.0"
@@ -36,6 +36,7 @@ androidx-test-ext-version = "1.7.0"
 junit-version = "4.13.2"
 compose-test-version = "1.12.1"
 compose-multiplatform-test-version = "1.12.0"
+robolectric-version = "4.17"
 
 [libraries]
 supernova-app-core = { group = "se.supernovait.app", name = "app-core", version.ref = "supernova-version" }
@@ -86,6 +87,7 @@ androidx-test-core = { group = "androidx.test", name = "core", version.ref = "an
 compose-ui-test = { group = "org.jetbrains.compose.ui", name = "ui-test", version.ref = "compose-multiplatform-test-version" }
 compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "compose-test-version" }
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose-test-version" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric-version" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp-version" }

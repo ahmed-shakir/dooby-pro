@@ -8,5 +8,18 @@
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>se.supernovait.doobypro</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>doobypro</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

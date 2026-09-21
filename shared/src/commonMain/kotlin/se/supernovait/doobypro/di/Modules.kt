@@ -69,6 +69,10 @@ val sharedModule = module {
     singleOf(::SettingsRepositoryImpl).bind<SettingsRepository>()
     singleOf(::StorageLocationRepositoryImpl).bind<StorageLocationRepository>()
 
+    singleOf(::OrderManager)
+    singleOf(::OrderQueryManager)
+    singleOf(::StorageLocationManager)
+
     viewModelOf(::WelcomeViewModel)
     viewModelOf(::AccountSetupWizardViewModel)
     viewModelOf(::NotificationViewModel)
@@ -79,9 +83,6 @@ val sharedModule = module {
     viewModelOf(::ServiceViewModel)
     viewModelOf(::StorageViewModel)
 
-    singleOf(::OrderManager)
-    singleOf(::OrderQueryManager)
-    singleOf(::StorageLocationManager)
     single<FileStorage> { FileStorage() }
 
     single<List<ShareConfiguration>> {

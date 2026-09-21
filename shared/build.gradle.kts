@@ -37,6 +37,13 @@ kotlin {
         }
     }
 
+    @Suppress("UnstableApiUsage")
+    tasks.withType<Test>().configureEach {
+        if (name == "testAndroidHostTest") {
+            // This is a bit hacky but might work to pass the flag
+        }
+    }
+
     sourceSets {
         androidMain.dependencies {
             api(libs.androidx.startup)
@@ -85,11 +92,12 @@ kotlin {
             implementation(libs.ktor.client.mock)
             implementation(libs.koin.test)
         }
-        val androidHostTest by getting {
+        getByName("androidHostTest") {
             dependencies {
                 implementation(libs.androidx.test.core)
                 implementation(libs.compose.ui.test.junit4)
                 runtimeOnly(libs.compose.ui.test.manifest)
+                implementation(libs.robolectric)
             }
         }
     }

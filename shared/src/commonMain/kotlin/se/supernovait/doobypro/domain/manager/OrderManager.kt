@@ -46,9 +46,7 @@ class OrderManager(
             .truncateToMinutes()
 
         val defaultService = orderSettings.defaultServiceId?.let { id ->
-            serviceRepository.getServiceById(id).let { result ->
-                if (result is Result.Success) result.data else null
-            }
+            serviceRepository.getServiceById(id).getOrNull()
         } ?: Service()
 
         val defaultStorage = storageLocationRepository.getLocationById(storageSettings.defaultStorageLocationId).getOrNull()
@@ -123,7 +121,7 @@ class OrderManager(
                 storageLocationManager.releaseStorageLocation(order.data.storageLocation.id!!)
             }
         }
-        
+
         return result
     }
 

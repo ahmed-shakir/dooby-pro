@@ -43,7 +43,9 @@ import org.koin.compose.koinInject
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.AuthenticationState
 import se.supernovait.app.core.domain.connectivity.ConnectivityManager
+import se.supernovait.app.core.domain.navigation.navigateWithRules
 import se.supernovait.app.core.domain.notification.NotificationManager
+import se.supernovait.app.core.domain.sharing.DeepLinkHandler
 import se.supernovait.app.core.ui.component.drawer.LocalNavigationDrawerState
 import se.supernovait.app.core.ui.component.drawer.NavigationDrawerSection
 import se.supernovait.app.core.ui.component.fab.LocalFabState
@@ -58,7 +60,6 @@ import se.supernovait.doobypro.presentation.navigation.Route
 import se.supernovait.doobypro.presentation.navigation.accountGraph
 import se.supernovait.doobypro.presentation.navigation.introGraph
 import se.supernovait.doobypro.presentation.navigation.mainGraph
-import se.supernovait.doobypro.presentation.navigation.navigateWithRules
 import se.supernovait.doobypro.presentation.navigation.settingsGraph
 
 @Composable
@@ -73,6 +74,7 @@ fun AppRoot() {
         val isAuthenticated = authManager.isAuthenticated()
         val notificationManager = koinInject<NotificationManager>()
         val unreadCount by notificationManager.unreadCount.collectAsStateWithLifecycle(0)
+        val deepLinkHandler = koinInject<DeepLinkHandler>()
 
         val topBarState = LocalTopBarState.current
         val navigationBarState = LocalNavigationBarState.current
@@ -84,7 +86,7 @@ fun AppRoot() {
         val navController: NavHostController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
         val startScreen = Route.startScreen(isAuthenticated)
-        val currentScreen = Route.parse(backStackEntry?.destination?.route, startScreen)
+        val currentScreen = Route.parse(route = backStackEntry?.destination?.route, defaultRoute = startScreen)
 
         LaunchedEffect(currentScreen) {
             if (!currentScreen.showFab) {
@@ -97,6 +99,13 @@ fun AppRoot() {
                 navController.navigate(Route.Welcome) {
                     popUpTo(0) { inclusive = true }
                 }
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            deepLinkHandler.events.collect { sharedData ->
+                val route = Route.parse(sharedData.route, sharedData.data)
+                navController.navigate(route)
             }
         }
 

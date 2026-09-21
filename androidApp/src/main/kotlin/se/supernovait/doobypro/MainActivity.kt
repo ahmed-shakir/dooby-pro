@@ -1,5 +1,6 @@
 package se.supernovait.doobypro
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,10 +10,12 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import se.supernovait.app.core.domain.initialization.AppInitializer
+import se.supernovait.app.core.domain.sharing.DeepLinkHandler
 import se.supernovait.doobypro.presentation.app.App
 
 class MainActivity : ComponentActivity() {
     private val appInitializer: AppInitializer by inject()
+    private val deepLinkHandler: DeepLinkHandler by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -31,8 +34,21 @@ class MainActivity : ComponentActivity() {
             appInitializer.initialize()
         }
 
+        handleIntent(intent)
+
         setContent {
             App()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        intent?.data?.toString()?.let { url ->
+            deepLinkHandler.handleDeepLink(url)
         }
     }
 }

@@ -156,6 +156,10 @@
     <string name="screen_Notification_action_mark_read">Mark as read</string>
     <string name="screen_Notification_empty_state">No notifications</string>
 
+    <!-- Notification Messages -->
+    <string name="notification_order_updated_title">Order Updated</string>
+    <string name="notification_order_updated_message">Order %1$s status changed to %2$s</string>
+
     <!-- Settings Screen -->
     <string name="screen_Settings_common_label">Common</string>
     <string name="screen_Settings_common_description">Currency, date format, language and theme</string>

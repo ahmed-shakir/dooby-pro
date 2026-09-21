@@ -18,6 +18,9 @@ import doobypro.shared.generated.resources.navigation_item_settings_storage_labe
 import doobypro.shared.generated.resources.navigation_item_storage_label
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import se.supernovait.app.core.domain.navigation.NavigationRoute
+import se.supernovait.app.core.domain.navigation.NavigationRouteParser
+import se.supernovait.app.core.domain.navigation.ParameterizedRoute
 
 sealed interface Route : NavigationRoute {
 
@@ -124,10 +127,12 @@ sealed interface Route : NavigationRoute {
     }
 
     @Serializable
-    data class OrderDetails(val id: String) : Route {
+    data class OrderDetails(val id: String) : Route, ParameterizedRoute<Route> {
         @Transient
         override val label = Res.string.navigation_item_orders_label
         override val isTopLevel = false
+        override val param = id
+        override fun copyWithParam(param: String) = copy(id = param)
     }
 
     @Serializable
@@ -137,8 +142,10 @@ sealed interface Route : NavigationRoute {
     }
 
     @Serializable
-    data class ServiceDetails(val id: String) : Route {
+    data class ServiceDetails(val id: String) : Route, ParameterizedRoute<Route> {
         override val isTopLevel = false
+        override val param = id
+        override fun copyWithParam(param: String) = copy(id = param)
     }
 
     @Serializable
@@ -152,16 +159,17 @@ sealed interface Route : NavigationRoute {
             Welcome, AccountSetup, AppInfo, Support, Notifications, Account, Settings,
             SettingsCommon, SettingsOrder, SettingsStorage, SettingsReceipt, SettingsPrinter, SettingsNotification,
             Dashboard, Orders, CancelledOrders, OrderDetails(""), Services, ServiceDetails(""), StorageManagement
-        ).associateBy { it.name }
+        )
+
+        private val parser = NavigationRouteParser(routes)
+
+        fun parse(route: String?, data: String? = null, defaultRoute: Route = Welcome): Route {
+            return parser.parse(route, data, defaultRoute)
+        }
 
         fun startScreen(isAuthenticated: Boolean): Route {
             println("Navigation route - isAuthenticated: $isAuthenticated")
             return if (isAuthenticated) Dashboard else Welcome
-        }
-
-        fun parse(route: String?, defaultRoute: Route = Welcome): Route {
-            val routeName = route?.substringBefore("/")?.substringBefore("?")
-            return routes[routeName] ?: defaultRoute
         }
     }
 }

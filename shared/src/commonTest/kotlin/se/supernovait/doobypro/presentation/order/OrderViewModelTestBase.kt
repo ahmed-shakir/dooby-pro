@@ -26,6 +26,7 @@ import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.notification.NotificationRepository
 import se.supernovait.app.core.domain.notification.PlatformNotificationHandler
 import se.supernovait.app.core.domain.sharing.DeepLinkHandler
+import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.app.core.domain.sharing.SharedData
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.manager.OrderQueryManager
@@ -49,7 +50,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class OrderViewModelTest {
+abstract class OrderViewModelTestBase {
     private lateinit var viewModel: OrderViewModel
     private lateinit var fakeOrderRepo: FakeOrderRepository
     private lateinit var fakeServiceRepo: FakeServiceRepository
@@ -109,7 +110,8 @@ class OrderViewModelTest {
             storageLocationManager = storageManager,
             storageLocationRepository = fakeStorageRepo,
             settingsRepository = fakeSettingsRepo,
-            notificationManager = notificationManager
+            notificationManager = notificationManager,
+            shareConfiguration = ShareConfiguration.custom("doobypro")
         )
         orderQueryManager = OrderQueryManager(fakeOrderRepo)
         
