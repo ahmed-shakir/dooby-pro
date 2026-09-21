@@ -1,17 +1,25 @@
 package se.supernovait.doobypro.domain.manager
 
+import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.notification_order_updated_message
+import doobypro.shared.generated.resources.notification_order_updated_title
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.getString
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.extension.truncateToMinutes
+import se.supernovait.app.core.domain.model.notification.NotificationType
+import se.supernovait.app.core.domain.navigation.toUrl
+import se.supernovait.app.core.domain.notification.NotificationManager
+import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
@@ -20,6 +28,7 @@ import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
+import se.supernovait.doobypro.presentation.navigation.Route
 import kotlin.time.Clock
 
 /**
@@ -30,7 +39,9 @@ class OrderManager(
     private val serviceRepository: ServiceRepository,
     private val storageLocationManager: StorageLocationManager,
     private val storageLocationRepository: StorageLocationRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val notificationManager: NotificationManager,
+    private val shareConfiguration: ShareConfiguration
 ) {
 
     /**
@@ -114,11 +125,28 @@ class OrderManager(
      */
     suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus): Result<Unit, DataError> {
         val result = orderRepository.updateOrderStatus(orderId, newStatus)
-        
-        if (result is Result.Success && newStatus.isTerminal()) {
-            val order = orderRepository.getOrderById(orderId)
-            if (order is Result.Success) {
-                storageLocationManager.releaseStorageLocation(order.data.storageLocation.id!!)
+
+        if (result is Result.Success) {
+            val title = getString(Res.string.notification_order_updated_title)
+            val statusName = getString(newStatus.label)
+            val message = getString(Res.string.notification_order_updated_message, orderId, statusName)
+
+            // TODO: use notification settings to determine if notification should be sent/shown.
+            // TODO: test platform notification
+            // TODO: test notification deep-link
+            // TODO: investigate and fix notification icon badge issue
+            notificationManager.notify(
+                title = title,
+                message = message,
+                type = NotificationType.SUCCESS,
+                deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
+            )
+
+            if (newStatus.isTerminal()) {
+                val order = orderRepository.getOrderById(orderId)
+                if (order is Result.Success) {
+                    storageLocationManager.releaseStorageLocation(order.data.storageLocation.id!!)
+                }
             }
         }
 

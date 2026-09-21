@@ -43,6 +43,7 @@ import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
+import se.supernovait.doobypro.util.PlatformTestConfig
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -50,7 +51,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
-abstract class OrderViewModelTestBase {
+class OrderViewModelTest : PlatformTestConfig() {
     private lateinit var viewModel: OrderViewModel
     private lateinit var fakeOrderRepo: FakeOrderRepository
     private lateinit var fakeServiceRepo: FakeServiceRepository

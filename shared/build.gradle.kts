@@ -37,13 +37,6 @@ kotlin {
         }
     }
 
-    @Suppress("UnstableApiUsage")
-    tasks.withType<Test>().configureEach {
-        if (name == "testAndroidHostTest") {
-            // This is a bit hacky but might work to pass the flag
-        }
-    }
-
     sourceSets {
         androidMain.dependencies {
             api(libs.androidx.startup)

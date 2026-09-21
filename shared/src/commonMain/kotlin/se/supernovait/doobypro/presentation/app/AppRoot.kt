@@ -106,6 +106,7 @@ fun AppRoot() {
             deepLinkHandler.events.collect { sharedData ->
                 val route = Route.parse(sharedData.route, sharedData.data)
                 navController.navigate(route)
+                notificationManager.markAsRead(sharedData.data)
             }
         }
 
@@ -130,7 +131,7 @@ fun AppRoot() {
                 
                 topBarState.actions(
                     actions = actions,
-                    canNavigateBack = currentScreen != Route.Dashboard
+                    canNavigateBack = currentScreen != startScreen
                 )
                 topBarState.onNavigateUp { navController.navigateUp() }
                 topBarState.show()
@@ -222,7 +223,7 @@ fun AppRoot() {
                     ),
                     NavigationItem(
                         id = Route.AppInfo.name,
-                        label = Route.AppInfo.label ?: Res.string.app_name,
+                        label = Route.AppInfo.label,
                         icon = Res.drawable.ic_info,
                         selectedIcon = Res.drawable.ic_info_selected,
                         onClick = { navController.navigateWithRules(Route.AppInfo) }

@@ -2,7 +2,6 @@ package se.supernovait.doobypro.presentation.notification
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -23,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_check_circle
@@ -38,6 +38,7 @@ import doobypro.shared.generated.resources.screen_Notification_empty_state
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.model.notification.Notification
 import se.supernovait.app.core.domain.model.notification.NotificationType
+import se.supernovait.app.core.ui.component.SupernovaEmptyState
 import se.supernovait.app.core.ui.component.SupernovaIcon
 import se.supernovait.app.core.ui.component.list.SupernovaSwipeableItem
 import se.supernovait.app.core.ui.component.list.SwipeAction
@@ -77,9 +78,9 @@ fun NotificationScreen(
     }
 
     if (uiState.notifications.isEmpty() && !uiState.isLoading) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            SupernovaLabel(text = stringResource(Res.string.screen_Notification_empty_state))
-        }
+        SupernovaEmptyState(
+            titleRes = Res.string.screen_Notification_empty_state
+        )
     } else {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -90,16 +91,17 @@ fun NotificationScreen(
                 SupernovaSwipeableItem(
                     startAction = SwipeAction(
                         icon = Res.drawable.ic_read,
-                        backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                        backgroundColor = MaterialTheme.statusColor.info,
                         contentDescription = Res.string.screen_Notification_action_mark_read,
                         onSwipe = { onEvent(NotificationEvent.MarkAsRead(notification.id)) }
                     ),
                     endAction = SwipeAction(
                         icon = Res.drawable.ic_delete,
-                        backgroundColor = MaterialTheme.colorScheme.errorContainer,
+                        backgroundColor = MaterialTheme.statusColor.error,
                         contentDescription = Res.string.label_delete,
                         onSwipe = { onEvent(NotificationEvent.DeleteNotification(notification)) }
-                    )
+                    ),
+                    modifier = Modifier.clip(MaterialTheme.shapes.medium)
                 ) {
                     NotificationItem(
                         notification = notification
@@ -148,7 +150,7 @@ fun NotificationItem(
             if (!notification.isRead) {
                 Badge(
                     modifier = Modifier.size(MaterialTheme.spacing.small),
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = MaterialTheme.statusColor.info
                 )
             }
         }
