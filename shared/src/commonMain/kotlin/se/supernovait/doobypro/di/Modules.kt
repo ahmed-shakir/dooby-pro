@@ -7,10 +7,12 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import se.supernovait.app.core.data.persistence.DatabaseFactory
 import se.supernovait.app.core.data.persistence.dao.LicenseDao
+import se.supernovait.app.core.data.persistence.dao.NotificationDao
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.di.coreModule
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.initialization.InitializableDatabase
+import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.data.local.AppDatabase
 import se.supernovait.doobypro.data.local.dao.AccountDao
 import se.supernovait.doobypro.data.local.dao.AgreementDao
@@ -42,6 +44,7 @@ import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 import se.supernovait.doobypro.domain.util.FileStorage
 import se.supernovait.doobypro.presentation.account.AccountViewModel
+import se.supernovait.doobypro.presentation.notification.NotificationViewModel
 import se.supernovait.doobypro.presentation.order.OrderViewModel
 import se.supernovait.doobypro.presentation.order.details.OrderDetailsViewModel
 import se.supernovait.doobypro.presentation.service.ServiceViewModel
@@ -68,8 +71,9 @@ val sharedModule = module {
 
     viewModelOf(::WelcomeViewModel)
     viewModelOf(::AccountSetupWizardViewModel)
-    viewModelOf(::SettingsViewModel)
+    viewModelOf(::NotificationViewModel)
     viewModelOf(::AccountViewModel)
+    viewModelOf(::SettingsViewModel)
     viewModelOf(::OrderViewModel)
     viewModelOf(::OrderDetailsViewModel)
     viewModelOf(::ServiceViewModel)
@@ -79,6 +83,13 @@ val sharedModule = module {
     singleOf(::OrderQueryManager)
     singleOf(::StorageLocationManager)
     single<FileStorage> { FileStorage() }
+
+    single<List<ShareConfiguration>> {
+        listOf(
+            ShareConfiguration.custom("doobypro"),
+            ShareConfiguration.https(host = "doobypro.supernovait.se")
+        )
+    }
 
     single<AppDatabase> {
         DatabaseFactory.create(get())
@@ -106,6 +117,10 @@ val sharedModule = module {
 
     single<AgreementDao> {
         get<AppDatabase>().agreementDao()
+    }
+
+    single<NotificationDao> {
+        get<AppDatabase>().notificationDao()
     }
 
     single<OrderDao> {

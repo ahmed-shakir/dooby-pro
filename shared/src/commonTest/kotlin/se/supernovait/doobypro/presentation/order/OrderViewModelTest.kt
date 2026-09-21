@@ -1,10 +1,13 @@
 package se.supernovait.doobypro.presentation.order
 
 import androidx.lifecycle.SavedStateHandle
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -18,6 +21,12 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.domain.model.notification.Notification
+import se.supernovait.app.core.domain.notification.NotificationManager
+import se.supernovait.app.core.domain.notification.NotificationRepository
+import se.supernovait.app.core.domain.notification.PlatformNotificationHandler
+import se.supernovait.app.core.domain.sharing.DeepLinkHandler
+import se.supernovait.app.core.domain.sharing.SharedData
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.manager.OrderQueryManager
 import se.supernovait.doobypro.domain.manager.StorageLocationManager
@@ -48,6 +57,7 @@ class OrderViewModelTest {
     private lateinit var fakeSettingsRepo: FakeSettingsRepository
     private lateinit var fakeCustomerRepo: FakeCustomerRepository
     private lateinit var fakeUserDao: FakeUserDao
+    private lateinit var fakeNotificationRepo: FakeNotificationRepository
     private lateinit var orderManager: OrderManager
     private lateinit var orderQueryManager: OrderQueryManager
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -80,12 +90,27 @@ class OrderViewModelTest {
         fakeSettingsRepo = FakeSettingsRepository()
         fakeCustomerRepo = FakeCustomerRepository()
         fakeUserDao = FakeUserDao()
+        fakeNotificationRepo = FakeNotificationRepository()
         
         val storageManager = StorageLocationManager(
             fakeStorageRepo, fakeSettingsRepo
         )
+
+        val notificationManager = NotificationManager(
+            repository = fakeNotificationRepo,
+            platformHandler = FakePlatformNotificationHandler(),
+            deepLinkHandler = FakeDeepLinkHandler(),
+            managerScope = CoroutineScope(testDispatcher)
+        )
         
-        orderManager = OrderManager(fakeOrderRepo, fakeServiceRepo, storageManager, fakeStorageRepo, fakeSettingsRepo)
+        orderManager = OrderManager(
+            orderRepository = fakeOrderRepo,
+            serviceRepository = fakeServiceRepo,
+            storageLocationManager = storageManager,
+            storageLocationRepository = fakeStorageRepo,
+            settingsRepository = fakeSettingsRepo,
+            notificationManager = notificationManager
+        )
         orderQueryManager = OrderQueryManager(fakeOrderRepo)
         
         viewModel = OrderViewModel(
@@ -240,6 +265,25 @@ class OrderViewModelTest {
             return Result.Success(customer.id ?: "gen")
         }
         override suspend fun deleteCustomer(customer: User): Result<Unit, DataError> = Result.Success(Unit)
+    }
+
+    private class FakeNotificationRepository : NotificationRepository {
+        override fun getNotifications(): Flow<List<Notification>> = MutableStateFlow(emptyList())
+        override fun getUnreadCount(): Flow<Int> = MutableStateFlow(0)
+        override suspend fun markAsRead(id: String): Result<Unit, DataError> = Result.Success(Unit)
+        override suspend fun markAllAsRead(): Result<Unit, DataError> = Result.Success(Unit)
+        override suspend fun save(notification: Notification): Result<String, DataError> = Result.Success(notification.id)
+        override suspend fun delete(notification: Notification): Result<Unit, DataError> = Result.Success(Unit)
+        override suspend fun deleteAll(): Result<Unit, DataError> = Result.Success(Unit)
+    }
+
+    private class FakePlatformNotificationHandler : PlatformNotificationHandler {
+        override fun showNotification(notification: Notification) {}
+    }
+
+    private class FakeDeepLinkHandler : DeepLinkHandler {
+        override val events: SharedFlow<SharedData> = MutableSharedFlow()
+        override fun handleDeepLink(url: String) {}
     }
 
     private class FakeUserDao : UserDao {

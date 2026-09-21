@@ -9,8 +9,10 @@ import androidx.room.execSQL
 import androidx.room.useWriterConnection
 import se.supernovait.app.core.data.persistence.RoomConverters
 import se.supernovait.app.core.data.persistence.dao.LicenseDao
+import se.supernovait.app.core.data.persistence.dao.NotificationDao
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.data.persistence.entity.LicenseEntity
+import se.supernovait.app.core.data.persistence.entity.NotificationEntity
 import se.supernovait.app.core.data.persistence.entity.UserEntity
 import se.supernovait.app.core.domain.initialization.InitializableDatabase
 import se.supernovait.doobypro.data.local.dao.AccountDao
@@ -36,6 +38,7 @@ import se.supernovait.doobypro.domain.model.storage.StorageType
         LicenseEntity::class,
         AgreementEntity::class,
         AccountEntity::class,
+        NotificationEntity::class,
         OrderEntity::class,
         ServiceEntity::class,
         StorageLocationEntity::class
@@ -49,6 +52,7 @@ abstract class AppDatabase : RoomDatabase(), InitializableDatabase {
     abstract fun licenseDao(): LicenseDao
     abstract fun agreementDao(): AgreementDao
     abstract fun accountDao(): AccountDao
+    abstract fun notificationDao(): NotificationDao
     abstract fun orderDao(): OrderDao
     abstract fun serviceDao(): ServiceDao
     abstract fun storageLocationDao(): StorageLocationDao
@@ -93,6 +97,7 @@ suspend fun AppDatabase.clearAllTablesKmp() {
         connection.execSQL("DELETE FROM licenses")
         connection.execSQL("DELETE FROM agreements")
         connection.execSQL("DELETE FROM accounts")
+        connection.execSQL("DELETE FROM notifications")
         connection.execSQL("DELETE FROM orders")
         connection.execSQL("DELETE FROM services")
         connection.execSQL("DELETE FROM storage_locations")

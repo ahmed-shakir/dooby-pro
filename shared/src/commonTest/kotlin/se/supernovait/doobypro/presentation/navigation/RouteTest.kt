@@ -14,6 +14,7 @@ class RouteTest {
         assertEquals(Route.Welcome, Route.parse(Route.Welcome.name))
         assertEquals(Route.Dashboard, Route.parse(Route.Dashboard.name))
         assertEquals(Route.Orders, Route.parse(Route.Orders.name))
+        assertEquals(Route.Notifications, Route.parse(Route.Notifications.name))
         assertEquals(Route.Account, Route.parse(Route.Account.name))
         assertEquals(Route.Settings, Route.parse(Route.Settings.name))
     }
@@ -49,6 +50,7 @@ class RouteTest {
     fun `isTopLevel property should be correct for main routes`() {
         assertEquals(true, Route.Dashboard.isTopLevel)
         assertEquals(true, Route.Orders.isTopLevel)
+        assertEquals(true, Route.Notifications.isTopLevel)
         assertEquals(true, Route.Services.isTopLevel)
     }
 

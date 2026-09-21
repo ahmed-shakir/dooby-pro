@@ -8,6 +8,8 @@ import androidx.navigation.compose.composable
 import org.koin.compose.viewmodel.koinViewModel
 import se.supernovait.doobypro.presentation.app.AppEventHandler
 import se.supernovait.doobypro.presentation.info.AppInfoScreen
+import se.supernovait.doobypro.presentation.notification.NotificationScreen
+import se.supernovait.doobypro.presentation.notification.NotificationViewModel
 import se.supernovait.doobypro.presentation.welcome.SignInBottomSheet
 import se.supernovait.doobypro.presentation.welcome.WelcomeScreen
 import se.supernovait.doobypro.presentation.welcome.WelcomeScreenEvent
@@ -62,5 +64,11 @@ fun NavGraphBuilder.introGraph(
 
     composable<Route.AppInfo> {
         AppInfoScreen(onBack = { navController.popBackStack() })
+    }
+
+    composable<Route.Notifications> {
+        val viewModel = koinViewModel<NotificationViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        NotificationScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 }

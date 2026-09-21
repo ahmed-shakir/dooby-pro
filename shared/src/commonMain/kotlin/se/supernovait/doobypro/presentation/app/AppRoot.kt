@@ -22,6 +22,8 @@ import doobypro.shared.generated.resources.ic_info_selected
 import doobypro.shared.generated.resources.ic_logout
 import doobypro.shared.generated.resources.ic_menu
 import doobypro.shared.generated.resources.ic_menu_selected
+import doobypro.shared.generated.resources.ic_notification
+import doobypro.shared.generated.resources.ic_notification_selected
 import doobypro.shared.generated.resources.ic_order
 import doobypro.shared.generated.resources.ic_order_selected
 import doobypro.shared.generated.resources.ic_service
@@ -34,11 +36,14 @@ import doobypro.shared.generated.resources.ic_user_account
 import doobypro.shared.generated.resources.ic_user_account_selected
 import doobypro.shared.generated.resources.label_sign_out
 import doobypro.shared.generated.resources.navigation_item_menu_label
+import doobypro.shared.generated.resources.navigation_item_notifications_label
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.AuthenticationState
 import se.supernovait.app.core.domain.connectivity.ConnectivityManager
+import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.ui.component.drawer.LocalNavigationDrawerState
 import se.supernovait.app.core.ui.component.drawer.NavigationDrawerSection
 import se.supernovait.app.core.ui.component.fab.LocalFabState
@@ -46,6 +51,7 @@ import se.supernovait.app.core.ui.component.navigation.LocalNavigationBarState
 import se.supernovait.app.core.ui.component.navigation.NavigationItem
 import se.supernovait.app.core.ui.component.scaffold.SupernovaScaffold
 import se.supernovait.app.core.ui.component.topbar.LocalTopBarState
+import se.supernovait.app.core.ui.component.topbar.TopBarAction
 import se.supernovait.doobypro.AppConfig
 import se.supernovait.doobypro.presentation.common.preview.ScreenPreviewContainer
 import se.supernovait.doobypro.presentation.navigation.Route
@@ -65,11 +71,15 @@ fun AppRoot() {
         val authManager = koinInject<AuthenticationManager>()
         val authState by authManager.authState.collectAsStateWithLifecycle()
         val isAuthenticated = authManager.isAuthenticated()
+        val notificationManager = koinInject<NotificationManager>()
+        val unreadCount by notificationManager.unreadCount.collectAsStateWithLifecycle(0)
 
         val topBarState = LocalTopBarState.current
         val navigationBarState = LocalNavigationBarState.current
         val navigationDrawerState = LocalNavigationDrawerState.current
         val fabState = LocalFabState.current
+
+        val notificationsLabel = stringResource(Res.string.navigation_item_notifications_label)
 
         val navController: NavHostController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
@@ -90,13 +100,29 @@ fun AppRoot() {
             }
         }
 
-        LaunchedEffect(topBarState, currentScreen) {
+        LaunchedEffect(topBarState, currentScreen, unreadCount) {
             if (currentScreen.showTopBar) {
                 val title = if (currentScreen == Route.Dashboard) Res.string.app_name else currentScreen.label ?: Res.string.app_name
                 val icon = if (currentScreen == Route.Dashboard) Res.drawable.ic_app_icon else null
                 topBarState.title(title)
                 topBarState.icon(icon)
-                topBarState.actions(canNavigateBack = currentScreen != Route.Dashboard)
+                
+                val actions = mutableListOf<TopBarAction>()
+                if (isAuthenticated) {
+                    actions.add(
+                        TopBarAction(
+                            icon = Res.drawable.ic_notification,
+                            label = notificationsLabel,
+                            contentDescription = notificationsLabel,
+                            onClick = { navController.navigate(Route.Notifications) }
+                        )
+                    )
+                }
+                
+                topBarState.actions(
+                    actions = actions,
+                    canNavigateBack = currentScreen != Route.Dashboard
+                )
                 topBarState.onNavigateUp { navController.navigateUp() }
                 topBarState.show()
             } else {
@@ -178,11 +204,12 @@ fun AppRoot() {
                 )),
                 NavigationDrawerSection(items = listOf(
                     NavigationItem(
-                        id = Route.Account.name,
-                        label = Route.Account.label,
-                        icon = Res.drawable.ic_user_account,
-                        selectedIcon = Res.drawable.ic_user_account_selected,
-                        onClick = { navController.navigateWithRules(Route.Account) }
+                        id = Route.Notifications.name,
+                        label = Route.Notifications.label,
+                        icon = Res.drawable.ic_notification,
+                        selectedIcon = Res.drawable.ic_notification_selected,
+                        badgeCount = if (unreadCount > 0) unreadCount else null,
+                        onClick = { navController.navigateWithRules(Route.Notifications) }
                     ),
                     NavigationItem(
                         id = Route.AppInfo.name,
@@ -190,6 +217,15 @@ fun AppRoot() {
                         icon = Res.drawable.ic_info,
                         selectedIcon = Res.drawable.ic_info_selected,
                         onClick = { navController.navigateWithRules(Route.AppInfo) }
+                    )
+                )),
+                NavigationDrawerSection(items = listOf(
+                    NavigationItem(
+                        id = Route.Account.name,
+                        label = Route.Account.label,
+                        icon = Res.drawable.ic_user_account,
+                        selectedIcon = Res.drawable.ic_user_account_selected,
+                        onClick = { navController.navigateWithRules(Route.Account) }
                     ),
                     NavigationItem(
                         id = Route.Settings.name,

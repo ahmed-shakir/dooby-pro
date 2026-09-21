@@ -29,6 +29,7 @@
     <string name="navigation_item_settings_receipt_label">Receipt settings</string>
     <string name="navigation_item_settings_printer_label">Printer settings</string>
     <string name="navigation_item_settings_notification_label">Notification Settings</string>
+    <string name="navigation_item_notifications_label">Notifications</string>
 
     <!-- Delivery -->
     <string name="delivery_option_express">Express</string>
@@ -149,6 +150,11 @@
     <string name="screen_AppInfo_support_action_label">Send feedback</string>
     <string name="screen_AppInfo_copyright">© 2026 Supernova Technology AB</string>
     <string name="screen_AppInfo_check_updates_label">Check for updates</string>
+
+    <!-- Notification Screen -->
+    <string name="screen_Notification_action_mark_all_read">Mark all as read</string>
+    <string name="screen_Notification_action_mark_read">Mark as read</string>
+    <string name="screen_Notification_empty_state">No notifications</string>
 
     <!-- Settings Screen -->
     <string name="screen_Settings_common_label">Common</string>

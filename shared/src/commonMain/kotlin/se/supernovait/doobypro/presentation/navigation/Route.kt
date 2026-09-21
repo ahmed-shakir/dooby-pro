@@ -5,6 +5,7 @@ import doobypro.shared.generated.resources.navigation_item_account_label
 import doobypro.shared.generated.resources.navigation_item_app_info_label
 import doobypro.shared.generated.resources.navigation_item_cancelled_orders_label
 import doobypro.shared.generated.resources.navigation_item_dashboard_label
+import doobypro.shared.generated.resources.navigation_item_notifications_label
 import doobypro.shared.generated.resources.navigation_item_orders_label
 import doobypro.shared.generated.resources.navigation_item_services_label
 import doobypro.shared.generated.resources.navigation_item_settings_common_label
@@ -45,6 +46,11 @@ sealed interface Route : NavigationRoute {
     @Serializable
     data object Support : Route {
         override val showBottomBar = false
+    }
+
+    @Serializable
+    data object Notifications : Route {
+        override val label = Res.string.navigation_item_notifications_label
     }
 
     @Serializable
@@ -143,7 +149,7 @@ sealed interface Route : NavigationRoute {
 
     companion object {
         private val routes = listOf(
-            Welcome, AccountSetup, AppInfo, Account, Support, Settings,
+            Welcome, AccountSetup, AppInfo, Support, Notifications, Account, Settings,
             SettingsCommon, SettingsOrder, SettingsStorage, SettingsReceipt, SettingsPrinter, SettingsNotification,
             Dashboard, Orders, CancelledOrders, OrderDetails(""), Services, ServiceDetails(""), StorageManagement
         ).associateBy { it.name }
