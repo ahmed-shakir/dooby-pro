@@ -110,33 +110,38 @@ fun AppRoot() {
             }
         }
 
-        LaunchedEffect(topBarState, currentScreen, unreadCount) {
+        LaunchedEffect(topBarState, currentScreen, unreadCount, isAuthenticated) {
             if (currentScreen.showTopBar) {
                 val title = if (currentScreen == Route.Dashboard) Res.string.app_name else currentScreen.label ?: Res.string.app_name
                 val icon = if (currentScreen == Route.Dashboard) Res.drawable.ic_app_icon else null
                 topBarState.title(title)
                 topBarState.icon(icon)
-                
-                val actions = mutableListOf<TopBarAction>()
-                if (isAuthenticated) {
-                    actions.add(
-                        TopBarAction(
-                            icon = Res.drawable.ic_notification,
-                            label = notificationsLabel,
-                            contentDescription = notificationsLabel,
-                            onClick = { navController.navigate(Route.Notifications) }
-                        )
-                    )
-                }
-                
-                topBarState.actions(
-                    actions = actions,
-                    canNavigateBack = currentScreen != startScreen
-                )
+                topBarState.actions(canNavigateBack = currentScreen != startScreen)
                 topBarState.onNavigateUp { navController.navigateUp() }
                 topBarState.show()
             } else {
                 topBarState.hide()
+            }
+        }
+
+        // Global TopBar Actions (like Notifications) that should persist across screens
+        LaunchedEffect(topBarState.actions, unreadCount, isAuthenticated) {
+            if (isAuthenticated) {
+                // If the notification action is missing or the badge count is outdated, update the actions
+                val currentNotificationAction = topBarState.actions.find { it.icon == Res.drawable.ic_notification }
+                if (currentNotificationAction == null || currentNotificationAction.badgeCount != unreadCount) {
+                    val newAction = TopBarAction(
+                        icon = Res.drawable.ic_notification,
+                        label = notificationsLabel,
+                        contentDescription = notificationsLabel,
+                        badgeCount = if (unreadCount > 0) unreadCount else null,
+                        onClick = { navController.navigate(Route.Notifications) }
+                    )
+                    
+                    // Prepend or replace the notification action
+                    val otherActions = topBarState.actions.filter { it.icon != Res.drawable.ic_notification }
+                    topBarState.actions(listOf(newAction) + otherActions)
+                }
             }
         }
 

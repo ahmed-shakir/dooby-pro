@@ -159,6 +159,12 @@
     <!-- Notification Messages -->
     <string name="notification_order_updated_title">Order Updated</string>
     <string name="notification_order_updated_message">Order %1$s status changed to %2$s</string>
+    <string name="notification_order_late_title">Late Order</string>
+    <string name="notification_order_late_message">Order %1$s is past its delivery deadline</string>
+    <string name="notification_order_not_picked_up_title">Order Not Picked Up</string>
+    <string name="notification_order_not_picked_up_message">Order %1$s has not been picked up</string>
+    <string name="notification_order_not_delivered_title">Order Not Delivered</string>
+    <string name="notification_order_not_delivered_message">Order %1$s has not been delivered</string>
 
     <!-- Settings Screen -->
     <string name="screen_Settings_common_label">Common</string>

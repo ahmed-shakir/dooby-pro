@@ -37,13 +37,13 @@ class OrderQueryManager(
     }
 
     /**
-     * Calculates the count of late orders in each operational tab.
-     * An order is considered late if its delivery deadline has passed.
+     * Calculates the count of late or overdue orders in each operational tab.
+     * An order is considered late/overdue if its delivery deadline has passed.
      */
     fun getLateOrderCountPerTab(): Flow<Map<OrderTab, Int>> {
         return orderRepository.getOrders().map { orders ->
             OrderTab.entries.associateWith { tab ->
-                orders.filter { it.isLate() }.count { order ->
+                orders.filter { it.isLate() || it.isNotPickedUp() || it.isNotDelivered() }.count { order ->
                     when (tab) {
                         OrderTab.NEW -> order.status == OrderStatus.NEW
                         OrderTab.IN_PROGRESS -> order.status == OrderStatus.IN_PROGRESS

@@ -125,4 +125,56 @@ class OrderTest {
         assertFalse(createOrder(status = OrderStatus.DELIVERED).canDelete())
         assertFalse(createOrder(status = OrderStatus.CANCELLED).canDelete())
     }
+
+    @Test
+    fun `isLate - NEW, IN_PROGRESS or HOME_DELIVERY READY and OUT_FOR_DELIVERY orders past delivery date are late`() {
+        val pastDateTime = LocalDateTime(2000, 1, 1, 0, 0, 0)
+        val futureDateTime = LocalDateTime(2099, 1, 1, 0, 0, 0)
+
+        val newPastOrder = createOrder(status = OrderStatus.NEW).copy(deliveryDatetime = pastDateTime)
+        val inProgressPastOrder = createOrder(status = OrderStatus.IN_PROGRESS).copy(deliveryDatetime = pastDateTime)
+        val readyPickupPastOrder = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = pastDateTime)
+        val readyHomePastOrder = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = pastDateTime)
+        val outForDeliveryHomePastOrder = createOrder(status = OrderStatus.OUT_FOR_DELIVERY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = pastDateTime)
+        val newFutureOrder = createOrder(status = OrderStatus.NEW).copy(deliveryDatetime = futureDateTime)
+
+        assertTrue(newPastOrder.isLate())
+        assertTrue(inProgressPastOrder.isLate())
+        assertFalse(readyPickupPastOrder.isLate())
+        assertTrue(readyHomePastOrder.isLate())
+        assertTrue(outForDeliveryHomePastOrder.isLate())
+        assertFalse(newFutureOrder.isLate())
+    }
+
+    @Test
+    fun `isNotPickedUp - only IN_STORE_PICKUP orders in READY status past delivery date`() {
+        val pastDateTime = LocalDateTime(2000, 1, 1, 0, 0, 0)
+        val futureDateTime = LocalDateTime(2099, 1, 1, 0, 0, 0)
+
+        val readyPickupPast = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = pastDateTime)
+        val readyPickupFuture = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = futureDateTime)
+        val readyDeliveryPast = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = pastDateTime)
+        val newPickupPast = createOrder(status = OrderStatus.NEW, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = pastDateTime)
+
+        assertTrue(readyPickupPast.isNotPickedUp())
+        assertFalse(readyPickupFuture.isNotPickedUp())
+        assertFalse(readyDeliveryPast.isNotPickedUp())
+        assertFalse(newPickupPast.isNotPickedUp())
+    }
+
+    @Test
+    fun `isNotDelivered - only HOME_DELIVERY orders in READY status past delivery date`() {
+        val pastDateTime = LocalDateTime(2000, 1, 1, 0, 0, 0)
+        val futureDateTime = LocalDateTime(2099, 1, 1, 0, 0, 0)
+
+        val readyHomePast = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = pastDateTime)
+        val readyHomeFuture = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = futureDateTime)
+        val readyPickupPast = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = pastDateTime)
+        val deliveredHomePast = createOrder(status = OrderStatus.DELIVERED, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = pastDateTime)
+
+        assertTrue(readyHomePast.isNotDelivered())
+        assertFalse(readyHomeFuture.isNotDelivered())
+        assertFalse(readyPickupPast.isNotDelivered())
+        assertFalse(deliveredHomePast.isNotDelivered())
+    }
 }

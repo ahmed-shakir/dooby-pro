@@ -1,8 +1,15 @@
 package se.supernovait.doobypro.domain.manager
 
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.notification_order_late_message
+import doobypro.shared.generated.resources.notification_order_late_title
+import doobypro.shared.generated.resources.notification_order_not_delivered_message
+import doobypro.shared.generated.resources.notification_order_not_delivered_title
+import doobypro.shared.generated.resources.notification_order_not_picked_up_message
+import doobypro.shared.generated.resources.notification_order_not_picked_up_title
 import doobypro.shared.generated.resources.notification_order_updated_message
 import doobypro.shared.generated.resources.notification_order_updated_title
+import doobypro.shared.generated.resources.screen_Order_label_new_order
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
@@ -106,7 +113,20 @@ class OrderManager(
                 storageLocation = fullLocation
             )
             
-            orderRepository.saveOrder(finalizedOrder)
+            val result = orderRepository.saveOrder(finalizedOrder)
+            
+            if (result is Result.Success) {
+                val settings = settingsRepository.settings.first()
+                if (settings.notification.newOrders) {
+                    notificationManager.notify(
+                        title = getString(Res.string.screen_Order_label_new_order),
+                        message = getString(Res.string.notification_order_updated_message, result.data, getString(OrderStatus.NEW.label)),
+                        type = NotificationType.SUCCESS,
+                        deepLink = Route.OrderDetails(result.data).toUrl(shareConfiguration)
+                    )
+                }
+            }
+            result
         } catch (e: Exception) {
             Result.Failure(DataError.UNKNOWN)
         }
@@ -124,33 +144,95 @@ class OrderManager(
      * Updates an order's status and handles side effects (like storage release).
      */
     suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus): Result<Unit, DataError> {
+        val currentOrder = (orderRepository.getOrderById(orderId) as? Result.Success)?.data
         val result = orderRepository.updateOrderStatus(orderId, newStatus)
 
         if (result is Result.Success) {
-            val title = getString(Res.string.notification_order_updated_title)
-            val statusName = getString(newStatus.label)
-            val message = getString(Res.string.notification_order_updated_message, orderId, statusName)
+            val settings = settingsRepository.settings.first()
 
-            // TODO: use notification settings to determine if notification should be sent/shown.
-            // TODO: test platform notification
-            // TODO: test notification deep-link
-            // TODO: investigate and fix notification icon badge issue
-            notificationManager.notify(
-                title = title,
-                message = message,
-                type = NotificationType.SUCCESS,
-                deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
-            )
+            if (currentOrder?.status == OrderStatus.OUT_FOR_DELIVERY && newStatus == OrderStatus.READY) {
+                if (settings.notification.orderNotDelivered) {
+                    val title = getString(Res.string.notification_order_not_delivered_title)
+                    val message = getString(Res.string.notification_order_not_delivered_message, orderId)
+
+                    notificationManager.notify(
+                        title = title,
+                        message = message,
+                        type = NotificationType.WARNING,
+                        deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
+                    )
+                }
+            } else {
+                val shouldNotify = when (newStatus) {
+                    OrderStatus.READY -> settings.notification.readyOrders
+                    else -> false 
+                }
+
+                if (shouldNotify) {
+                    val title = getString(Res.string.notification_order_updated_title)
+                    val statusName = getString(newStatus.label)
+                    val message = getString(Res.string.notification_order_updated_message, orderId, statusName)
+
+                    notificationManager.notify(
+                        title = title,
+                        message = message,
+                        type = NotificationType.INFO,
+                        deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
+                    )
+                }
+            }
 
             if (newStatus.isTerminal()) {
-                val order = orderRepository.getOrderById(orderId)
-                if (order is Result.Success) {
-                    storageLocationManager.releaseStorageLocation(order.data.storageLocation.id!!)
+                if (currentOrder != null) {
+                    storageLocationManager.releaseStorageLocation(currentOrder.storageLocation.id!!)
                 }
             }
         }
 
         return result
+    }
+
+    /**
+     * Checks active orders and sends notifications for late orders, orders not picked up, and orders not delivered
+     * based on notification settings.
+     */
+    suspend fun checkAndNotifyOrderAlerts() {
+        val settings = settingsRepository.settings.first()
+        val orders = orderRepository.getOrders().first()
+
+        orders.forEach { order ->
+            val orderId = order.id ?: return@forEach
+            val deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
+
+            if (settings.notification.lateOrders && order.isLate()) {
+                val title = getString(Res.string.notification_order_late_title)
+                val message = getString(Res.string.notification_order_late_message, orderId)
+                notificationManager.notify(
+                    title = title,
+                    message = message,
+                    type = NotificationType.WARNING,
+                    deepLink = deepLink
+                )
+            } else if (settings.notification.orderNotPickedUp && order.isNotPickedUp()) {
+                val title = getString(Res.string.notification_order_not_picked_up_title)
+                val message = getString(Res.string.notification_order_not_picked_up_message, orderId)
+                notificationManager.notify(
+                    title = title,
+                    message = message,
+                    type = NotificationType.WARNING,
+                    deepLink = deepLink
+                )
+            } else if (settings.notification.orderNotDelivered && order.isNotDelivered()) {
+                val title = getString(Res.string.notification_order_not_delivered_title)
+                val message = getString(Res.string.notification_order_not_delivered_message, orderId)
+                notificationManager.notify(
+                    title = title,
+                    message = message,
+                    type = NotificationType.WARNING,
+                    deepLink = deepLink
+                )
+            }
+        }
     }
 
     /**

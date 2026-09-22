@@ -62,8 +62,34 @@ data class Order(
 
     /**
      * Checks if the order is considered late based on the current time.
+     * Late orders are orders in status NEW or IN_PROGRESS, or HOME_DELIVERY orders in READY or OUT_FOR_DELIVERY status,
+     * that are later than the delivery date.
      */
     fun isLate(): Boolean {
-        return deliveryDatetime < LocalDateTime.now() && !status.isTerminal()
+        val isLate = deliveryDatetime < LocalDateTime.now() && !status.isTerminal()
+        val isNotReady = status == OrderStatus.NEW || status == OrderStatus.IN_PROGRESS
+        val isHomeDelivery = deliveryMethod == DeliveryMethod.HOME_DELIVERY
+        val isNotDelivered = isHomeDelivery && (status == OrderStatus.READY || status == OrderStatus.OUT_FOR_DELIVERY)
+
+        return isLate && (isNotReady || isNotDelivered)
+    }
+
+    /**
+     * Checks if the order is not picked up based on the current time.
+     * Not picked up is for orders with delivery method IN_STORE_PICKUP, status READY, and current datetime is after delivery datetime.
+     */
+    fun isNotPickedUp(): Boolean {
+        return deliveryMethod == DeliveryMethod.IN_STORE_PICKUP &&
+            status == OrderStatus.READY &&
+            deliveryDatetime < LocalDateTime.now()
+    }
+
+    /**
+     * Checks if the order is not delivered based on the current time.
+     */
+    fun isNotDelivered(): Boolean {
+        return deliveryMethod == DeliveryMethod.HOME_DELIVERY &&
+            status == OrderStatus.READY &&
+            deliveryDatetime < LocalDateTime.now()
     }
 }
