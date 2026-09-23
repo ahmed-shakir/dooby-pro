@@ -358,6 +358,7 @@
     <string name="screen_Order_action_next_status_ready_pickup">Mark as Picked Up</string>
     <string name="screen_Order_action_next_status_ready_delivery">Dispatch for Delivery</string>
     <string name="screen_Order_action_next_status_out_for_delivery">Deliver Order</string>
+    <string name="screen_Order_action_delivery_failed">Delivery Failed (Return to Ready)</string>
     <string name="screen_Order_error_save_failed">Failed to save order</string>
     <string name="screen_Order_error_delete_failed">Failed to delete order</string>
     <string name="screen_Order_error_not_found">Order not found</string>

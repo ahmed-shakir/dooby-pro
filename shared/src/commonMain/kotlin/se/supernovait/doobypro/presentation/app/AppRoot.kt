@@ -43,7 +43,6 @@ import org.koin.compose.koinInject
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.AuthenticationState
 import se.supernovait.app.core.domain.connectivity.ConnectivityManager
-import se.supernovait.app.core.domain.navigation.navigateWithRules
 import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.sharing.DeepLinkHandler
 import se.supernovait.app.core.ui.component.drawer.LocalNavigationDrawerState
@@ -55,11 +54,13 @@ import se.supernovait.app.core.ui.component.scaffold.SupernovaScaffold
 import se.supernovait.app.core.ui.component.topbar.LocalTopBarState
 import se.supernovait.app.core.ui.component.topbar.TopBarAction
 import se.supernovait.doobypro.AppConfig
+import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.presentation.common.preview.ScreenPreviewContainer
 import se.supernovait.doobypro.presentation.navigation.Route
 import se.supernovait.doobypro.presentation.navigation.accountGraph
 import se.supernovait.doobypro.presentation.navigation.introGraph
 import se.supernovait.doobypro.presentation.navigation.mainGraph
+import se.supernovait.doobypro.presentation.navigation.navigateWithRules
 import se.supernovait.doobypro.presentation.navigation.settingsGraph
 
 @Composable
@@ -75,6 +76,7 @@ fun AppRoot() {
         val notificationManager = koinInject<NotificationManager>()
         val unreadCount by notificationManager.unreadCount.collectAsStateWithLifecycle(0)
         val deepLinkHandler = koinInject<DeepLinkHandler>()
+        val orderManager = koinInject<OrderManager>()
 
         val topBarState = LocalTopBarState.current
         val navigationBarState = LocalNavigationBarState.current
@@ -94,6 +96,12 @@ fun AppRoot() {
             }
         }
 
+        LaunchedEffect(isAuthenticated) {
+            if (isAuthenticated) {
+                orderManager.checkAndNotifyOrderAlerts()
+            }
+        }
+
         LaunchedEffect(authState) {
             if (authState is AuthenticationState.NotAuthenticated && currentScreen != Route.Welcome) {
                 navController.navigate(Route.Welcome) {
@@ -110,38 +118,31 @@ fun AppRoot() {
             }
         }
 
-        LaunchedEffect(topBarState, currentScreen, unreadCount, isAuthenticated) {
+        LaunchedEffect(topBarState, currentScreen) {
             if (currentScreen.showTopBar) {
                 val title = if (currentScreen == Route.Dashboard) Res.string.app_name else currentScreen.label ?: Res.string.app_name
                 val icon = if (currentScreen == Route.Dashboard) Res.drawable.ic_app_icon else null
                 topBarState.title(title)
                 topBarState.icon(icon)
-                topBarState.actions(canNavigateBack = currentScreen != startScreen)
-                topBarState.onNavigateUp { navController.navigateUp() }
+                topBarState.onNavigateUp(canNavigateBack = currentScreen != startScreen) { navController.navigateUp() }
                 topBarState.show()
             } else {
                 topBarState.hide()
             }
         }
 
-        // Global TopBar Actions (like Notifications) that should persist across screens
-        LaunchedEffect(topBarState.actions, unreadCount, isAuthenticated) {
-            if (isAuthenticated) {
-                // If the notification action is missing or the badge count is outdated, update the actions
-                val currentNotificationAction = topBarState.actions.find { it.icon == Res.drawable.ic_notification }
-                if (currentNotificationAction == null || currentNotificationAction.badgeCount != unreadCount) {
-                    val newAction = TopBarAction(
-                        icon = Res.drawable.ic_notification,
-                        label = notificationsLabel,
-                        contentDescription = notificationsLabel,
-                        badgeCount = if (unreadCount > 0) unreadCount else null,
-                        onClick = { navController.navigate(Route.Notifications) }
-                    )
-                    
-                    // Prepend or replace the notification action
-                    val otherActions = topBarState.actions.filter { it.icon != Res.drawable.ic_notification }
-                    topBarState.actions(listOf(newAction) + otherActions)
-                }
+        LaunchedEffect(currentScreen, unreadCount, isAuthenticated) {
+            if (isAuthenticated && currentScreen.showNotificationAction) {
+                val notificationAction = TopBarAction(
+                    icon = Res.drawable.ic_notification,
+                    label = notificationsLabel,
+                    contentDescription = notificationsLabel,
+                    badgeCount = if (unreadCount > 0) unreadCount else null,
+                    onClick = { navController.navigate(Route.Notifications) }
+                )
+                topBarState.actions(actions = listOf(notificationAction))
+            } else if (!currentScreen.showNotificationAction && currentScreen != Route.Orders && currentScreen != Route.Notifications) {
+                topBarState.actions(emptyList())
             }
         }
 
@@ -182,7 +183,7 @@ fun AppRoot() {
             }
         }
 
-        LaunchedEffect(navigationDrawerState, currentScreen) {
+        LaunchedEffect(navigationDrawerState, currentScreen, unreadCount) {
             navigationDrawerState.header(title = Res.string.app_name, icon = Res.drawable.ic_app_icon)
             navigationDrawerState.appVersion(AppConfig.VERSION_NAME)
 

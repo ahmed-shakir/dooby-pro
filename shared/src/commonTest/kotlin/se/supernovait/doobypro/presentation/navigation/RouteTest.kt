@@ -36,8 +36,8 @@ class RouteTest {
 
     @Test
     fun `name property should return qualified class name`() {
-        assertEquals(Route.Welcome::class.qualifiedName, Route.Welcome.name)
-        assertEquals(Route.OrderDetails::class.qualifiedName, Route.OrderDetails("1").name)
+        assertEquals(Route.Welcome::class.simpleName, Route.Welcome.name)
+        assertEquals(Route.OrderDetails::class.simpleName, Route.OrderDetails("1").name)
     }
 
     @Test

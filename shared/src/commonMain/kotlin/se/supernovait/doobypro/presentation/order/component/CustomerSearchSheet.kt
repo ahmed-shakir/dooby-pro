@@ -56,6 +56,7 @@ fun CustomerSearchSheet(
             SupernovaIconButton(
                 icon = Res.drawable.ic_add,
                 contentDescription = stringResource(Res.string.screen_Order_label_add_new_customer),
+                tint = MaterialTheme.colorScheme.onSurface,
                 onClick = onAddClick
             )
         }

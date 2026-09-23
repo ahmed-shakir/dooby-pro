@@ -140,6 +140,7 @@ fun OrderDetailsScreen(
         OrderActions(
             order = order,
             onNextStatus = { onEvent(OrderDetailsEvent.TransitionToNextStatus) },
+            onDeliveryFailed = { onEvent(OrderDetailsEvent.DeliveryFailed) },
             onCancel = {
                 dialogState.showConfirmation(
                     message = cancelMessage,

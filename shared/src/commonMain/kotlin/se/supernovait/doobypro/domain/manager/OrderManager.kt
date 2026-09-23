@@ -114,10 +114,10 @@ class OrderManager(
             )
             
             val result = orderRepository.saveOrder(finalizedOrder)
-            
+
             if (result is Result.Success) {
                 val settings = settingsRepository.settings.first()
-                if (settings.notification.newOrders) {
+                if (settings.notification.newOrders && order.id == null) {
                     notificationManager.notify(
                         title = getString(Res.string.screen_Order_label_new_order),
                         message = getString(Res.string.notification_order_updated_message, result.data, getString(OrderStatus.NEW.label)),
@@ -150,36 +150,22 @@ class OrderManager(
         if (result is Result.Success) {
             val settings = settingsRepository.settings.first()
 
-            if (currentOrder?.status == OrderStatus.OUT_FOR_DELIVERY && newStatus == OrderStatus.READY) {
-                if (settings.notification.orderNotDelivered) {
-                    val title = getString(Res.string.notification_order_not_delivered_title)
-                    val message = getString(Res.string.notification_order_not_delivered_message, orderId)
+            val shouldNotify = when (newStatus) {
+                OrderStatus.READY -> settings.notification.readyOrders
+                else -> false
+            }
 
-                    notificationManager.notify(
-                        title = title,
-                        message = message,
-                        type = NotificationType.WARNING,
-                        deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
-                    )
-                }
-            } else {
-                val shouldNotify = when (newStatus) {
-                    OrderStatus.READY -> settings.notification.readyOrders
-                    else -> false 
-                }
+            if (shouldNotify) {
+                val title = getString(Res.string.notification_order_updated_title)
+                val statusName = getString(newStatus.label)
+                val message = getString(Res.string.notification_order_updated_message, orderId, statusName)
 
-                if (shouldNotify) {
-                    val title = getString(Res.string.notification_order_updated_title)
-                    val statusName = getString(newStatus.label)
-                    val message = getString(Res.string.notification_order_updated_message, orderId, statusName)
-
-                    notificationManager.notify(
-                        title = title,
-                        message = message,
-                        type = NotificationType.INFO,
-                        deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
-                    )
-                }
+                notificationManager.notify(
+                    title = title,
+                    message = message,
+                    type = NotificationType.INFO,
+                    deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
+                )
             }
 
             if (newStatus.isTerminal()) {
@@ -193,44 +179,78 @@ class OrderManager(
     }
 
     /**
+     * Triggers a "Not Delivered" warning notification if enabled in notification settings.
+     */
+    suspend fun notifyOrderNotDelivered(orderId: String) {
+        val settings = settingsRepository.settings.first()
+        if (settings.notification.orderNotDelivered) {
+            val title = getString(Res.string.notification_order_not_delivered_title)
+            val message = getString(Res.string.notification_order_not_delivered_message, orderId)
+
+            notificationManager.notify(
+                title = title,
+                message = message,
+                type = NotificationType.WARNING,
+                deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
+            )
+        }
+    }
+
+    /**
      * Checks active orders and sends notifications for late orders, orders not picked up, and orders not delivered
-     * based on notification settings.
+     * based on notification settings. Each alert type per order is sent at most once per day until resolved.
      */
     suspend fun checkAndNotifyOrderAlerts() {
         val settings = settingsRepository.settings.first()
         val orders = orderRepository.getOrders().first()
+        val allNotifications = notificationManager.notifications.first()
+        val today = LocalDateTime.now().date
 
         orders.forEach { order ->
             val orderId = order.id ?: return@forEach
             val deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
 
+            fun isAlreadyNotifiedToday(title: String): Boolean {
+                return allNotifications.any { notification ->
+                    notification.title == title &&
+                        notification.deepLink == deepLink &&
+                        notification.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == today
+                }
+            }
+
             if (settings.notification.lateOrders && order.isLate()) {
                 val title = getString(Res.string.notification_order_late_title)
-                val message = getString(Res.string.notification_order_late_message, orderId)
-                notificationManager.notify(
-                    title = title,
-                    message = message,
-                    type = NotificationType.WARNING,
-                    deepLink = deepLink
-                )
+                if (!isAlreadyNotifiedToday(title)) {
+                    val message = getString(Res.string.notification_order_late_message, orderId)
+                    notificationManager.notify(
+                        title = title,
+                        message = message,
+                        type = NotificationType.WARNING,
+                        deepLink = deepLink
+                    )
+                }
             } else if (settings.notification.orderNotPickedUp && order.isNotPickedUp()) {
                 val title = getString(Res.string.notification_order_not_picked_up_title)
-                val message = getString(Res.string.notification_order_not_picked_up_message, orderId)
-                notificationManager.notify(
-                    title = title,
-                    message = message,
-                    type = NotificationType.WARNING,
-                    deepLink = deepLink
-                )
+                if (!isAlreadyNotifiedToday(title)) {
+                    val message = getString(Res.string.notification_order_not_picked_up_message, orderId)
+                    notificationManager.notify(
+                        title = title,
+                        message = message,
+                        type = NotificationType.WARNING,
+                        deepLink = deepLink
+                    )
+                }
             } else if (settings.notification.orderNotDelivered && order.isNotDelivered()) {
                 val title = getString(Res.string.notification_order_not_delivered_title)
-                val message = getString(Res.string.notification_order_not_delivered_message, orderId)
-                notificationManager.notify(
-                    title = title,
-                    message = message,
-                    type = NotificationType.WARNING,
-                    deepLink = deepLink
-                )
+                if (!isAlreadyNotifiedToday(title)) {
+                    val message = getString(Res.string.notification_order_not_delivered_message, orderId)
+                    notificationManager.notify(
+                        title = title,
+                        message = message,
+                        type = NotificationType.WARNING,
+                        deepLink = deepLink
+                    )
+                }
             }
         }
     }

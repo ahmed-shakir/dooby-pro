@@ -17,6 +17,7 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.presentation.navigation.Route
 
@@ -42,6 +43,7 @@ class OrderDetailsViewModel(
         when (event) {
             OrderDetailsEvent.LoadOrder -> loadOrder()
             OrderDetailsEvent.TransitionToNextStatus -> transitionStatus()
+            OrderDetailsEvent.DeliveryFailed -> deliveryFailed()
             OrderDetailsEvent.CancelOrder -> cancelOrder()
             OrderDetailsEvent.DeleteOrder -> deleteOrder()
             OrderDetailsEvent.ReissueOrder -> { /* Handled by navigation */ }
@@ -66,6 +68,16 @@ class OrderDetailsViewModel(
         viewModelScope.launch {
             val order = _uiState.value.order ?: return@launch
             orderManager.transitionToNextStatus(order)
+            loadOrder() // Refresh
+        }
+    }
+
+    private fun deliveryFailed() {
+        viewModelScope.launch {
+            val order = _uiState.value.order ?: return@launch
+            val orderId = order.id ?: return@launch
+            orderManager.updateOrderStatus(orderId, OrderStatus.READY)
+            orderManager.notifyOrderNotDelivered(orderId)
             loadOrder() // Refresh
         }
     }

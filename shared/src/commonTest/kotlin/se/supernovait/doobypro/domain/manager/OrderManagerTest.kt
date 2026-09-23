@@ -115,7 +115,7 @@ class OrderManagerTest : PlatformTestConfig() {
     }
 
     private fun createOrder(
-        id: String = "order_1",
+        id: String? = "order_1",
         status: OrderStatus = OrderStatus.NEW,
         deliveryMethod: DeliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
         deliveryDatetime: LocalDateTime = futureDateTime
@@ -132,6 +132,31 @@ class OrderManagerTest : PlatformTestConfig() {
         isPaymentDone = false,
         notes = null
     )
+
+    @Test
+    fun `createOrder - sends new order notification when creating brand new order and newOrders setting is true`() = runTest {
+        val manager = createOrderManager(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        fakeSettingsRepo.updateNotificationSettings(NotificationSettings(newOrders = true))
+        fakeStorageRepo.saveLocation(testStorage)
+
+        val newOrderTemplate = createOrder(id = null, status = OrderStatus.NEW)
+        manager.createOrder(newOrderTemplate)
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(1, fakeNotificationRepo.savedNotifications.size)
+    }
+
+    @Test
+    fun `createOrder - does not send new order notification when updating existing order`() = runTest {
+        val manager = createOrderManager(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        fakeSettingsRepo.updateNotificationSettings(NotificationSettings(newOrders = true))
+        fakeStorageRepo.saveLocation(testStorage)
+
+        val existingOrder = createOrder(id = "existing_123", status = OrderStatus.NEW)
+        manager.createOrder(existingOrder)
+
+        assertEquals(0, fakeNotificationRepo.savedNotifications.size)
+    }
 
     @Test
     fun `updateOrderStatus - READY status notifies when readyOrders notification setting is true`() = runTest {
@@ -156,12 +181,12 @@ class OrderManagerTest : PlatformTestConfig() {
     }
 
     @Test
-    fun `updateOrderStatus - transition from OUT_FOR_DELIVERY to READY sends orderNotDelivered notification when enabled`() = runTest {
+    fun `notifyOrderNotDelivered - sends orderNotDelivered notification when enabled`() = runTest {
         val manager = createOrderManager(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
         fakeSettingsRepo.updateNotificationSettings(NotificationSettings(orderNotDelivered = true))
         fakeOrderRepo.saveOrder(createOrder(id = "order_1", status = OrderStatus.OUT_FOR_DELIVERY, deliveryMethod = DeliveryMethod.HOME_DELIVERY))
 
-        manager.updateOrderStatus("order_1", OrderStatus.READY)
+        manager.notifyOrderNotDelivered("order_1")
 
         assertEquals(1, fakeNotificationRepo.savedNotifications.size)
     }
@@ -186,6 +211,21 @@ class OrderManagerTest : PlatformTestConfig() {
 
         manager.checkAndNotifyOrderAlerts()
 
+        assertEquals(1, fakeNotificationRepo.savedNotifications.size)
+    }
+
+    @Test
+    fun `checkAndNotifyOrderAlerts - does not send duplicate notifications on the same day`() = runTest {
+        val manager = createOrderManager(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        fakeSettingsRepo.updateNotificationSettings(NotificationSettings(lateOrders = true))
+        val lateOrder = createOrder(id = "late_1", status = OrderStatus.NEW, deliveryDatetime = pastDateTime)
+        fakeOrderRepo.saveOrder(lateOrder)
+
+        manager.checkAndNotifyOrderAlerts()
+        assertEquals(1, fakeNotificationRepo.savedNotifications.size)
+
+        // Calling checkAndNotifyOrderAlerts again on the same day should skip duplicate
+        manager.checkAndNotifyOrderAlerts()
         assertEquals(1, fakeNotificationRepo.savedNotifications.size)
     }
 
@@ -276,10 +316,20 @@ class OrderManagerTest : PlatformTestConfig() {
     }
 
     private class FakeStorageLocationRepository : StorageLocationRepository {
-        override fun getActiveLocations(): Flow<List<StorageLocation>> = flowOf(emptyList())
-        override suspend fun getLocationById(id: String): Result<StorageLocation, DataError> = Result.Failure(DataError.NOT_FOUND)
-        override suspend fun getDefaultLocation(): Result<StorageLocation, DataError> = Result.Failure(DataError.NOT_FOUND)
-        override suspend fun saveLocation(location: StorageLocation): Result<String, DataError> = Result.Success("")
+        private val locations = mutableMapOf<String, StorageLocation>()
+
+        override fun getActiveLocations(): Flow<List<StorageLocation>> = flowOf(locations.values.toList())
+        override suspend fun getLocationById(id: String): Result<StorageLocation, DataError> {
+            return locations[id]?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
+        }
+        override suspend fun getDefaultLocation(): Result<StorageLocation, DataError> {
+            return locations.values.firstOrNull { it.isDefault }?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
+        }
+        override suspend fun saveLocation(location: StorageLocation): Result<String, DataError> {
+            val id = location.id ?: "gen_id"
+            locations[id] = location.copy(id = id)
+            return Result.Success(id)
+        }
         override suspend fun deleteLocation(location: StorageLocation): Result<Unit, DataError> = Result.Success(Unit)
         override suspend fun incrementOccupiedSlots(id: String) {}
         override suspend fun decrementOccupiedSlots(id: String) {}

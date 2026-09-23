@@ -10,7 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_add
@@ -43,7 +43,7 @@ fun StorageManagementScreen(
     val deleteTitle = stringResource(Res.string.screen_Storage_dialog_delete_title)
     val deleteMessage = stringResource(Res.string.screen_Storage_dialog_delete_message)
 
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit) {
         fabState.set(
             icon = Res.drawable.ic_add,
             contentDescription = Res.string.screen_Storage_action_add_location,
@@ -62,7 +62,6 @@ fun StorageManagementScreen(
                 }
             }
         )
-        onDispose {}
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

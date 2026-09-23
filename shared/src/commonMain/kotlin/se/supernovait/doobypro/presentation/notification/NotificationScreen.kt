@@ -19,7 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,7 +59,7 @@ fun NotificationScreen(
     val topBarState = LocalTopBarState.current
     val markAllReadLabel = stringResource(Res.string.screen_Notification_action_mark_all_read)
 
-    DisposableEffect(uiState.notifications) {
+    LaunchedEffect(uiState.notifications) {
         topBarState.actions(
             if (uiState.notifications.isNotEmpty()) {
                 listOf(
@@ -72,9 +72,6 @@ fun NotificationScreen(
                 )
             } else emptyList()
         )
-        onDispose {
-            topBarState.actions(emptyList())
-        }
     }
 
     if (uiState.notifications.isEmpty() && !uiState.isLoading) {

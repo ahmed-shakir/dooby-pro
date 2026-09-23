@@ -4,6 +4,7 @@ import se.supernovait.doobypro.domain.model.order.Order
 
 sealed interface OrderDetailsEvent {
     data object TransitionToNextStatus : OrderDetailsEvent
+    data object DeliveryFailed : OrderDetailsEvent
     data object LoadOrder : OrderDetailsEvent
     data object CancelOrder : OrderDetailsEvent
     data object DeleteOrder : OrderDetailsEvent

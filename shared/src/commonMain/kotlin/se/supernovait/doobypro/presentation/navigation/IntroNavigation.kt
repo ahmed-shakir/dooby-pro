@@ -6,7 +6,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import org.koin.compose.viewmodel.koinViewModel
-import se.supernovait.app.core.domain.navigation.navigateWithRules
 import se.supernovait.doobypro.presentation.app.AppEventHandler
 import se.supernovait.doobypro.presentation.info.AppInfoScreen
 import se.supernovait.doobypro.presentation.notification.NotificationScreen

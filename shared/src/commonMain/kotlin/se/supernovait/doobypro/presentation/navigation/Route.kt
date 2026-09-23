@@ -59,12 +59,14 @@ sealed interface Route : NavigationRoute {
     @Serializable
     data object Account : Route {
         override val label = Res.string.navigation_item_account_label
+        override val showNotificationAction = true
     }
 
     @Serializable
     data object Settings : Route {
         override val label = Res.string.navigation_item_settings_label
         override val showBottomBar = false
+        override val showNotificationAction = true
     }
 
     @Serializable
@@ -112,6 +114,7 @@ sealed interface Route : NavigationRoute {
     @Serializable
     data object Dashboard : Route {
         override val label = Res.string.navigation_item_dashboard_label
+        override val showNotificationAction = true
     }
 
     @Serializable
@@ -155,13 +158,13 @@ sealed interface Route : NavigationRoute {
     }
 
     companion object {
-        private val routes = listOf(
+        private val routes get() = listOf(
             Welcome, AccountSetup, AppInfo, Support, Notifications, Account, Settings,
             SettingsCommon, SettingsOrder, SettingsStorage, SettingsReceipt, SettingsPrinter, SettingsNotification,
             Dashboard, Orders, CancelledOrders, OrderDetails(""), Services, ServiceDetails(""), StorageManagement
         )
 
-        private val parser = NavigationRouteParser(routes)
+        private val parser by lazy { NavigationRouteParser(routes) }
 
         fun parse(route: String?, data: String? = null, defaultRoute: Route = Welcome): Route {
             return parser.parse(route, data, defaultRoute)

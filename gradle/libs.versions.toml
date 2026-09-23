@@ -9,7 +9,7 @@ app-version-name = "1.0.0"
 ###########################
 agp-version = "9.4.1"
 ksp-version = "2.3.10"
-supernova-version = "1.11.5"
+supernova-version = "1.11.4"
 # KOTLIN
 kotlin-version = "2.4.20"
 kotlinx-datetime-version = "0.8.0"

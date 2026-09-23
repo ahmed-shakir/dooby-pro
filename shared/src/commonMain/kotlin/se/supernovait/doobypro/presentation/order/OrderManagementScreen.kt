@@ -9,9 +9,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,7 +64,7 @@ fun OrderManagementScreen(
     val currentOrderUiState = remember { mutableStateOf(uiState) }
     currentOrderUiState.value = uiState
 
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit) {
         fabState.set(
             icon = Res.drawable.ic_add,
             contentDescription = Res.string.screen_Order_action_add_order,
@@ -75,7 +73,9 @@ fun OrderManagementScreen(
                 showCustomerSheet = true
             }
         )
-        
+    }
+
+    LaunchedEffect(Unit) {
         topBarState.actions(
             listOf(
                 TopBarAction(
@@ -86,10 +86,6 @@ fun OrderManagementScreen(
                 )
             )
         )
-
-        onDispose {
-            topBarState.actions(emptyList())
-        }
     }
 
     LaunchedEffect(showCustomerSheet) {
@@ -166,7 +162,7 @@ fun OrderManagementScreen(
                                         containerColor = MaterialTheme.colorScheme.primary,
                                         contentColor = MaterialTheme.colorScheme.onPrimary
                                     ) {
-                                        Text(
+                                        SupernovaLabel(
                                             text = lateCount.toString(),
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontWeight = FontWeight.Bold

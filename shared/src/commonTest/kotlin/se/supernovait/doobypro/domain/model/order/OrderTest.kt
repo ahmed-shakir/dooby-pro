@@ -127,7 +127,7 @@ class OrderTest {
     }
 
     @Test
-    fun `isLate - NEW, IN_PROGRESS or HOME_DELIVERY READY and OUT_FOR_DELIVERY orders past delivery date are late`() {
+    fun `isLate - NEW IN_PROGRESS or HOME_DELIVERY READY and OUT_FOR_DELIVERY orders past delivery date are late`() {
         val pastDateTime = LocalDateTime(2000, 1, 1, 0, 0, 0)
         val futureDateTime = LocalDateTime(2099, 1, 1, 0, 0, 0)
 

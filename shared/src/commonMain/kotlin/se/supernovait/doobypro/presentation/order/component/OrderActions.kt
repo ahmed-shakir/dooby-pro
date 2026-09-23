@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.label_delete
 import doobypro.shared.generated.resources.screen_Order_action_cancel_order
+import doobypro.shared.generated.resources.screen_Order_action_delivery_failed
 import doobypro.shared.generated.resources.screen_Order_action_next_status_in_progress
 import doobypro.shared.generated.resources.screen_Order_action_next_status_new
 import doobypro.shared.generated.resources.screen_Order_action_next_status_out_for_delivery
@@ -28,6 +29,7 @@ import se.supernovait.doobypro.domain.model.order.OrderStatus
 fun OrderActions(
     order: Order,
     onNextStatus: () -> Unit,
+    onDeliveryFailed: () -> Unit = {},
     onCancel: () -> Unit,
     onDelete: () -> Unit,
     onReissue: () -> Unit
@@ -51,6 +53,15 @@ fun OrderActions(
             SupernovaButton(
                 label = stringResource(nextStatusLabel),
                 onClick = onNextStatus,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.extraSmall
+            )
+        }
+
+        if (order.status == OrderStatus.OUT_FOR_DELIVERY) {
+            SupernovaOutlinedButton(
+                label = stringResource(Res.string.screen_Order_action_delivery_failed),
+                onClick = onDeliveryFailed,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.extraSmall
             )
