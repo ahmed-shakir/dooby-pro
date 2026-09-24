@@ -16,11 +16,9 @@
     <!-- Route labels -->
     <string name="navigation_item_menu_label">Menu</string>
     <string name="navigation_item_app_info_label">About Dooby Pro</string>
+    <string name="navigation_item_support_label">Support center</string>
+    <string name="navigation_item_notifications_label">Notification center</string>
     <string name="navigation_item_dashboard_label">Dashboard</string>
-    <string name="navigation_item_orders_label">Orders</string>
-    <string name="navigation_item_cancelled_orders_label">Cancelled orders</string>
-    <string name="navigation_item_services_label">Services</string>
-    <string name="navigation_item_storage_label">Storage</string>
     <string name="navigation_item_account_label">Account</string>
     <string name="navigation_item_settings_label">Settings</string>
     <string name="navigation_item_settings_common_label">Common settings</string>
@@ -29,7 +27,10 @@
     <string name="navigation_item_settings_receipt_label">Receipt settings</string>
     <string name="navigation_item_settings_printer_label">Printer settings</string>
     <string name="navigation_item_settings_notification_label">Notification Settings</string>
-    <string name="navigation_item_notifications_label">Notifications</string>
+    <string name="navigation_item_orders_label">Orders</string>
+    <string name="navigation_item_cancelled_orders_label">Cancelled orders</string>
+    <string name="navigation_item_services_label">Services</string>
+    <string name="navigation_item_storage_label">Storage</string>
 
     <!-- Delivery -->
     <string name="delivery_option_express">Express</string>

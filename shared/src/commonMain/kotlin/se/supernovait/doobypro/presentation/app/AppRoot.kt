@@ -32,6 +32,8 @@ import doobypro.shared.generated.resources.ic_settings
 import doobypro.shared.generated.resources.ic_settings_selected
 import doobypro.shared.generated.resources.ic_storage
 import doobypro.shared.generated.resources.ic_storage_selected
+import doobypro.shared.generated.resources.ic_support
+import doobypro.shared.generated.resources.ic_support_selected
 import doobypro.shared.generated.resources.ic_user_account
 import doobypro.shared.generated.resources.ic_user_account_selected
 import doobypro.shared.generated.resources.label_sign_out
@@ -218,6 +220,13 @@ fun AppRoot() {
                         selectedIcon = Res.drawable.ic_notification_selected,
                         badgeCount = if (unreadCount > 0) unreadCount else null,
                         onClick = { navController.navigateWithRules(Route.Notifications) }
+                    ),
+                    NavigationItem(
+                        id = Route.Support.name,
+                        label = Route.Support.label,
+                        icon = Res.drawable.ic_support,
+                        selectedIcon = Res.drawable.ic_support_selected,
+                        onClick = { navController.navigateWithRules(Route.Support) }
                     ),
                     NavigationItem(
                         id = Route.AppInfo.name,

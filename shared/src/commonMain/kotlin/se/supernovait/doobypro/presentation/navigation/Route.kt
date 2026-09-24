@@ -16,9 +16,11 @@ import doobypro.shared.generated.resources.navigation_item_settings_printer_labe
 import doobypro.shared.generated.resources.navigation_item_settings_receipt_label
 import doobypro.shared.generated.resources.navigation_item_settings_storage_label
 import doobypro.shared.generated.resources.navigation_item_storage_label
+import doobypro.shared.generated.resources.navigation_item_support_label
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import se.supernovait.app.core.domain.navigation.NavigationRoute
+import se.supernovait.app.core.domain.navigation.NavigationRouteParser
 import se.supernovait.app.core.domain.navigation.ParameterizedRoute
 
 sealed interface Route : NavigationRoute {
@@ -47,6 +49,7 @@ sealed interface Route : NavigationRoute {
 
     @Serializable
     data object Support : Route {
+        override val label = Res.string.navigation_item_support_label
         override val showBottomBar = false
     }
 
@@ -163,17 +166,10 @@ sealed interface Route : NavigationRoute {
             Dashboard, Orders, CancelledOrders, OrderDetails(""), Services, ServiceDetails(""), StorageManagement
         )
 
-        fun parse(route: String?, data: String? = null, defaultRoute: Route = Welcome): Route {
-            if (route == null) return defaultRoute
-            val routeName = route.substringBefore("/").substringBefore("?").substringAfterLast(".").substringAfterLast("$")
-            val matched = routes.find { it.name == routeName } ?: defaultRoute
+        private val parser by lazy { NavigationRouteParser(routes) }
 
-            return if (data != null && matched is ParameterizedRoute<*>) {
-                @Suppress("UNCHECKED_CAST")
-                (matched as ParameterizedRoute<Route>).copyWithParam(data)
-            } else {
-                matched
-            }
+        fun parse(route: String?, data: String? = null, defaultRoute: Route = Welcome): Route {
+            return parser.parse(route, data, defaultRoute)
         }
 
         fun startScreen(isAuthenticated: Boolean): Route {
