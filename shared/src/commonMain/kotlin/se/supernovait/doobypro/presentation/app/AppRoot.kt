@@ -54,7 +54,6 @@ import se.supernovait.app.core.ui.component.scaffold.SupernovaScaffold
 import se.supernovait.app.core.ui.component.topbar.LocalTopBarState
 import se.supernovait.app.core.ui.component.topbar.TopBarAction
 import se.supernovait.doobypro.AppConfig
-import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.presentation.common.preview.ScreenPreviewContainer
 import se.supernovait.doobypro.presentation.navigation.Route
 import se.supernovait.doobypro.presentation.navigation.accountGraph
@@ -76,7 +75,6 @@ fun AppRoot() {
         val notificationManager = koinInject<NotificationManager>()
         val unreadCount by notificationManager.unreadCount.collectAsStateWithLifecycle(0)
         val deepLinkHandler = koinInject<DeepLinkHandler>()
-        val orderManager = koinInject<OrderManager>()
 
         val topBarState = LocalTopBarState.current
         val navigationBarState = LocalNavigationBarState.current
@@ -93,12 +91,6 @@ fun AppRoot() {
         LaunchedEffect(currentScreen) {
             if (!currentScreen.showFab) {
                 fabState.clear()
-            }
-        }
-
-        LaunchedEffect(isAuthenticated) {
-            if (isAuthenticated) {
-                orderManager.checkAndNotifyOrderAlerts()
             }
         }
 

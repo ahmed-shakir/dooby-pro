@@ -50,6 +50,7 @@ dependencies {
     implementation(projects.shared)
 
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.work)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 

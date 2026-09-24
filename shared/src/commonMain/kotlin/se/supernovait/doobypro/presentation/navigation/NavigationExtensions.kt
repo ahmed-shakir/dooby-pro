@@ -2,8 +2,8 @@ package se.supernovait.doobypro.presentation.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import se.supernovait.app.core.domain.extension.computeOptions
 import se.supernovait.app.core.domain.navigation.NavigationRoute
-import se.supernovait.app.core.domain.navigation.computeOptions
 
 /**
  * Custom navigation rules for Dooby Pro.

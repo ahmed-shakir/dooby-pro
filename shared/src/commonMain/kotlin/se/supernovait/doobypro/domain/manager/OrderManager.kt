@@ -10,21 +10,32 @@ import doobypro.shared.generated.resources.notification_order_not_picked_up_titl
 import doobypro.shared.generated.resources.notification_order_updated_message
 import doobypro.shared.generated.resources.notification_order_updated_title
 import doobypro.shared.generated.resources.screen_Order_label_new_order
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.getString
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import se.supernovait.app.core.domain.auth.AuthenticationManager
+import se.supernovait.app.core.domain.auth.AuthenticationState
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.error.DataError
+import se.supernovait.app.core.domain.extension.isAlreadyNotifiedToday
 import se.supernovait.app.core.domain.extension.now
+import se.supernovait.app.core.domain.extension.toUrl
 import se.supernovait.app.core.domain.extension.truncateToMinutes
 import se.supernovait.app.core.domain.model.notification.NotificationType
-import se.supernovait.app.core.domain.navigation.toUrl
 import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.domain.model.Service
@@ -49,7 +60,33 @@ class OrderManager(
     private val settingsRepository: SettingsRepository,
     private val notificationManager: NotificationManager,
     private val shareConfiguration: ShareConfiguration
-) {
+) : KoinComponent {
+
+    private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val authenticationManager: AuthenticationManager? by lazy {
+        runCatching { get<AuthenticationManager>() }.getOrNull()
+    }
+
+    init {
+        managerScope.launch {
+            try {
+                authenticationManager?.authState
+                    ?.map { it is AuthenticationState.Authenticated }
+                    ?.distinctUntilChanged()
+                    ?.collect { isAuthenticated ->
+                        if (isAuthenticated) {
+                            try {
+                                checkAndNotifyOrderAlerts()
+                            } catch (e: Exception) {
+                                // Ignore or log
+                            }
+                        }
+                    }
+            } catch (e: Exception) {
+                // Ignore or log
+            }
+        }
+    }
 
     /**
      * Creates a new order template populated with default values from settings.
@@ -204,23 +241,14 @@ class OrderManager(
         val settings = settingsRepository.settings.first()
         val orders = orderRepository.getOrders().first()
         val allNotifications = notificationManager.notifications.first()
-        val today = LocalDateTime.now().date
 
         orders.forEach { order ->
             val orderId = order.id ?: return@forEach
             val deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
 
-            fun isAlreadyNotifiedToday(title: String): Boolean {
-                return allNotifications.any { notification ->
-                    notification.title == title &&
-                        notification.deepLink == deepLink &&
-                        notification.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == today
-                }
-            }
-
             if (settings.notification.lateOrders && order.isLate()) {
                 val title = getString(Res.string.notification_order_late_title)
-                if (!isAlreadyNotifiedToday(title)) {
+                if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
                     val message = getString(Res.string.notification_order_late_message, orderId)
                     notificationManager.notify(
                         title = title,
@@ -231,7 +259,7 @@ class OrderManager(
                 }
             } else if (settings.notification.orderNotPickedUp && order.isNotPickedUp()) {
                 val title = getString(Res.string.notification_order_not_picked_up_title)
-                if (!isAlreadyNotifiedToday(title)) {
+                if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
                     val message = getString(Res.string.notification_order_not_picked_up_message, orderId)
                     notificationManager.notify(
                         title = title,
@@ -242,7 +270,7 @@ class OrderManager(
                 }
             } else if (settings.notification.orderNotDelivered && order.isNotDelivered()) {
                 val title = getString(Res.string.notification_order_not_delivered_title)
-                if (!isAlreadyNotifiedToday(title)) {
+                if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
                     val message = getString(Res.string.notification_order_not_delivered_message, orderId)
                     notificationManager.notify(
                         title = title,
