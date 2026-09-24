@@ -19,7 +19,6 @@ import doobypro.shared.generated.resources.navigation_item_storage_label
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import se.supernovait.app.core.domain.navigation.NavigationRoute
-import se.supernovait.app.core.domain.navigation.NavigationRouteParser
 import se.supernovait.app.core.domain.navigation.ParameterizedRoute
 
 sealed interface Route : NavigationRoute {
@@ -164,10 +163,17 @@ sealed interface Route : NavigationRoute {
             Dashboard, Orders, CancelledOrders, OrderDetails(""), Services, ServiceDetails(""), StorageManagement
         )
 
-        private val parser by lazy { NavigationRouteParser(routes) }
-
         fun parse(route: String?, data: String? = null, defaultRoute: Route = Welcome): Route {
-            return parser.parse(route, data, defaultRoute)
+            if (route == null) return defaultRoute
+            val routeName = route.substringBefore("/").substringBefore("?").substringAfterLast(".").substringAfterLast("$")
+            val matched = routes.find { it.name == routeName } ?: defaultRoute
+
+            return if (data != null && matched is ParameterizedRoute<*>) {
+                @Suppress("UNCHECKED_CAST")
+                (matched as ParameterizedRoute<Route>).copyWithParam(data)
+            } else {
+                matched
+            }
         }
 
         fun startScreen(isAuthenticated: Boolean): Route {

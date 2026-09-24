@@ -15,14 +15,20 @@ import se.supernovait.app.core.domain.navigation.computeOptions
  * @param route The destination route.
  */
 fun NavController.navigateWithRules(route: NavigationRoute) {
-    val startId = graph.findStartDestination().id
-    val options = route.computeOptions(graph.findStartDestination().route)
+    val options = route.computeOptions(currentRootRoute = graph.findStartDestination().route)
 
-    println("navigateWithRules route: ${graph.findStartDestination().route} and option: ${options.routeName} and routeName: ${route.name}")
+    if (options.isRoot) {
+        navigate(options.routeName) {
+            popUpTo(graph.findStartDestination().id) {
+                inclusive = options.popUpInclusive
+            }
+        }
+        return
+    }
 
-    navigate(route) {
-        if (options.popUpToStart) {
-            popUpTo(startId) {
+    navigate(options.routeName) {
+        if (options.popUpToRoute != null) {
+            popUpTo(options.popUpToRoute!!) {
                 inclusive = options.popUpInclusive
                 saveState = options.saveState
             }
