@@ -76,7 +76,7 @@ class AuthRepositoryImpl(
                 } else {
                     Result.Failure(AuthError.USER_NOT_FOUND)
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Result.Failure(AuthError.UNKNOWN)
             }
         }

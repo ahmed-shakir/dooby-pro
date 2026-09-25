@@ -16,6 +16,7 @@ import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.data.local.AppDatabase
 import se.supernovait.doobypro.data.local.dao.AccountDao
 import se.supernovait.doobypro.data.local.dao.AgreementDao
+import se.supernovait.doobypro.data.local.dao.BusinessHoursDao
 import se.supernovait.doobypro.data.local.dao.CompanyDao
 import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
@@ -23,6 +24,7 @@ import se.supernovait.doobypro.data.local.dao.StorageLocationDao
 import se.supernovait.doobypro.data.repository.AccountRepositoryImpl
 import se.supernovait.doobypro.data.repository.AgreementRepositoryImpl
 import se.supernovait.doobypro.data.repository.AuthRepositoryImpl
+import se.supernovait.doobypro.data.repository.BusinessHoursRepositoryImpl
 import se.supernovait.doobypro.data.repository.CompanyRepositoryImpl
 import se.supernovait.doobypro.data.repository.CustomerRepositoryImpl
 import se.supernovait.doobypro.data.repository.LicenseRepositoryImpl
@@ -35,6 +37,7 @@ import se.supernovait.doobypro.domain.manager.OrderQueryManager
 import se.supernovait.doobypro.domain.manager.StorageLocationManager
 import se.supernovait.doobypro.domain.repository.AccountRepository
 import se.supernovait.doobypro.domain.repository.AgreementRepository
+import se.supernovait.doobypro.domain.repository.BusinessHoursRepository
 import se.supernovait.doobypro.domain.repository.CompanyRepository
 import se.supernovait.doobypro.domain.repository.CustomerRepository
 import se.supernovait.doobypro.domain.repository.LicenseRepository
@@ -61,6 +64,7 @@ val sharedModule = module {
     singleOf(::AuthRepositoryImpl).bind<AuthRepository>()
     singleOf(::AccountRepositoryImpl).bind<AccountRepository>()
     singleOf(::CompanyRepositoryImpl).bind<CompanyRepository>()
+    singleOf(::BusinessHoursRepositoryImpl).bind<BusinessHoursRepository>()
     singleOf(::LicenseRepositoryImpl).bind<LicenseRepository>()
     singleOf(::AgreementRepositoryImpl).bind<AgreementRepository>()
     singleOf(::CustomerRepositoryImpl).bind<CustomerRepository>()
@@ -118,6 +122,10 @@ val sharedModule = module {
 
     single<AgreementDao> {
         get<AppDatabase>().agreementDao()
+    }
+
+    single<BusinessHoursDao> {
+        get<AppDatabase>().businessHoursDao()
     }
 
     single<NotificationDao> {

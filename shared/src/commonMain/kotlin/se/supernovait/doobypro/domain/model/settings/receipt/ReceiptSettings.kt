@@ -9,6 +9,7 @@ data class ReceiptSettings(
     val includeCompanyAddress: Boolean = false,
     val includeCompanyPhone: Boolean = true,
     val includeCompanyEmail: Boolean = false,
+    val includeCompanyBusinessHours: Boolean = false,
     val includeCustomerName: Boolean = true,
     val includeOrderNumber: Boolean = true,
     val includeOrderTime: Boolean = true,

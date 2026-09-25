@@ -39,7 +39,7 @@ class CustomerRepositoryImpl(
                 val entity = customer.toEntity()
                 userDao.upsert(entity)
                 Result.Success(entity.id)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -50,7 +50,7 @@ class CustomerRepositoryImpl(
             try {
                 userDao.delete(customer.toEntity())
                 Result.Success(Unit)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }

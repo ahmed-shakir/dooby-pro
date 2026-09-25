@@ -28,7 +28,7 @@ actual suspend fun loadLogoBytes(urlOrPath: String): ByteArray? = withContext(Di
                 bytes
             } else null
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 }

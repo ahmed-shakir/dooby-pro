@@ -25,6 +25,7 @@ import se.supernovait.doobypro.data.local.dao.FakeUserDao
 import se.supernovait.doobypro.data.repository.AccountRepositoryImpl
 import se.supernovait.doobypro.data.repository.fake.FakeAgreementRepository
 import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
+import se.supernovait.doobypro.data.repository.fake.FakeBusinessHoursRepository
 import se.supernovait.doobypro.data.repository.fake.FakeCompanyRepository
 import se.supernovait.doobypro.data.repository.fake.FakeLicenseRepository
 import se.supernovait.doobypro.domain.model.Account
@@ -48,6 +49,7 @@ class AccountViewModelTest {
     private lateinit var accountRepository: AccountRepositoryImpl
     private lateinit var fileStorage: FakeFileStorage
     private lateinit var pdfGenerator: FakePdfGenerator
+    private lateinit var businessHoursRepository: FakeBusinessHoursRepository
     private lateinit var viewModel: AccountViewModel
 
     private val testUser = User(
@@ -101,6 +103,7 @@ class AccountViewModelTest {
         authRepository = FakeAuthRepository()
         fileStorage = FakeFileStorage()
         pdfGenerator = FakePdfGenerator()
+        businessHoursRepository = FakeBusinessHoursRepository()
         agreementRepository = FakeAgreementRepository()
         accountRepository = AccountRepositoryImpl(
             authRepository = authRepository,
@@ -125,7 +128,7 @@ class AccountViewModelTest {
             )
         }
 
-        viewModel = AccountViewModel(authRepository, accountRepository, fileStorage, pdfGenerator)
+        viewModel = AccountViewModel(authRepository, accountRepository, businessHoursRepository, fileStorage, pdfGenerator)
         
         // Wait for initial load to start
         runTest(testDispatcher) {

@@ -38,6 +38,7 @@ sealed interface SettingsScreenEvent {
     data class UpdateIncludeCompanyAddress(val include: Boolean) : SettingsScreenEvent
     data class UpdateIncludeCompanyPhone(val include: Boolean) : SettingsScreenEvent
     data class UpdateIncludeCompanyEmail(val include: Boolean) : SettingsScreenEvent
+    data class UpdateIncludeCompanyBusinessHours(val include: Boolean) : SettingsScreenEvent
     data class UpdateIncludeCustomerName(val include: Boolean) : SettingsScreenEvent
     data class UpdateIncludeOrderNumber(val include: Boolean) : SettingsScreenEvent
     data class UpdateIncludeOrderTime(val include: Boolean) : SettingsScreenEvent

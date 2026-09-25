@@ -13,7 +13,7 @@ actual suspend fun loadLogoBytes(urlOrPath: String): ByteArray? = withContext(Di
             val file = File(urlOrPath)
             if (file.exists()) file.readBytes() else null
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 }

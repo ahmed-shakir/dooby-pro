@@ -77,12 +77,12 @@ class OrderManager(
                         if (isAuthenticated) {
                             try {
                                 checkAndNotifyOrderAlerts()
-                            } catch (e: Exception) {
+                            } catch (_: Exception) {
                                 // Ignore or log
                             }
                         }
                     }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Ignore or log
             }
         }

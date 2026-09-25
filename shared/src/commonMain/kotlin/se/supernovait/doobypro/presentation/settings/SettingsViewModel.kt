@@ -77,6 +77,7 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateIncludeCompanyAddress -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyAddress = event.include)) }
             is SettingsScreenEvent.UpdateIncludeCompanyPhone -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyPhone = event.include)) }
             is SettingsScreenEvent.UpdateIncludeCompanyEmail -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyEmail = event.include)) }
+            is SettingsScreenEvent.UpdateIncludeCompanyBusinessHours -> updateSettings { it.copy(receipt = it.receipt.copy(includeCompanyBusinessHours = event.include)) }
             is SettingsScreenEvent.UpdateIncludeCustomerName -> updateSettings { it.copy(receipt = it.receipt.copy(includeCustomerName = event.include)) }
             is SettingsScreenEvent.UpdateIncludeOrderNumber -> updateSettings { it.copy(receipt = it.receipt.copy(includeOrderNumber = event.include)) }
             is SettingsScreenEvent.UpdateIncludeOrderTime -> updateSettings { it.copy(receipt = it.receipt.copy(includeOrderTime = event.include)) }

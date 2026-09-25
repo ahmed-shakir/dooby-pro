@@ -7,6 +7,7 @@ package se.supernovait.doobypro.domain.model
  */
 enum class IdType(val prefix: String) {
     AGREEMENT("DA"),
+    BUSINESS_HOURS("BH"),
     COMPANY("DC"),
     LICENSE("DL"),
     ORDER("DO"),

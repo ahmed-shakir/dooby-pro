@@ -12,6 +12,7 @@ import doobypro.shared.generated.resources.screen_Settings_receipt_customer_deta
 import doobypro.shared.generated.resources.screen_Settings_receipt_delivery_details_label
 import doobypro.shared.generated.resources.screen_Settings_receipt_footer_details_label
 import doobypro.shared.generated.resources.screen_Settings_receipt_include_company_address
+import doobypro.shared.generated.resources.screen_Settings_receipt_include_company_business_hours
 import doobypro.shared.generated.resources.screen_Settings_receipt_include_company_email
 import doobypro.shared.generated.resources.screen_Settings_receipt_include_company_logo
 import doobypro.shared.generated.resources.screen_Settings_receipt_include_company_name
@@ -84,6 +85,13 @@ fun ReceiptSettingsScreen(
                     label = Res.string.screen_Settings_receipt_include_company_email,
                     checked = uiState.settings.receipt.includeCompanyEmail,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeCompanyEmail(it)) }
+                )
+            }
+            item {
+                SupernovaToggle(
+                    label = Res.string.screen_Settings_receipt_include_company_business_hours,
+                    checked = uiState.settings.receipt.includeCompanyBusinessHours,
+                    onCheckedChange = { onEvent(SettingsScreenEvent.UpdateIncludeCompanyBusinessHours(it)) }
                 )
             }
         }

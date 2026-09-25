@@ -24,7 +24,7 @@ class KoinHelper : KoinComponent {
         scope.launch {
             try {
                 orderManager.checkAndNotifyOrderAlerts()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Ignore or log error
             }
         }
