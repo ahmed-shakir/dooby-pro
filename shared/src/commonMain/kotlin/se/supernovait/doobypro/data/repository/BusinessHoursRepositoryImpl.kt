@@ -10,8 +10,8 @@ import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.dao.BusinessHoursDao
 import se.supernovait.doobypro.data.local.entity.BusinessHoursDayEntity
 import se.supernovait.doobypro.domain.model.IdType
-import se.supernovait.doobypro.domain.model.businesshours.BusinessHours
-import se.supernovait.doobypro.domain.model.businesshours.DayHours
+import se.supernovait.doobypro.domain.model.company.BusinessHours
+import se.supernovait.doobypro.domain.model.company.DayHours
 import se.supernovait.doobypro.domain.repository.BusinessHoursRepository
 import kotlin.coroutines.CoroutineContext
 

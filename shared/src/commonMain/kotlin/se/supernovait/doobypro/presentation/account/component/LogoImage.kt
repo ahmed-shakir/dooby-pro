@@ -31,7 +31,7 @@ fun LogoImage(
         value = try {
             val bytes = loadLogoBytes(logoUrl)
             bytes?.decodeToImageBitmap()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }

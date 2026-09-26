@@ -5,8 +5,8 @@ import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.location.Address
 import se.supernovait.app.core.domain.location.AddressType
 import se.supernovait.doobypro.data.local.entity.CompanyEntity
-import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.domain.model.IdType
+import se.supernovait.doobypro.domain.model.company.Company
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

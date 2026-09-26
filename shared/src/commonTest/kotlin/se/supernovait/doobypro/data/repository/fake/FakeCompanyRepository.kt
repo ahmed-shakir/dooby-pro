@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
-import se.supernovait.doobypro.domain.model.Company
+import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.domain.repository.CompanyRepository
 
 class FakeCompanyRepository : CompanyRepository {

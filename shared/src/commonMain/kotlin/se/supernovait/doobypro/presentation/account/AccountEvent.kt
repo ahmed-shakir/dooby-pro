@@ -1,6 +1,8 @@
 package se.supernovait.doobypro.presentation.account
 
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
+import se.supernovait.doobypro.domain.model.company.DayHours
 
 sealed interface AccountEvent {
     data object LoadAccount : AccountEvent
@@ -46,6 +48,7 @@ sealed interface AccountEvent {
             return bytes.contentHashCode()
         }
     }
+    data class UpdateDayHours(val day: DayOfWeek, val hours: DayHours) : AccountEvent
     data object SaveCompanyProfile : AccountEvent
 
     // Account Actions

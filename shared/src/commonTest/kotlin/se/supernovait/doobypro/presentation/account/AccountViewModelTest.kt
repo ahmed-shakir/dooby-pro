@@ -29,9 +29,9 @@ import se.supernovait.doobypro.data.repository.fake.FakeBusinessHoursRepository
 import se.supernovait.doobypro.data.repository.fake.FakeCompanyRepository
 import se.supernovait.doobypro.data.repository.fake.FakeLicenseRepository
 import se.supernovait.doobypro.domain.model.Account
-import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.domain.model.agreement.Agreement
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
+import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.util.FakeFileStorage
 import se.supernovait.doobypro.util.FakePdfGenerator
 import kotlin.test.AfterTest

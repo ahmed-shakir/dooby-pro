@@ -1,18 +1,10 @@
 package se.supernovait.doobypro.domain.usecase
 
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDateTime
-import se.supernovait.app.core.domain.extension.now
-import se.supernovait.doobypro.domain.model.businesshours.BusinessHours
-import se.supernovait.doobypro.domain.model.businesshours.DayHours
+import se.supernovait.doobypro.domain.model.company.BusinessHours
+import se.supernovait.doobypro.domain.model.company.DayHours
 
 class FormatBusinessHoursUseCase {
-
-    fun formatForReceipt(businessHours: BusinessHours): String {
-        val today = LocalDateTime.now().dayOfWeek
-        val todayHours = businessHours.getDayHours(today)
-        return "Today: ${formatDay(todayHours)}"
-    }
 
     fun formatDay(dayHours: DayHours): String {
         return when (dayHours) {

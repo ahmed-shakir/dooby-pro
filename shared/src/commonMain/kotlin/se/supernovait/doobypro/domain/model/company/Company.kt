@@ -1,4 +1,4 @@
-package se.supernovait.doobypro.domain.model
+package se.supernovait.doobypro.domain.model.company
 
 import kotlinx.datetime.LocalDateTime
 import se.supernovait.app.core.domain.extension.now
@@ -13,8 +13,9 @@ import se.supernovait.app.core.domain.location.Address
  * @property licenseNumber The regulatory or trade license number.
  * @property phoneNumber The primary contact phone number.
  * @property email The primary contact email address.
- * @property address The physical address of the company.
  * @property logoUrl The URL or path to the company's logo image.
+ * @property address The physical address of the company.
+ * @property businessHours The operating business hours for the company.
  * @property createdAt The timestamp when the company was created.
  * @property updatedAt The timestamp when the company was last updated.
  */
@@ -25,8 +26,9 @@ data class Company(
     val licenseNumber: String,
     val phoneNumber: String,
     val email: String,
-    val address: Address? = null,
     val logoUrl: String? = null,
+    val address: Address? = null,
+    val businessHours: BusinessHours? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 )

@@ -3,8 +3,8 @@ package se.supernovait.doobypro.data.repository.fake
 import kotlinx.datetime.DayOfWeek
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
-import se.supernovait.doobypro.domain.model.businesshours.BusinessHours
-import se.supernovait.doobypro.domain.model.businesshours.DayHours
+import se.supernovait.doobypro.domain.model.company.BusinessHours
+import se.supernovait.doobypro.domain.model.company.DayHours
 import se.supernovait.doobypro.domain.repository.BusinessHoursRepository
 
 class FakeBusinessHoursRepository : BusinessHoursRepository {

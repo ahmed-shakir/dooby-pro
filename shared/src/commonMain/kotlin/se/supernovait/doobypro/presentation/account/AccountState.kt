@@ -3,6 +3,7 @@ package se.supernovait.doobypro.presentation.account
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.StringResource
 import se.supernovait.doobypro.domain.model.Account
+import se.supernovait.doobypro.presentation.businesshours.BusinessHoursEditorState
 
 /**
  * UI state for the Account screens.
@@ -71,7 +72,8 @@ data class AccountState(
     val expandedAgreementIds: Set<String> = emptySet(),
     
     val memberSince: String = "",
-    val registeredSince: String = ""
+    val registeredSince: String = "",
+    val businessHoursState: BusinessHoursEditorState = BusinessHoursEditorState()
 )
 
 enum class AccountTab {

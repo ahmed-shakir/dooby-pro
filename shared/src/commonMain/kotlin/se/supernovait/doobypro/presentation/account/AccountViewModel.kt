@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.label_not_authenticated
 import doobypro.shared.generated.resources.screen_Account_agreements_download_success
+import doobypro.shared.generated.resources.screen_Account_business_hours_error_update
+import doobypro.shared.generated.resources.screen_Account_business_hours_success_update
 import doobypro.shared.generated.resources.screen_Account_error_delete_failed
 import doobypro.shared.generated.resources.screen_Account_error_load_failed
 import doobypro.shared.generated.resources.screen_Account_error_save_company_failed
@@ -15,11 +17,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DayOfWeek
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.location.Address
 import se.supernovait.doobypro.domain.model.AppDefaults
+import se.supernovait.doobypro.domain.model.company.BusinessHours
+import se.supernovait.doobypro.domain.model.company.DayHours
 import se.supernovait.doobypro.domain.repository.AccountRepository
+import se.supernovait.doobypro.domain.repository.BusinessHoursRepository
 import se.supernovait.doobypro.domain.util.FileStorage
 import se.supernovait.doobypro.domain.util.PdfGenerator
 import se.supernovait.doobypro.domain.util.PdfSection
@@ -32,6 +38,7 @@ import kotlin.time.Clock
 class AccountViewModel(
     private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository,
+    private val businessHoursRepository: BusinessHoursRepository,
     private val fileStorage: FileStorage,
     private val pdfGenerator: PdfGenerator
 ) : ViewModel() {
@@ -76,6 +83,7 @@ class AccountViewModel(
             is AccountEvent.UpdateCompanyNotes -> _uiState.update { it.copy(editCompanyNotes = event.value) }
             is AccountEvent.UpdateCompanyLogo -> updateCompanyLogo(event.bytes)
             AccountEvent.SaveCompanyProfile -> saveCompanyProfile()
+            is AccountEvent.UpdateDayHours -> updateDayHours(event.day, event.hours)
             
             AccountEvent.SignOut -> signOut()
             AccountEvent.DeactivateAccount -> deactivateAccount()
@@ -95,10 +103,12 @@ class AccountViewModel(
                 val accountResult = accountRepository.getAccountByUserId(userIdResult.data)
                 if (accountResult is Result.Success) {
                     val account = accountResult.data
+                    val businessHours = (businessHoursRepository.getBusinessHours(account.company.id!!) as? Result.Success)?.data ?: BusinessHours(account.company.id!!)
                     _uiState.update { state ->
                         state.copy(
                             account = account,
                             isLoading = false,
+                            businessHoursState = state.businessHoursState.copy(businessHours = businessHours),
                             editUserFirstName = account.user.firstname,
                             editUserLastName = account.user.lastname,
                             editUserBirthDate = account.user.birthdate,
@@ -223,6 +233,40 @@ class AccountViewModel(
             _uiState.value.account?.company?.let { company ->
                 val logoUrl = fileStorage.saveFile("company_logo_${company.id}.png", bytes)
                 _uiState.update { it.copy(editCompanyLogoUrl = logoUrl) }
+            }
+        }
+    }
+
+    private fun updateDayHours(day: DayOfWeek, hours: DayHours) {
+        val companyId = _uiState.value.account?.company?.id ?: return
+        
+        viewModelScope.launch {
+            _uiState.update { state ->
+                state.copy(businessHoursState = state.businessHoursState.copy(isSaving = true, error = null))
+            }
+            
+            val result = businessHoursRepository.updateDayHours(companyId, day, hours)
+            if (result is Result.Success) {
+                val updatedHoursResult = businessHoursRepository.getBusinessHours(companyId)
+                val updatedHours = (updatedHoursResult as? Result.Success)?.data
+                _uiState.update { state ->
+                    state.copy(
+                        businessHoursState = state.businessHoursState.copy(
+                            businessHours = updatedHours ?: state.businessHoursState.businessHours,
+                            isSaving = false,
+                            successMessage = Res.string.screen_Account_business_hours_success_update
+                        )
+                    )
+                }
+            } else {
+                _uiState.update { state ->
+                    state.copy(
+                        businessHoursState = state.businessHoursState.copy(
+                            isSaving = false,
+                            error = Res.string.screen_Account_business_hours_error_update
+                        )
+                    )
+                }
             }
         }
     }

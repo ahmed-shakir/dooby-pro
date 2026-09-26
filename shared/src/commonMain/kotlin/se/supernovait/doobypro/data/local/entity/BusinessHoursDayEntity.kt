@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
-import se.supernovait.doobypro.domain.model.businesshours.DayHours
+import se.supernovait.doobypro.domain.model.company.DayHours
 import kotlin.time.Clock
 import kotlin.time.Instant
 

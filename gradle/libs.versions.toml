@@ -9,13 +9,13 @@ app-version-name = "1.0.0"
 ###########################
 agp-version = "9.4.1"
 ksp-version = "2.3.10"
-supernova-version = "1.11.6"
+supernova-version = "1.11.7"
 # KOTLIN
 kotlin-version = "2.4.20"
 kotlinx-datetime-version = "0.8.0"
 kotlinx-coroutines-version = "1.11.0"
 # ANDROID
-androidx-core-version = "1.19.0"
+androidx-core-version = "1.19.1"
 androidx-activity-version = "1.13.0"
 androidx-lifecycle-version = "2.11.0"
 androidx-datastore-version = "1.2.1"

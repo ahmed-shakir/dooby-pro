@@ -6,9 +6,10 @@ import kotlinx.coroutines.test.runTest
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.location.Address
+import se.supernovait.doobypro.data.local.dao.FakeBusinessHoursDao
 import se.supernovait.doobypro.data.local.dao.FakeCompanyDao
-import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.domain.model.IdType
+import se.supernovait.doobypro.domain.model.company.Company
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -20,6 +21,7 @@ import kotlin.test.assertTrue
  */
 class CompanyRepositoryImplTest {
     private lateinit var fakeCompanyDao: FakeCompanyDao
+    private lateinit var fakeBusinessHoursDao: FakeBusinessHoursDao
     private lateinit var repository: CompanyRepositoryImpl
     private val testDispatcher = StandardTestDispatcher()
 
@@ -42,8 +44,10 @@ class CompanyRepositoryImplTest {
     @BeforeTest
     fun setUp() {
         fakeCompanyDao = FakeCompanyDao()
+        fakeBusinessHoursDao = FakeBusinessHoursDao()
         repository = CompanyRepositoryImpl(
-            companyDao = fakeCompanyDao
+            companyDao = fakeCompanyDao,
+            businessHoursDao = fakeBusinessHoursDao
         )
     }
 

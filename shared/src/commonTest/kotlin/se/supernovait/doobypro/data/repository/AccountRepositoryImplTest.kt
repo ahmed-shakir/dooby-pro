@@ -20,10 +20,10 @@ import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
 import se.supernovait.doobypro.data.repository.fake.FakeCompanyRepository
 import se.supernovait.doobypro.data.repository.fake.FakeLicenseRepository
 import se.supernovait.doobypro.domain.model.Account
-import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.agreement.Agreement
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
+import se.supernovait.doobypro.domain.model.company.Company
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

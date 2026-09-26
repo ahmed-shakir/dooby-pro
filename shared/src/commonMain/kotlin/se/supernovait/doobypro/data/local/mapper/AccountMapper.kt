@@ -7,8 +7,8 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.model.license.License
 import se.supernovait.doobypro.data.local.entity.AccountEntity
 import se.supernovait.doobypro.domain.model.Account
-import se.supernovait.doobypro.domain.model.Company
 import se.supernovait.doobypro.domain.model.agreement.Agreement
+import se.supernovait.doobypro.domain.model.company.Company
 import kotlin.time.Clock
 
 /**

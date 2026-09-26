@@ -1,7 +1,6 @@
 package se.supernovait.doobypro.data.local
 
 import androidx.room.TypeConverter
-import kotlinx.datetime.LocalTime
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
@@ -62,26 +61,4 @@ object DbConverters {
      */
     @TypeConverter
     fun fromStorageType(type: StorageType?): String? = type?.name
-
-    /**
-     * Converts a string of comma-separated values to a list of strings.
-     */
-    @TypeConverter
-    fun fromStringList(value: String?): List<String> {
-        return value?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
-    }
-
-    /**
-     * Converts a list of strings to a comma-separated string.
-     */
-    @TypeConverter
-    fun toStringList(list: List<String>?): String? {
-        return list?.joinToString(",")
-    }
-
-    @TypeConverter
-    fun toLocalTime(value: String?): LocalTime? = value?.let { LocalTime.parse(it) }
-
-    @TypeConverter
-    fun fromLocalTime(time: LocalTime?): String? = time?.toString()
 }

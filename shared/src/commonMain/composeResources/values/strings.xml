@@ -307,6 +307,16 @@
     <string name="business_hours_open_24_hours">Open 24 hours</string>
     <string name="business_hours_today">Today: %1$s</string>
     <string name="business_hours_not_available">Hours not available</string>
+    <string name="business_hours_title">Business Hours</string>
+    <string name="business_hours_subtitle">Set your operating hours. Used for notifications and receipt display.</string>
+    <string name="business_hours_status_label">Status</string>
+    <string name="business_hours_open">Open</string>
+    <string name="business_hours_hours_label">Hours</string>
+    <string name="business_hours_24_hours">24 Hours</string>
+    <string name="business_hours_custom">Custom</string>
+    <string name="business_hours_opens">Opens</string>
+    <string name="business_hours_closes">Closes</string>
+    <string name="business_hours_edit_day">Edit %1$s</string>
 
     <!-- Account License -->
     <string name="Account_LicenseTab_error_not_found">No active license found for this account.</string>

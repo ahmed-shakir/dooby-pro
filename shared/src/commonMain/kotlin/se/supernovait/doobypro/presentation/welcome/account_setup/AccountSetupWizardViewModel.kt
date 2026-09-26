@@ -15,7 +15,7 @@ import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.app.core.domain.location.Address
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.AppDefaults
-import se.supernovait.doobypro.domain.model.Company
+import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.domain.repository.AccountRepository
 
 /**

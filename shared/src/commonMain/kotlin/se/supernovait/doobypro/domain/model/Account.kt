@@ -5,6 +5,7 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.model.license.License
 import se.supernovait.doobypro.domain.model.agreement.Agreement
+import se.supernovait.doobypro.domain.model.company.Company
 
 /**
  * Domain model representing a unified Dooby Account.
@@ -12,9 +13,9 @@ import se.supernovait.doobypro.domain.model.agreement.Agreement
  * This model orchestrates user identity, company profile, and associated
  * licenses or agreements into a single aggregate root.
  *
- * @property id The unique identifier for the account, matching the [Company.id].
+ * @property id The unique identifier for the account, matching the [se.supernovait.doobypro.domain.model.company.Company.id].
  * @property user The [User] associated with this account.
- * @property company The [Company] profile for this account.
+ * @property company The [se.supernovait.doobypro.domain.model.company.Company] profile for this account.
  * @property license The active [License] associated with this account, if any.
  * @property agreements The list of equipment lease or support [Agreement]s associated with this account.
  * @property deactivatedAt The timestamp when the account was deactivated, if any.

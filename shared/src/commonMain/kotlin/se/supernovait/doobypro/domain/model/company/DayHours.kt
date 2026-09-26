@@ -1,4 +1,4 @@
-package se.supernovait.doobypro.domain.model.businesshours
+package se.supernovait.doobypro.domain.model.company
 
 import kotlinx.datetime.LocalTime
 

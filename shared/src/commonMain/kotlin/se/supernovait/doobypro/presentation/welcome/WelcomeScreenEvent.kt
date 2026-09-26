@@ -2,7 +2,7 @@ package se.supernovait.doobypro.presentation.welcome
 
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.location.Address
-import se.supernovait.doobypro.domain.model.Company
+import se.supernovait.doobypro.domain.model.company.Company
 
 sealed interface WelcomeScreenEvent {
     data object NavigateToAppInfo: WelcomeScreenEvent

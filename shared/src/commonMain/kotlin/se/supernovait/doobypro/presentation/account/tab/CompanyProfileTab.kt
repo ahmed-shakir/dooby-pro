@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
@@ -35,6 +36,7 @@ import doobypro.shared.generated.resources.Account_CompanyProfileTab_picker_opti
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_picker_title
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_address
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_branding
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_contact
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_info
 import doobypro.shared.generated.resources.Address_field_city
@@ -46,6 +48,7 @@ import doobypro.shared.generated.resources.Address_field_street
 import doobypro.shared.generated.resources.Contact_details_field_email
 import doobypro.shared.generated.resources.Contact_details_field_phone
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.business_hours_subtitle
 import doobypro.shared.generated.resources.ic_files
 import doobypro.shared.generated.resources.ic_info
 import doobypro.shared.generated.resources.ic_photo_library
@@ -66,6 +69,7 @@ import se.supernovait.doobypro.presentation.account.AccountState
 import se.supernovait.doobypro.presentation.account.component.AccountCard
 import se.supernovait.doobypro.presentation.account.component.AccountField
 import se.supernovait.doobypro.presentation.account.component.LogoImage
+import se.supernovait.doobypro.presentation.businesshours.component.BusinessHoursEditor
 
 /**
  * Tab displaying the company profile information, including branding, basic info, and contact details.
@@ -374,6 +378,27 @@ fun CompanyProfileTab(
             AccountField(
                 label = stringResource(Res.string.Account_CompanyProfileTab_label_registered_since),
                 value = uiState.registeredSince
+            )
+        }
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        // Business Hours Card
+        AccountCard(
+            title = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours),
+            isSaving = uiState.businessHoursState.isSaving,
+            isEditing = false,
+            onEditClick = null
+        ) {
+            SupernovaLabel(
+                text = stringResource(Res.string.business_hours_subtitle),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = MaterialTheme.spacing.medium))
+            BusinessHoursEditor(
+                state = uiState.businessHoursState,
+                onDayHoursUpdate = { day, hours -> onEvent(AccountEvent.UpdateDayHours(day, hours)) }
             )
         }
 
