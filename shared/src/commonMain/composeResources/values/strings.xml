@@ -152,6 +152,20 @@
     <string name="screen_AppInfo_copyright">© 2026 Supernova Technology AB</string>
     <string name="screen_AppInfo_check_updates_label">Check for updates</string>
 
+    <!-- Support & FAQs -->
+    <string name="faq_category_getting_started">Getting Started</string>
+    <string name="faq_category_orders">Orders</string>
+    <string name="faq_category_delivery">Delivery</string>
+    <string name="faq_category_account">Account</string>
+    <string name="faq_category_technical">Technical</string>
+    <string name="faq_category_billing">Billing</string>
+    <string name="faq_category_other">Other</string>
+
+    <string name="support_request_type_question">Question</string>
+    <string name="support_request_type_suggestion">Suggestion</string>
+    <string name="support_request_type_bug_report">Report Error</string>
+    <string name="support_request_type_other">Other</string>
+
     <!-- Notification Screen -->
     <string name="screen_Notification_action_mark_all_read">Mark all as read</string>
     <string name="screen_Notification_action_mark_read">Mark as read</string>
