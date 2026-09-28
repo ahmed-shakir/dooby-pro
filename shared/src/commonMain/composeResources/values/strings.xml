@@ -167,6 +167,10 @@
     <string name="support_request_type_other">Other</string>
 
     <!-- Notification Screen -->
+    <string name="notification_schedule_label">Notification schedule</string>
+    <string name="notification_schedule_business_hours">During business hours</string>
+    <string name="notification_schedule_daytime">Daytime (08:00 - 20:00)</string>
+    <string name="notification_schedule_anytime">Anytime</string>
     <string name="screen_Notification_action_mark_all_read">Mark all as read</string>
     <string name="screen_Notification_action_mark_read">Mark as read</string>
     <string name="screen_Notification_empty_state">No notifications</string>

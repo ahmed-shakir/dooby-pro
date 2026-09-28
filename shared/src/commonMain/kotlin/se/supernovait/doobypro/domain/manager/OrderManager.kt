@@ -25,6 +25,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.getString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.AuthenticationState
 import se.supernovait.app.core.domain.auth.User
@@ -39,9 +40,13 @@ import se.supernovait.app.core.domain.model.notification.NotificationType
 import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.domain.model.Service
+import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
+import se.supernovait.doobypro.domain.model.settings.notification.NotificationSchedule
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
+import se.supernovait.doobypro.domain.repository.AccountRepository
+import se.supernovait.doobypro.domain.repository.BusinessHoursRepository
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
@@ -59,7 +64,10 @@ class OrderManager(
     private val storageLocationRepository: StorageLocationRepository,
     private val settingsRepository: SettingsRepository,
     private val notificationManager: NotificationManager,
-    private val shareConfiguration: ShareConfiguration
+    private val shareConfiguration: ShareConfiguration,
+    private val authRepository: AuthRepository,
+    private val accountRepository: AccountRepository,
+    private val businessHoursRepository: BusinessHoursRepository
 ) : KoinComponent {
 
     private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -159,12 +167,13 @@ class OrderManager(
                         title = getString(Res.string.screen_Order_label_new_order),
                         message = getString(Res.string.notification_order_updated_message, result.data, getString(OrderStatus.NEW.label)),
                         type = NotificationType.SUCCESS,
+                        showNativeAlert = shouldSendPlatformNotification(),
                         deepLink = Route.OrderDetails(result.data).toUrl(shareConfiguration)
                     )
                 }
             }
             result
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Result.Failure(DataError.UNKNOWN)
         }
     }
@@ -201,6 +210,7 @@ class OrderManager(
                     title = title,
                     message = message,
                     type = NotificationType.INFO,
+                    showNativeAlert = shouldSendPlatformNotification(),
                     deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
                 )
             }
@@ -228,6 +238,7 @@ class OrderManager(
                 title = title,
                 message = message,
                 type = NotificationType.WARNING,
+                showNativeAlert = shouldSendPlatformNotification(),
                 deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
             )
         }
@@ -238,6 +249,8 @@ class OrderManager(
      * based on notification settings. Each alert type per order is sent at most once per day until resolved.
      */
     suspend fun checkAndNotifyOrderAlerts() {
+        if (!shouldSendPlatformNotification()) return
+
         val settings = settingsRepository.settings.first()
         val orders = orderRepository.getOrders().first()
         val allNotifications = notificationManager.notifications.first()
@@ -303,5 +316,33 @@ class OrderManager(
             storageLocationManager.releaseStorageLocation(order.storageLocation.id!!)
         }
         return result
+    }
+
+    private suspend fun shouldSendPlatformNotification(): Boolean {
+        val settings = settingsRepository.settings.first()
+        return when (settings.notification.notificationSchedule) {
+            NotificationSchedule.ANYTIME -> true
+            NotificationSchedule.DAYTIME -> {
+                val hour = LocalDateTime.now().hour
+                hour in 8..20
+            }
+            NotificationSchedule.BUSINESS_HOURS -> {
+                val company = getCompany()
+                if (company?.id != null) {
+                    when (val res = businessHoursRepository.getBusinessHours(company.id)) {
+                        is Result.Success -> res.data.isOpenNow()
+                        else -> true
+                    }
+                } else {
+                    true
+                }
+            }
+        }
+    }
+
+    private suspend fun getCompany(): Company? {
+        val userId = authRepository.getCurrentUserId().getOrNull() ?: return null
+        val account = accountRepository.getAccountByUserId(userId).getOrNull() ?: return null
+        return account.company
     }
 }

@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DayOfWeek
 import se.supernovait.app.core.ui.component.loading.SupernovaLoadingIndicator
+import se.supernovait.doobypro.domain.formatter.defaultFormatDayHours
 import se.supernovait.doobypro.domain.model.company.DayHours
-import se.supernovait.doobypro.domain.usecase.defaultFormatDayHours
 import se.supernovait.doobypro.presentation.businesshours.BusinessHoursEditorState
 
 @Composable

@@ -6,6 +6,7 @@ import se.supernovait.doobypro.domain.model.settings.common.Currency
 import se.supernovait.doobypro.domain.model.settings.common.DateFormat
 import se.supernovait.doobypro.domain.model.settings.common.Language
 import se.supernovait.doobypro.domain.model.settings.common.ThemeMode
+import se.supernovait.doobypro.domain.model.settings.notification.NotificationSchedule
 import se.supernovait.doobypro.domain.model.settings.printer.ConnectionMethod
 import se.supernovait.doobypro.domain.model.settings.receipt.PaperWidth
 import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
@@ -64,4 +65,5 @@ sealed interface SettingsScreenEvent {
     data class UpdateOrderNotPickedUpNotification(val enabled: Boolean) : SettingsScreenEvent
     data class UpdateOrderNotDeliveredNotification(val enabled: Boolean) : SettingsScreenEvent
     data class UpdatePrinterErrorsNotification(val enabled: Boolean) : SettingsScreenEvent
+    data class UpdateNotificationSchedule(val schedule: NotificationSchedule) : SettingsScreenEvent
 }

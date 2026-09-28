@@ -1,11 +1,10 @@
-package se.supernovait.doobypro.domain.usecase
+package se.supernovait.doobypro.domain.formatter
 
 import kotlinx.datetime.DayOfWeek
 import se.supernovait.doobypro.domain.model.company.BusinessHours
 import se.supernovait.doobypro.domain.model.company.DayHours
 
-class FormatBusinessHoursUseCase {
-
+class BusinessHoursFormatter {
     fun formatDay(dayHours: DayHours): String {
         return when (dayHours) {
             DayHours.Closed -> "Closed"
@@ -52,5 +51,5 @@ class FormatBusinessHoursUseCase {
 }
 
 fun defaultFormatDayHours(dayHours: DayHours): String {
-    return FormatBusinessHoursUseCase().formatDay(dayHours)
+    return BusinessHoursFormatter().formatDay(dayHours)
 }

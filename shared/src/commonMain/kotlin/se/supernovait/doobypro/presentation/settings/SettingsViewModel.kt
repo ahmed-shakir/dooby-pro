@@ -101,6 +101,7 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateOrderNotPickedUpNotification -> updateSettings { it.copy(notification = it.notification.copy(orderNotPickedUp = event.enabled)) }
             is SettingsScreenEvent.UpdateOrderNotDeliveredNotification -> updateSettings { it.copy(notification = it.notification.copy(orderNotDelivered = event.enabled)) }
             is SettingsScreenEvent.UpdatePrinterErrorsNotification -> updateSettings { it.copy(notification = it.notification.copy(printerErrors = event.enabled)) }
+            is SettingsScreenEvent.UpdateNotificationSchedule -> updateSettings { it.copy(notification = it.notification.copy(notificationSchedule = event.schedule)) }
         }
     }
 

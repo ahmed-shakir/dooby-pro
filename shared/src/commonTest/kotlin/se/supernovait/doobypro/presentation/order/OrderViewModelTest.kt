@@ -28,6 +28,9 @@ import se.supernovait.app.core.domain.notification.PlatformNotificationHandler
 import se.supernovait.app.core.domain.sharing.DeepLinkHandler
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.app.core.domain.sharing.SharedData
+import se.supernovait.doobypro.data.repository.fake.FakeAccountRepository
+import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
+import se.supernovait.doobypro.data.repository.fake.FakeBusinessHoursRepository
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.manager.OrderQueryManager
 import se.supernovait.doobypro.domain.manager.StorageLocationManager
@@ -112,7 +115,10 @@ class OrderViewModelTest : PlatformTestConfig() {
             storageLocationRepository = fakeStorageRepo,
             settingsRepository = fakeSettingsRepo,
             notificationManager = notificationManager,
-            shareConfiguration = ShareConfiguration.custom("doobypro")
+            shareConfiguration = ShareConfiguration.custom("doobypro"),
+            authRepository = FakeAuthRepository(),
+            accountRepository = FakeAccountRepository(),
+            businessHoursRepository = FakeBusinessHoursRepository()
         )
         orderQueryManager = OrderQueryManager(fakeOrderRepo)
         
