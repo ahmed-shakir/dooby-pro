@@ -36,9 +36,11 @@ import doobypro.shared.generated.resources.screen_AppInfo_description
 import doobypro.shared.generated.resources.screen_AppInfo_developer_label
 import doobypro.shared.generated.resources.screen_AppInfo_legal_section_title
 import doobypro.shared.generated.resources.screen_AppInfo_licenses_label
+import doobypro.shared.generated.resources.screen_AppInfo_privacy_policy_label
 import doobypro.shared.generated.resources.screen_AppInfo_support_action_label
 import doobypro.shared.generated.resources.screen_AppInfo_support_note
 import doobypro.shared.generated.resources.screen_AppInfo_support_section_title
+import doobypro.shared.generated.resources.screen_AppInfo_terms_of_service_label
 import doobypro.shared.generated.resources.screen_AppInfo_website_label
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.SupernovaIcon
@@ -54,7 +56,7 @@ import se.supernovait.doobypro.presentation.common.preview.ScreenPreviewContaine
 
 @Composable
 fun AppInfoScreen(
-    onBack: () -> Unit,
+    onEvent: (InfoScreenEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uriHandler = LocalUriHandler.current
@@ -79,18 +81,12 @@ fun AppInfoScreen(
             )
 
             LegalSection(
-                onPrivacyPolicyClick = { /* TODO: link to Privacy Policy */ },
-                onTermsOfServiceClick = { /* TODO: link to Terms Of Service */ },
+                onPrivacyPolicyClick = { uriHandler.openUri(AppConfig.PRIVACY_POLICY_URL) },
+                onTermsOfServiceClick = { uriHandler.openUri(AppConfig.TERMS_OF_SERVICE_URL) },
                 onLicensesClick = { uriHandler.openUri(AppConfig.LICENSE_URL) }
             )
 
-            // TODO: add when link is available
-            /*SupportNote(
-                onFeedbackClick = { *//* TODO: link to support form *//* }
-            )*/
-
-            // TODO: add when link is available
-            // UpdateSection()
+            SupportNote(onFeedbackClick = { onEvent(InfoScreenEvent.NavigateToSupport) })
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
 
@@ -101,7 +97,7 @@ fun AppInfoScreen(
         SupernovaIconButton(
             icon = Res.drawable.ic_arrow_back,
             contentDescription = stringResource(Res.string.app_action_back_label),
-            onClick = onBack,
+            onClick = { onEvent(InfoScreenEvent.NavigateBack) },
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .padding(top = MaterialTheme.spacing.small, start = MaterialTheme.spacing.small)
@@ -191,8 +187,7 @@ private fun LegalSection(
         
         HorizontalDivider(thickness = 0.5.dp)
 
-        // TODO: add when links is available
-        /*LegalLinkRow(
+        LegalLinkRow(
             label = stringResource(Res.string.screen_AppInfo_privacy_policy_label),
             onClick = onPrivacyPolicyClick
         )
@@ -202,7 +197,7 @@ private fun LegalSection(
             label = stringResource(Res.string.screen_AppInfo_terms_of_service_label),
             onClick = onTermsOfServiceClick
         )
-        HorizontalDivider(thickness = 0.5.dp)*/
+        HorizontalDivider(thickness = 0.5.dp)
         
         LegalLinkRow(
             label = stringResource(Res.string.screen_AppInfo_licenses_label),
@@ -276,6 +271,6 @@ private fun Copyright() {
 @Composable
 private fun Preview() {
     ScreenPreviewContainer {
-        AppInfoScreen(onBack = {})
+        AppInfoScreen(onEvent = {})
     }
 }

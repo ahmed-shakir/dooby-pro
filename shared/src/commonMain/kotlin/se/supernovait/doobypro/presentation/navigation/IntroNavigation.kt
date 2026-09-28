@@ -17,6 +17,7 @@ import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.presentation.app.AppEventHandler
 import se.supernovait.doobypro.presentation.info.AppInfoScreen
+import se.supernovait.doobypro.presentation.info.InfoScreenEvent
 import se.supernovait.doobypro.presentation.notification.NotificationScreen
 import se.supernovait.doobypro.presentation.notification.NotificationViewModel
 import se.supernovait.doobypro.presentation.welcome.SignInBottomSheet
@@ -72,7 +73,14 @@ fun NavGraphBuilder.introGraph(
     }
 
     composable<Route.AppInfo> {
-        AppInfoScreen(onBack = { navController.popBackStack() })
+        AppInfoScreen(
+            onEvent = { event ->
+                when (event) {
+                    InfoScreenEvent.NavigateBack -> navController.popBackStack()
+                    InfoScreenEvent.NavigateToSupport -> navController.navigateWithRules(Route.Support)
+                }
+            }
+        )
     }
 
     composable<Route.Support> {

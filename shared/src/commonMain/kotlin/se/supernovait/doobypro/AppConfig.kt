@@ -4,6 +4,8 @@ package se.supernovait.doobypro
 object AppConfig {
     const val VERSION_CODE = 1
     const val VERSION_NAME = "1.0.0"
-    const val WEBSITE_URL = "https://www.supernovait.se"
-    const val LICENSE_URL = "https://www.supernovait.se/stl1.txt"
+    const val WEBSITE_URL = "https://www.supernovait.se/dooby/pro/"
+    const val PRIVACY_POLICY_URL = "https://www.supernovait.se/dooby/pro/dooby-pro-privacy-policy.pdf"
+    const val TERMS_OF_SERVICE_URL = "https://www.supernovait.se/dooby/pro/dooby-pro-terms-of-service.pdf"
+    const val LICENSE_URL = "https://www.supernovait.se/license/stl1.txt"
 }

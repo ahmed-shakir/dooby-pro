@@ -16,6 +16,8 @@ tasks.register("generateAppVersionConfig") {
     val versionCode = libs.versions.app.version.code.get()
     val versionName = libs.versions.app.version.name.get()
     val websiteUrl = project.findProperty("app.url.website") ?: ""
+    val privacyPolicyUrl = project.findProperty("app.url.privacy-policy") ?: ""
+    val termsOfServiceUrl = project.findProperty("app.url.terms-of-service") ?: ""
     val licenseUrl = project.findProperty("app.url.license") ?: ""
     
     val iosOutputFile = file("iosApp/Configuration/Version.xcconfig")
@@ -24,6 +26,8 @@ tasks.register("generateAppVersionConfig") {
     inputs.property("versionCode", versionCode)
     inputs.property("versionName", versionName)
     inputs.property("websiteUrl", websiteUrl)
+    inputs.property("privacyPolicyUrl", privacyPolicyUrl)
+    inputs.property("termsOfServiceUrl", termsOfServiceUrl)
     inputs.property("licenseUrl", licenseUrl)
     outputs.files(iosOutputFile, commonOutputFile)
     
@@ -48,6 +52,8 @@ tasks.register("generateAppVersionConfig") {
                 const val VERSION_CODE = $versionCode
                 const val VERSION_NAME = "$versionName"
                 const val WEBSITE_URL = "$websiteUrl"
+                const val PRIVACY_POLICY_URL = "$privacyPolicyUrl"
+                const val TERMS_OF_SERVICE_URL = "$termsOfServiceUrl"
                 const val LICENSE_URL = "$licenseUrl"
             }
             """.trimIndent() + "\n"
