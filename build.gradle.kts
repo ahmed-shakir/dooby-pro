@@ -19,6 +19,7 @@ tasks.register("generateAppVersionConfig") {
     val privacyPolicyUrl = project.findProperty("app.url.privacy-policy") ?: ""
     val termsOfServiceUrl = project.findProperty("app.url.terms-of-service") ?: ""
     val licenseUrl = project.findProperty("app.url.license") ?: ""
+    val supportEmail = project.findProperty("app.support.email") ?: "support@supernovait.se"
     
     val iosOutputFile = file("iosApp/Configuration/Version.xcconfig")
     val commonOutputFile = file("shared/src/commonMain/kotlin/se/supernovait/doobypro/AppConfig.kt")
@@ -29,6 +30,7 @@ tasks.register("generateAppVersionConfig") {
     inputs.property("privacyPolicyUrl", privacyPolicyUrl)
     inputs.property("termsOfServiceUrl", termsOfServiceUrl)
     inputs.property("licenseUrl", licenseUrl)
+    inputs.property("supportEmail", supportEmail)
     outputs.files(iosOutputFile, commonOutputFile)
     
     doLast {
@@ -55,6 +57,7 @@ tasks.register("generateAppVersionConfig") {
                 const val PRIVACY_POLICY_URL = "$privacyPolicyUrl"
                 const val TERMS_OF_SERVICE_URL = "$termsOfServiceUrl"
                 const val LICENSE_URL = "$licenseUrl"
+                const val SUPPORT_EMAIL = "$supportEmail"
             }
             """.trimIndent() + "\n"
         )

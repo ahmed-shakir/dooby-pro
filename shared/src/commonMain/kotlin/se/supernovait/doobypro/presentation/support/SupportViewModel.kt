@@ -1,0 +1,84 @@
+package se.supernovait.doobypro.presentation.support
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import io.ktor.http.encodeURLParameter
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import se.supernovait.app.core.domain.auth.AuthRepository
+import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.common.getOrNull
+import se.supernovait.doobypro.AppConfig
+import se.supernovait.doobypro.domain.repository.AccountRepository
+
+/**
+ * ViewModel for the Support Center screen, handling support requests and FAQ search state.
+ */
+class SupportViewModel(
+    private val authRepository: AuthRepository,
+    private val accountRepository: AccountRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(SupportState())
+    val uiState: StateFlow<SupportState> = _uiState.asStateFlow()
+
+    fun onEvent(event: SupportEvent) {
+        when (event) {
+            is SupportEvent.SelectTab -> _uiState.update { it.copy(selectedTab = event.index) }
+            is SupportEvent.UpdateSearchQuery -> _uiState.update { it.copy(searchQuery = event.query) }
+            is SupportEvent.UpdateRequestType -> _uiState.update { it.copy(requestType = event.type) }
+            is SupportEvent.UpdateMessage -> _uiState.update { it.copy(message = event.message) }
+            is SupportEvent.UpdateWantsCallback -> _uiState.update { it.copy(wantsCallback = event.wantsCallback) }
+            is SupportEvent.SubmitRequest -> {
+                viewModelScope.launch {
+                    val state = _uiState.value
+                    var accountId = ""
+                    var userId = ""
+                    var userName = ""
+                    var userEmail = ""
+                    var userPhone = ""
+
+                    val userIdResult = authRepository.getCurrentUserId()
+                    if (userIdResult is Result.Success) {
+                        val accountResult = accountRepository.getAccountByUserId(userIdResult.data)
+                        accountId = accountResult.getOrNull()?.id.orEmpty()
+
+                        val userResult = authRepository.getUserById(userIdResult.data)
+                        if (userResult is Result.Success) {
+                            val user = userResult.data
+
+                            userId = user.id.orEmpty()
+                            userName = "${user.firstname} ${user.lastname}".trim()
+                            userEmail = user.email
+                            userPhone = user.phoneNumber.orEmpty()
+                        }
+                    }
+
+                    val subject = "[Support Request - ${state.requestType.name}] Dooby Pro"
+                    val body = buildString {
+                        appendLine("Request Type: ${state.requestType.name}")
+                        appendLine("Account ID: $accountId")
+                        appendLine("User ID: $userId")
+                        appendLine("User Name: $userName")
+                        appendLine("User Email: $userEmail")
+                        appendLine("User Phone: $userPhone")
+                        appendLine("Wants Callback: ${if (state.wantsCallback) "Yes" else "No"}")
+                        appendLine("App Version: ${AppConfig.VERSION_NAME} (${AppConfig.VERSION_CODE})")
+                        appendLine()
+                        appendLine("Message:")
+                        appendLine(state.message)
+                    }
+
+                    val mailtoUrl = "mailto:${AppConfig.SUPPORT_EMAIL}?subject=${uriEncode(subject)}&body=${uriEncode(body)}"
+
+                    event.onOpenEmail(mailtoUrl)
+                }
+            }
+        }
+    }
+
+    private fun uriEncode(value: String) = value.encodeURLParameter()
+}

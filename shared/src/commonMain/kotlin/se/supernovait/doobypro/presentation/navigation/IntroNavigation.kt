@@ -1,25 +1,18 @@
 package se.supernovait.doobypro.presentation.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import org.koin.compose.viewmodel.koinViewModel
-import se.supernovait.app.core.ui.component.text.SupernovaTitle
-import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.presentation.app.AppEventHandler
 import se.supernovait.doobypro.presentation.info.AppInfoScreen
 import se.supernovait.doobypro.presentation.info.InfoScreenEvent
 import se.supernovait.doobypro.presentation.notification.NotificationScreen
 import se.supernovait.doobypro.presentation.notification.NotificationViewModel
+import se.supernovait.doobypro.presentation.support.SupportScreen
+import se.supernovait.doobypro.presentation.support.SupportViewModel
 import se.supernovait.doobypro.presentation.welcome.SignInBottomSheet
 import se.supernovait.doobypro.presentation.welcome.WelcomeScreen
 import se.supernovait.doobypro.presentation.welcome.WelcomeScreenEvent
@@ -84,13 +77,9 @@ fun NavGraphBuilder.introGraph(
     }
 
     composable<Route.Support> {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.mediumLarge)
-        ) {
-            SupernovaTitle(text = "Support center")
-        }
+        val viewModel = koinViewModel<SupportViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        SupportScreen(uiState = uiState, onEvent = viewModel::onEvent)
     }
 
     composable<Route.Notifications> {

@@ -53,6 +53,7 @@ import se.supernovait.doobypro.presentation.order.details.OrderDetailsViewModel
 import se.supernovait.doobypro.presentation.service.ServiceViewModel
 import se.supernovait.doobypro.presentation.settings.SettingsViewModel
 import se.supernovait.doobypro.presentation.storage.StorageViewModel
+import se.supernovait.doobypro.presentation.support.SupportViewModel
 import se.supernovait.doobypro.presentation.welcome.WelcomeViewModel
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 
@@ -80,6 +81,7 @@ val sharedModule = module {
     viewModelOf(::WelcomeViewModel)
     viewModelOf(::AccountSetupWizardViewModel)
     viewModelOf(::NotificationViewModel)
+    viewModelOf(::SupportViewModel)
     viewModelOf(::AccountViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::OrderViewModel)

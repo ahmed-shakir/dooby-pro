@@ -17,6 +17,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.data.persistence.entity.UserEntity
+import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
@@ -108,6 +109,12 @@ class OrderViewModelTest : PlatformTestConfig() {
             managerScope = CoroutineScope(testDispatcher)
         )
         
+        val fakeAuth = FakeAuthRepository()
+        val authManager = AuthenticationManager(
+            authRepository = fakeAuth,
+            managerScope = CoroutineScope(testDispatcher)
+        )
+
         orderManager = OrderManager(
             orderRepository = fakeOrderRepo,
             serviceRepository = fakeServiceRepo,
@@ -116,7 +123,7 @@ class OrderViewModelTest : PlatformTestConfig() {
             settingsRepository = fakeSettingsRepo,
             notificationManager = notificationManager,
             shareConfiguration = ShareConfiguration.custom("doobypro"),
-            authRepository = FakeAuthRepository(),
+            authRepository = fakeAuth,
             accountRepository = FakeAccountRepository(),
             businessHoursRepository = FakeBusinessHoursRepository()
         )

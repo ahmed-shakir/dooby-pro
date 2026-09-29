@@ -153,6 +153,17 @@
     <string name="screen_AppInfo_check_updates_label">Check for updates</string>
 
     <!-- Support & FAQs -->
+    <string name="screen_support_title">Support Center</string>
+    <string name="screen_support_tab_faqs">FAQs</string>
+    <string name="screen_support_tab_contact">Contact Support</string>
+    <string name="screen_support_form_subject">Subject</string>
+    <string name="screen_support_form_message">Message</string>
+    <string name="screen_support_form_request_type">Request Type</string>
+    <string name="screen_support_form_wants_callback">Request a callback</string>
+    <string name="screen_support_form_submit">Send Support Request</string>
+    <string name="screen_support_faq_search_placeholder">Search FAQs...</string>
+    <string name="screen_support_faq_no_match">No matching FAQs found</string>
+
     <string name="faq_category_getting_started">Getting Started</string>
     <string name="faq_category_orders">Orders</string>
     <string name="faq_category_delivery">Delivery</string>
