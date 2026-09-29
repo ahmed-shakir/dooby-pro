@@ -153,7 +153,6 @@
     <string name="screen_AppInfo_check_updates_label">Check for updates</string>
 
     <!-- Support & FAQs -->
-    <string name="screen_support_title">Support Center</string>
     <string name="screen_support_tab_faqs">FAQs</string>
     <string name="screen_support_tab_contact">Contact Support</string>
     <string name="screen_support_form_subject">Subject</string>

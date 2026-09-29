@@ -1,5 +1,10 @@
 package se.supernovait.doobypro.presentation.support.tab
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -72,9 +77,7 @@ fun FAQTab(
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
 
         if (groupedFaqs.isEmpty()) {
-            SupernovaEmptyState(
-                titleRes = Res.string.screen_support_faq_no_match
-            )
+            SupernovaEmptyState(titleRes = Res.string.screen_support_faq_no_match)
         } else {
             groupedFaqs.forEach { (category, faqs) ->
                 val categoryName = when (category) {
@@ -110,14 +113,20 @@ fun FAQTab(
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.SemiBold
                                 )
-                                if (expanded) {
-                                    HorizontalDivider()
-                                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
-                                    SupernovaLabel(
-                                        text = faq.answer,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                AnimatedVisibility(
+                                    visible = expanded,
+                                    enter = fadeIn() + expandVertically(),
+                                    exit = fadeOut() + shrinkVertically()
+                                ) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
+                                        HorizontalDivider()
+                                        Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
+                                        SupernovaLabel(
+                                            text = faq.answer,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                 }
                             }
                         }

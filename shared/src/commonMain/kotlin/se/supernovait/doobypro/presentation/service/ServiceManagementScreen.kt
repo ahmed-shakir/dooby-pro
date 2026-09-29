@@ -67,9 +67,7 @@ fun ServiceManagementScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (uiState.services.isEmpty() && !uiState.isLoading) {
-            SupernovaEmptyState(
-                titleRes = Res.string.screen_Service_empty_state
-            )
+            SupernovaEmptyState(titleRes = Res.string.screen_Service_empty_state)
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = MaterialTheme.spacing.medium)

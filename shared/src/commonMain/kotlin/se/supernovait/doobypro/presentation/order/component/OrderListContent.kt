@@ -44,9 +44,7 @@ fun OrderListContent(
 
         Box(modifier = Modifier.weight(1f)) {
             if (orders.isEmpty() && !isLoading) {
-                SupernovaEmptyState(
-                    titleRes = Res.string.screen_Order_empty_state
-                )
+                SupernovaEmptyState(titleRes = Res.string.screen_Order_empty_state)
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = MaterialTheme.spacing.medium)

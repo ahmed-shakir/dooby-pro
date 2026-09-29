@@ -66,9 +66,7 @@ fun StorageManagementScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (uiState.locations.isEmpty() && !uiState.isLoading) {
-            SupernovaEmptyState(
-                titleRes = Res.string.screen_Storage_empty_state
-            )
+            SupernovaEmptyState(titleRes = Res.string.screen_Storage_empty_state)
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = MaterialTheme.spacing.medium)

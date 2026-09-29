@@ -15,9 +15,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.screen_support_tab_contact
 import doobypro.shared.generated.resources.screen_support_tab_faqs
-import doobypro.shared.generated.resources.screen_support_title
 import org.jetbrains.compose.resources.stringResource
-import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.presentation.support.tab.ContactSupportTab
 import se.supernovait.doobypro.presentation.support.tab.FAQTab
@@ -34,12 +32,6 @@ fun SupportScreen(
     val uriHandler = LocalUriHandler.current
 
     Column(modifier = modifier.fillMaxSize().padding(MaterialTheme.spacing.medium)) {
-        SupernovaTitle(
-            text = stringResource(Res.string.screen_support_title),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = MaterialTheme.spacing.medium)
-        )
-
         PrimaryTabRow(selectedTabIndex = uiState.selectedTab) {
             Tab(
                 selected = uiState.selectedTab == 0,

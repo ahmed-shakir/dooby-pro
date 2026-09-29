@@ -75,9 +75,7 @@ fun NotificationScreen(
     }
 
     if (uiState.notifications.isEmpty() && !uiState.isLoading) {
-        SupernovaEmptyState(
-            titleRes = Res.string.screen_Notification_empty_state
-        )
+        SupernovaEmptyState(titleRes = Res.string.screen_Notification_empty_state)
     } else {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),

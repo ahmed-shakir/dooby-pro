@@ -79,7 +79,7 @@ private fun ActionButtons(onEvent: (WelcomeScreenEvent) -> Unit) {
     SupernovaButton(
         label = stringResource(Res.string.screen_Welcome_action_sign_in_label),
         textStyle = MaterialTheme.typography.titleLarge,
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.extraSmall,
         onClick = { onEvent(WelcomeScreenEvent.ShowSignInForm) },
         modifier = Modifier
             .fillMaxWidth()

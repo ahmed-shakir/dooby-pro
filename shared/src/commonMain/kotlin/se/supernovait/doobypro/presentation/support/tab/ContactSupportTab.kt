@@ -66,6 +66,7 @@ fun ContactSupportTab(
         SupernovaButton(
             label = stringResource(Res.string.screen_support_form_submit),
             onClick = { onEvent(SupportEvent.SubmitRequest(onOpenEmail)) },
+            shape = MaterialTheme.shapes.extraSmall,
             modifier = Modifier.fillMaxWidth()
         )
     }
