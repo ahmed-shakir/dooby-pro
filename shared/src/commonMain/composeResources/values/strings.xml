@@ -165,6 +165,9 @@
 
     <string name="faq_category_getting_started">Getting Started</string>
     <string name="faq_category_orders">Orders</string>
+    <string name="faq_category_storage">Storage</string>
+    <string name="faq_category_services">Services</string>
+    <string name="faq_category_printing">Printing</string>
     <string name="faq_category_delivery">Delivery</string>
     <string name="faq_category_account">Account</string>
     <string name="faq_category_technical">Technical</string>

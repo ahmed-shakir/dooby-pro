@@ -31,12 +31,10 @@ import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.screen_support_faq_no_match
 import doobypro.shared.generated.resources.screen_support_faq_search_placeholder
 import org.jetbrains.compose.resources.stringResource
-import se.supernovait.app.core.domain.model.faq.StandardFAQCategory
 import se.supernovait.app.core.ui.component.SupernovaEmptyState
 import se.supernovait.app.core.ui.component.input.SupernovaSearchField
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
-import se.supernovait.doobypro.domain.model.support.faq.DoobyFAQCategory
 import se.supernovait.doobypro.domain.model.support.faq.FAQData
 import se.supernovait.doobypro.presentation.support.SupportEvent
 import se.supernovait.doobypro.presentation.support.SupportState
@@ -77,14 +75,13 @@ fun FAQTab(
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
 
         if (groupedFaqs.isEmpty()) {
-            SupernovaEmptyState(titleRes = Res.string.screen_support_faq_no_match)
+            SupernovaEmptyState(title = Res.string.screen_support_faq_no_match)
         } else {
             groupedFaqs.forEach { (category, faqs) ->
-                val categoryName = when (category) {
-                    is StandardFAQCategory -> category.name.lowercase().replace('_', ' ').replaceFirstChar { it.uppercase() }
-                    is DoobyFAQCategory -> category.name.lowercase().replace('_', ' ').replaceFirstChar { it.uppercase() }
-                    else -> category.toString()
-                }
+                val categoryName = category.id
+                    .lowercase()
+                    .replace('_', ' ')
+                    .replaceFirstChar { it.uppercase() }
 
                 Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
                     SupernovaLabel(
