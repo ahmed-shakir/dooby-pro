@@ -16,7 +16,7 @@ object FAQData {
             id = "faq_2",
             category = StandardFAQCategory.GETTING_STARTED,
             question = "Can I change my account information later?",
-            answer = "Yes, you can update your account information anytime. Go to Settings > Account and tap on the section you want to edit. Make your changes and save."
+            answer = "Yes, you can update your account information anytime. Go to Account and tap on the section you want to edit. Make your changes and save."
         ),
 
         // Orders
@@ -24,13 +24,13 @@ object FAQData {
             id = "faq_3",
             category = DoobyFAQCategory.ORDERS,
             question = "How do I create a new order?",
-            answer = "Tap the + button on the dashboard to create a new order. You can either scan a customer QR code or manually enter their details. Then fill in the order information and submit."
+            answer = "Tap + in Orders to create a new order. You can either scan a customer QR code or manually enter their details. Then fill in the order information and submit."
         ),
         FAQ(
             id = "faq_4",
             category = DoobyFAQCategory.ORDERS,
             question = "Can I edit an order after creating it?",
-            answer = "Yes, you can edit orders in the New, In Progress, and Ready statuses. Open the order details and tap Edit. Some fields like the delivery method are locked and can't be changed once the order reaches Ready status."
+            answer = "Yes, you can edit orders in the New, In Progress, and Ready statuses. Open the order details and tap Edit. The delivery method can't be changed once the order reaches Ready status."
         ),
         FAQ(
             id = "faq_5",
@@ -48,13 +48,13 @@ object FAQData {
             id = "faq_7",
             category = DoobyFAQCategory.ORDERS,
             question = "How do I find a specific order?",
-            answer = "On the Orders screen, use search and filters to find orders by customer name, order ID, service type, or date range."
+            answer = "In Orders, use search and filters to find orders by customer name, order ID, service type, or date range."
         ),
         FAQ(
             id = "faq_8",
             category = DoobyFAQCategory.ORDERS,
             question = "Where can I see old or cancelled orders?",
-            answer = "Open the menu on the Orders screen and choose the historical orders option. It lists cancelled orders and older completed orders that no longer appear in the main tabs."
+            answer = "Open the menu in Orders and choose the historical orders option. It lists cancelled orders and older completed orders that no longer appear in the main tabs."
         ),
 
         // Delivery
@@ -96,22 +96,28 @@ object FAQData {
             question = "Where can I find my license information?",
             answer = "Your license details are available in Account > License. This section is read-only and shows your license status, tier, and validity dates."
         ),
+        FAQ(
+            id = "faq_15",
+            category = StandardFAQCategory.ACCOUNT,
+            question = "How do I set my business hours?",
+            answer = "Go to Account > Company Profile and open the business hours section. Tap a day to edit it. You can mark a day as Closed, Open 24 hours, or set custom opening and closing times. Business hours are used for notification timing and shown on receipts."
+        ),
 
         // Technical
         FAQ(
-            id = "faq_15",
+            id = "faq_16",
             category = StandardFAQCategory.TECHNICAL,
             question = "The app is running slowly. What can I do?",
-            answer = "Try these steps: 1) Close and reopen the app, 2) Clear the app cache in settings, 3) Make sure you have enough storage space, 4) Update to the latest version. If problems persist, contact support."
+            answer = "Try these steps: 1) Close and reopen the app, 2) Clear the app cache in your device settings, 3) Make sure you have enough storage space, 4) Update to the latest version. If problems persist, contact support."
         ),
         FAQ(
-            id = "faq_16",
+            id = "faq_17",
             category = StandardFAQCategory.TECHNICAL,
             question = "I'm having trouble logging in.",
             answer = "First, check your internet connection. Then verify your email and password are correct. If you've forgotten your password, use the password reset option. For continued issues, contact our support team."
         ),
         FAQ(
-            id = "faq_17",
+            id = "faq_18",
             category = StandardFAQCategory.TECHNICAL,
             question = "How do I report a bug?",
             answer = "Go to Support > Support and select 'Bug Report' as the request type. Describe the issue in detail, including when it happens and what you were doing. Attach screenshots if possible."
@@ -119,39 +125,39 @@ object FAQData {
 
         // Billing
         FAQ(
-            id = "faq_18",
+            id = "faq_19",
             category = StandardFAQCategory.BILLING,
             question = "How are customers charged for orders?",
             answer = "Customers can be charged based on your pricing settings. You can set prices for services and delivery options. The app calculates totals automatically based on the service selected and delivery method."
         ),
         FAQ(
-            id = "faq_19",
+            id = "faq_20",
             category = StandardFAQCategory.BILLING,
             question = "Can I change prices for services?",
-            answer = "Yes, you can update service prices anytime. Open the Services from the menu, tap the service, and change its price. Changes apply to new orders created after the update."
+            answer = "Yes, you can update service prices anytime. Go to Services, tap the service, and change its price. Changes apply to new orders created after the update."
         ),
 
         // Storage
         FAQ(
-            id = "faq_20",
+            id = "faq_21",
             category = DoobyFAQCategory.STORAGE,
             question = "What is a storage location?",
             answer = "A storage location is the shelf, rack, or bin where you keep a customer's items while their order is being processed. It helps your team find items quickly when the order is ready."
         ),
         FAQ(
-            id = "faq_21",
+            id = "faq_22",
             category = DoobyFAQCategory.STORAGE,
             question = "Do I have to choose a storage location for every order?",
             answer = "It depends on your storage allocation mode. In manual mode, you must select a storage location before creating an order. In automatic mode, the field is hidden and the app assigns a location for you."
         ),
         FAQ(
-            id = "faq_22",
+            id = "faq_23",
             category = DoobyFAQCategory.STORAGE,
             question = "When is a storage location released?",
             answer = "A storage location is released automatically when the order is completed: picked up, delivered, or cancelled. It then becomes available for new orders."
         ),
         FAQ(
-            id = "faq_23",
+            id = "faq_24",
             category = DoobyFAQCategory.STORAGE,
             question = "Can I print a storage location tag?",
             answer = "Yes. Open the order details and tap Print Storage Tag. Attach the tag to the customer's items so they are easy to match with the order. A connected printer is required."
@@ -159,25 +165,25 @@ object FAQData {
 
         // Services
         FAQ(
-            id = "faq_24",
-            category = DoobyFAQCategory.SERVICES,
-            question = "How do I add a new service?",
-            answer = "Open the Services screen and tap the + button. Enter a title, description, and price, then save. The service will be available when creating new orders."
-        ),
-        FAQ(
             id = "faq_25",
             category = DoobyFAQCategory.SERVICES,
-            question = "How do I edit a service?",
-            answer = "Open the Services screen, tap the service you want to change, and update its title, description, or price. Changes apply to new orders only. Existing orders keep their original details."
+            question = "How do I add a new service?",
+            answer = "Go to Services and tap the + button. Enter a title, description, and price, then save. The service will be available when creating new orders."
         ),
         FAQ(
             id = "faq_26",
+            category = DoobyFAQCategory.SERVICES,
+            question = "How do I edit a service?",
+            answer = "Go to Services, tap the service you want to change, and update its title, description, or price. Changes apply to new orders only. Existing orders keep their original details."
+        ),
+        FAQ(
+            id = "faq_27",
             category = DoobyFAQCategory.SERVICES,
             question = "Can I use a different service than the default for an order?",
             answer = "Yes. The default service is pre-selected when you create an order, but you can change it to match the customer's request."
         ),
         FAQ(
-            id = "faq_27",
+            id = "faq_28",
             category = DoobyFAQCategory.SERVICES,
             question = "How is the expected completion time calculated?",
             answer = "The expected completion time is generated automatically from your order settings and the selected service. You can override it manually when creating the order if the customer needs a different timeline."
@@ -185,34 +191,28 @@ object FAQData {
 
         // Settings
         FAQ(
-            id = "faq_28",
+            id = "faq_29",
             category = StandardFAQCategory.SETTINGS,
             question = "How do I change the app theme?",
             answer = "Go to Settings > Theme and choose Light, Dark, or Device default. Device default follows your phone's system appearance."
         ),
         FAQ(
-            id = "faq_29",
+            id = "faq_30",
             category = StandardFAQCategory.SETTINGS,
             question = "How do I change the currency or date format?",
             answer = "Go to Settings > Common. There you can set the currency and date format used across orders, receipts, and reports."
         ),
         FAQ(
-            id = "faq_30",
+            id = "faq_31",
             category = StandardFAQCategory.SETTINGS,
             question = "Can I change the app language?",
             answer = "The app is currently available in English only. Language selection is already in Settings and more languages will be added in future updates."
         ),
         FAQ(
-            id = "faq_31",
+            id = "faq_32",
             category = StandardFAQCategory.SETTINGS,
             question = "How do I set default values for new orders?",
             answer = "Go to Settings > Order. You can set the default delivery option, delivery method, and delivery date, and configure the order number format. These values are pre-filled on every new order, and you can still change them per order."
-        ),
-        FAQ(
-            id = "faq_32",
-            category = StandardFAQCategory.SETTINGS,
-            question = "How do I set my business hours?",
-            answer = "Go to Settings > Business Hours and tap a day to edit it. You can mark a day as Closed, Open 24 hours, or set custom opening and closing times. Business hours are used for notification timing and shown on receipts."
         ),
 
         // Printing
@@ -272,7 +272,7 @@ object FAQData {
             id = "faq_41",
             category = StandardFAQCategory.CUSTOMERS,
             question = "How does the customer QR code work?",
-            answer = "Customers get a QR code in their Dooby app. Tap + on the dashboard and scan it. Their name and details are filled in automatically, so you only need to enter the order information."
+            answer = "Customers can reveal a QR code in their Dooby app. Tap + in Orders and scan it. Their name and details are filled in automatically, so you only need to enter the order information. If a customer isn't in your system yet, a profile is created automatically."
         ),
         FAQ(
             id = "faq_42",
@@ -292,7 +292,7 @@ object FAQData {
             id = "faq_44",
             category = StandardFAQCategory.OTHER,
             question = "How do I contact support?",
-            answer = "You can reach our support team through the Support section in the app. Fill out the support form with your question or issue, and our team will get back to you within 24-48 hours."
+            answer = "Go to Support and fill out the support form with your question or issue. Our team will get back to you within 24-48 hours."
         )
     )
 }
