@@ -145,7 +145,7 @@
     <string name="screen_AppInfo_legal_section_title">Legal</string>
     <string name="screen_AppInfo_privacy_policy_label">Privacy Policy</string>
     <string name="screen_AppInfo_terms_of_service_label">Terms of Service</string>
-    <string name="screen_AppInfo_licenses_label">Licenses</string>
+    <string name="screen_AppInfo_license_label">License</string>
     <string name="screen_AppInfo_support_section_title">Support</string>
     <string name="screen_AppInfo_support_note">Need help? You can send feedback or contact support through our support form.</string>
     <string name="screen_AppInfo_support_action_label">Send feedback</string>

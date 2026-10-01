@@ -75,6 +75,8 @@ class OrderManager(
         runCatching { get<AuthenticationManager>() }.getOrNull()
     }
 
+    // TODO: IMPLEMENT LOGGING ALL OVER THE APP
+
     init {
         managerScope.launch {
             try {

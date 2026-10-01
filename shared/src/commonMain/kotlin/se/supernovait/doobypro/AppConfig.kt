@@ -7,6 +7,6 @@ object AppConfig {
     const val WEBSITE_URL = "https://www.supernovait.se/dooby/pro/"
     const val PRIVACY_POLICY_URL = "https://www.supernovait.se/dooby/pro/dooby-pro-privacy-policy.pdf"
     const val TERMS_OF_SERVICE_URL = "https://www.supernovait.se/dooby/pro/dooby-pro-terms-of-service.pdf"
-    const val LICENSE_URL = "https://www.supernovait.se/license/stl1.txt"
+    const val LICENSE_URL = "https://www.supernovait.se/license/SUPERNOVA_LICENSE_V1.txt"
     const val SUPPORT_EMAIL = "support@supernovait.se"
 }

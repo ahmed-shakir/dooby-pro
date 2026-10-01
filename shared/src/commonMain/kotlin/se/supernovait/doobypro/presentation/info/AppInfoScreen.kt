@@ -35,7 +35,7 @@ import doobypro.shared.generated.resources.screen_AppInfo_copyright
 import doobypro.shared.generated.resources.screen_AppInfo_description
 import doobypro.shared.generated.resources.screen_AppInfo_developer_label
 import doobypro.shared.generated.resources.screen_AppInfo_legal_section_title
-import doobypro.shared.generated.resources.screen_AppInfo_licenses_label
+import doobypro.shared.generated.resources.screen_AppInfo_license_label
 import doobypro.shared.generated.resources.screen_AppInfo_privacy_policy_label
 import doobypro.shared.generated.resources.screen_AppInfo_support_action_label
 import doobypro.shared.generated.resources.screen_AppInfo_support_note
@@ -200,7 +200,7 @@ private fun LegalSection(
         HorizontalDivider(thickness = 0.5.dp)
         
         LegalLinkRow(
-            label = stringResource(Res.string.screen_AppInfo_licenses_label),
+            label = stringResource(Res.string.screen_AppInfo_license_label),
             onClick = onLicensesClick
         )
         HorizontalDivider(thickness = 0.5.dp)
