@@ -24,6 +24,7 @@ import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.agreement.Agreement
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import se.supernovait.doobypro.domain.model.company.Company
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -98,7 +99,8 @@ class AccountRepositoryImplTest {
             licenseRepository = fakeLicenseRepository,
             agreementRepository = fakeAgreementRepository,
             accountDao = fakeAccountDao,
-            userDao = fakeUserDao
+            userDao = fakeUserDao,
+            logger = FakeLogger()
         )
     }
 

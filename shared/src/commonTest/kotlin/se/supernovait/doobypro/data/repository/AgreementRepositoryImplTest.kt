@@ -11,6 +11,7 @@ import se.supernovait.doobypro.data.local.dao.FakeAgreementDao
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.agreement.Agreement
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -47,7 +48,8 @@ class AgreementRepositoryImplTest {
     fun setUp() {
         fakeAgreementDao = FakeAgreementDao()
         repository = AgreementRepositoryImpl(
-            agreementDao = fakeAgreementDao
+            agreementDao = fakeAgreementDao,
+            logger = FakeLogger()
         )
     }
 

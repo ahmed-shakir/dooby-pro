@@ -14,6 +14,7 @@ import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
 import se.supernovait.doobypro.data.local.dao.StorageLocationDao
@@ -24,6 +25,7 @@ import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.OrderRepository
+import se.supernovait.doobypro.domain.util.LogTags
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Clock
 
@@ -35,11 +37,13 @@ class OrderRepositoryImpl(
     private val userDao: UserDao,
     private val orderDao: OrderDao,
     private val serviceDao: ServiceDao,
-    private val storageLocationDao: StorageLocationDao
+    private val storageLocationDao: StorageLocationDao,
+    private val logger: Logger
 ) : OrderRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
     override fun getOrders(): Flow<List<Order>> {
+        logger.debug("Observing all orders stream", tag = LogTags.ORDER_REPO)
         return orderDao.getAll().flatMapLatest { entities ->
             if (entities.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
@@ -63,6 +67,7 @@ class OrderRepositoryImpl(
     }
 
     override fun getOrdersByCustomerId(customerId: String): Flow<List<Order>> {
+        logger.debug("Observing orders for customer with ID: $customerId", tag = LogTags.ORDER_REPO)
         return orderDao.getByCustomerId(customerId).flatMapLatest { entities ->
             if (entities.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
@@ -86,6 +91,7 @@ class OrderRepositoryImpl(
 
     override suspend fun getOrderById(id: String): Result<Order, DataError> {
         return withContext(ioContext) {
+            logger.debug("Fetching order with ID: $id", tag = LogTags.ORDER_REPO)
             val order = orderDao.getById(id)
 
             if (order != null) {
@@ -96,9 +102,11 @@ class OrderRepositoryImpl(
                 if (user != null && service != null && storageLocation != null) {
                     Result.Success(order.toDomain(user, service, storageLocation))
                 } else {
+                    logger.warn("Order with ID: $id is missing dependent components (user=$user, service=$service, storage=$storageLocation)", tag = LogTags.ORDER_REPO)
                     Result.Failure(DataError.NOT_FOUND)
                 }
             } else {
+                logger.warn("Order entity not found with ID: $id", tag = LogTags.ORDER_REPO)
                 Result.Failure(DataError.NOT_FOUND)
             }
         }
@@ -107,10 +115,12 @@ class OrderRepositoryImpl(
     override suspend fun saveOrder(order: Order): Result<String, DataError> {
         return withContext(ioContext) {
             try {
+                logger.info("Saving order with ID: ${order.id}", tag = LogTags.ORDER_REPO)
                 val entityToSave = order.toEntity()
                 orderDao.upsert(entityToSave)
                 Result.Success(entityToSave.id)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logger.error("Error saving order with ID: ${order.id}", e, tag = LogTags.ORDER_REPO)
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -119,9 +129,11 @@ class OrderRepositoryImpl(
     override suspend fun deleteOrder(order: Order): Result<Unit, DataError> {
         return withContext(ioContext) {
             try {
+                logger.info("Deleting order with ID: ${order.id}", tag = LogTags.ORDER_REPO)
                 orderDao.delete(order.toEntity())
                 Result.Success(Unit)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logger.error("Error deleting order with ID: ${order.id}", e, tag = LogTags.ORDER_REPO)
                 Result.Failure(DataError.UNKNOWN)
             }
         }
@@ -130,16 +142,23 @@ class OrderRepositoryImpl(
     override suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus): Result<Unit, DataError> {
         return withContext(ioContext) {
             try {
-                val order = orderDao.getById(orderId) ?: return@withContext Result.Failure(DataError.NOT_FOUND)
+                logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_REPO)
+                val order = orderDao.getById(orderId)
+                if (order == null) {
+                    logger.warn("Cannot update status: Order not found with ID: $orderId", tag = LogTags.ORDER_REPO)
+                    return@withContext Result.Failure(DataError.NOT_FOUND)
+                }
 
                 // If transitioning to a terminal status, release the storage slot
                 if (newStatus.isTerminal()) {
+                    logger.info("Order with ID: $orderId reached terminal status $newStatus, releasing storage slot for location with ID: ${order.storageLocationId}", tag = LogTags.ORDER_REPO)
                     storageLocationDao.decrementOccupiedSlots(order.storageLocationId)
                 }
 
                 orderDao.updateOrderStatus(orderId, newStatus, Clock.System.now())
                 Result.Success(Unit)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logger.error("Error updating status for order with ID: $orderId", e, tag = LogTags.ORDER_REPO)
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }

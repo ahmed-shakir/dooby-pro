@@ -173,7 +173,6 @@ sealed interface Route : NavigationRoute {
         }
 
         fun startScreen(isAuthenticated: Boolean): Route {
-            println("Navigation route - isAuthenticated: $isAuthenticated")
             return if (isAuthenticated) Dashboard else Welcome
         }
     }

@@ -13,23 +13,30 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.app.core.domain.location.Address
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.domain.repository.AccountRepository
+import se.supernovait.doobypro.domain.util.LogTags
 
 /**
  * ViewModel for the Account Setup Wizard.
  * Manages the multi-step form state and handles user input events.
  */
 class AccountSetupWizardViewModel(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val logger: Logger
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountSetupWizardState())
     val uiState = _uiState.asStateFlow()
 
     private val _events = Channel<AppEvent>()
     val events = _events.receiveAsFlow()
+
+    init {
+        logger.info("AccountSetupWizardViewModel initialized", tag = LogTags.ACCOUNT_SETUP_VM)
+    }
 
     fun onEvent(event: AccountSetupWizardEvent) {
         when (event) {
@@ -57,6 +64,7 @@ class AccountSetupWizardViewModel(
 
     private fun onNextStep() {
         if (_uiState.value.currentStep < 4) {
+            logger.debug("Advancing to next wizard step from step ${_uiState.value.currentStep}", tag = LogTags.ACCOUNT_SETUP_VM)
             _uiState.update { currentState ->
                 currentState.copy(
                     phoneNumber = if (currentState.phoneNumber.isNotBlank()) formatPhoneNumber(currentState.phoneNumber) else "",
@@ -72,6 +80,7 @@ class AccountSetupWizardViewModel(
 
     private fun onBackStep() {
         if (_uiState.value.currentStep > 1) {
+            logger.debug("Going back to previous wizard step from step ${_uiState.value.currentStep}", tag = LogTags.ACCOUNT_SETUP_VM)
             _uiState.value = _uiState.value.copy(currentStep = _uiState.value.currentStep - 1)
         }
     }
@@ -98,6 +107,7 @@ class AccountSetupWizardViewModel(
 
     private fun createAccount() {
         viewModelScope.launch {
+            logger.info("Submitting new account setup wizard form", tag = LogTags.ACCOUNT_SETUP_VM)
             _uiState.value = _uiState.value.copy(isCreatingAccount = true)
             
             val state = _uiState.value
@@ -129,8 +139,10 @@ class AccountSetupWizardViewModel(
             
             val result = accountRepository.saveAccount(account)
             if (result.isSuccess) {
+                logger.info("Account creation in wizard succeeded", tag = LogTags.ACCOUNT_SETUP_VM)
                 _events.send(AppEvent.SignIn)
             } else {
+                logger.error("Account creation in wizard failed", tag = LogTags.ACCOUNT_SETUP_VM)
                 _events.send(AppEvent.Failure(AuthError.UNKNOWN))
             }
 

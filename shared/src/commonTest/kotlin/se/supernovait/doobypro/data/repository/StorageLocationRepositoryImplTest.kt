@@ -7,6 +7,7 @@ import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.doobypro.data.local.dao.FakeStorageLocationDao
 import se.supernovait.doobypro.data.local.mapper.toEntity
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,7 +22,10 @@ class StorageLocationRepositoryImplTest {
     @BeforeTest
     fun setUp() {
         fakeDao = FakeStorageLocationDao()
-        repository = StorageLocationRepositoryImpl(fakeDao)
+        repository = StorageLocationRepositoryImpl(
+            storageLocationDao = fakeDao,
+            logger = FakeLogger()
+        )
     }
 
     @Test

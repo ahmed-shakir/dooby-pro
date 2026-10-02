@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import se.supernovait.doobypro.data.local.preferences.FakeDataStore
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.common.Currency
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,10 +18,14 @@ class SettingsRepositoryImplTest {
     @BeforeTest
     fun setup() {
         fakeDataStore = FakeDataStore()
-        repository = SettingsRepositoryImpl(fakeDataStore, Json { 
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-        })
+        repository = SettingsRepositoryImpl(
+            dataStore = fakeDataStore,
+            json = Json { 
+                ignoreUnknownKeys = true
+                encodeDefaults = true
+            },
+            logger = FakeLogger()
+        )
     }
 
     @Test

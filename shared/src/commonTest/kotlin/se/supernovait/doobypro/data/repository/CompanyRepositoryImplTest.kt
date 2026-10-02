@@ -10,6 +10,7 @@ import se.supernovait.doobypro.data.local.dao.FakeBusinessHoursDao
 import se.supernovait.doobypro.data.local.dao.FakeCompanyDao
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.company.Company
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -47,7 +48,8 @@ class CompanyRepositoryImplTest {
         fakeBusinessHoursDao = FakeBusinessHoursDao()
         repository = CompanyRepositoryImpl(
             companyDao = fakeCompanyDao,
-            businessHoursDao = fakeBusinessHoursDao
+            businessHoursDao = fakeBusinessHoursDao,
+            logger = FakeLogger()
         )
     }
 

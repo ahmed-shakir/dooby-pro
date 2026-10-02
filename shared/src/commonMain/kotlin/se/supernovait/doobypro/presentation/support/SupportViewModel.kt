@@ -11,15 +11,18 @@ import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.AppConfig
 import se.supernovait.doobypro.domain.repository.AccountRepository
+import se.supernovait.doobypro.domain.util.LogTags
 
 /**
  * ViewModel for the Support Center screen, handling support requests and FAQ search state.
  */
 class SupportViewModel(
     private val authRepository: AuthRepository,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val logger: Logger
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SupportState())
@@ -27,12 +30,19 @@ class SupportViewModel(
 
     fun onEvent(event: SupportEvent) {
         when (event) {
-            is SupportEvent.SelectTab -> _uiState.update { it.copy(selectedTab = event.index) }
+            is SupportEvent.SelectTab -> {
+                logger.debug("Selecting support tab index: ${event.index}", tag = LogTags.SUPPORT_VM)
+                _uiState.update { it.copy(selectedTab = event.index) }
+            }
             is SupportEvent.UpdateSearchQuery -> _uiState.update { it.copy(searchQuery = event.query) }
-            is SupportEvent.UpdateRequestType -> _uiState.update { it.copy(requestType = event.type) }
+            is SupportEvent.UpdateRequestType -> {
+                logger.debug("Updating support request type: ${event.type}", tag = LogTags.SUPPORT_VM)
+                _uiState.update { it.copy(requestType = event.type) }
+            }
             is SupportEvent.UpdateMessage -> _uiState.update { it.copy(message = event.message) }
             is SupportEvent.UpdateWantsCallback -> _uiState.update { it.copy(wantsCallback = event.wantsCallback) }
             is SupportEvent.SubmitRequest -> {
+                logger.info("Submitting support request of type: ${_uiState.value.requestType}", tag = LogTags.SUPPORT_VM)
                 viewModelScope.launch {
                     val state = _uiState.value
                     var accountId = ""
@@ -73,7 +83,7 @@ class SupportViewModel(
                     }
 
                     val mailtoUrl = "mailto:${AppConfig.SUPPORT_EMAIL}?subject=${uriEncode(subject)}&body=${uriEncode(body)}"
-
+                    logger.info("Support request prepared successfully, launching email client", tag = LogTags.SUPPORT_VM)
                     event.onOpenEmail(mailtoUrl)
                 }
             }

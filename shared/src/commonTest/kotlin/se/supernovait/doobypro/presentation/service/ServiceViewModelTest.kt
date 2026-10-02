@@ -19,6 +19,7 @@ import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.common.Currency
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -37,7 +38,11 @@ class ServiceViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakeServiceRepository = FakeServiceRepository()
         fakeSettingsRepository = FakeSettingsRepository()
-        viewModel = ServiceViewModel(fakeServiceRepository, fakeSettingsRepository)
+        viewModel = ServiceViewModel(
+            serviceRepository = fakeServiceRepository,
+            settingsRepository = fakeSettingsRepository,
+            logger = FakeLogger()
+        )
     }
 
     @AfterTest

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.printer.ConnectionMethod
@@ -16,17 +17,23 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
+import se.supernovait.doobypro.domain.util.LogTags
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
     private val serviceRepository: ServiceRepository,
-    private val storageLocationRepository: StorageLocationRepository
+    private val storageLocationRepository: StorageLocationRepository,
+    private val logger: Logger
 ) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     private val _isSearchingPrinters = MutableStateFlow(false)
     private val _discoveredPrinters = MutableStateFlow<List<DiscoveredPrinter>>(emptyList())
     private val _error = MutableStateFlow<String?>(null)
+
+    init {
+        logger.info("SettingsViewModel initialized", tag = LogTags.SETTINGS_VM)
+    }
 
     val uiState: StateFlow<SettingsState> = combine(
         settingsRepository.settings,
@@ -54,6 +61,7 @@ class SettingsViewModel(
     )
 
     fun onEvent(event: SettingsScreenEvent) {
+        logger.debug("Handling event: $event", tag = LogTags.SETTINGS_VM)
         when (event) {
             SettingsScreenEvent.ResetSettings -> resetSettings()
             // Common settings
@@ -108,6 +116,7 @@ class SettingsViewModel(
     private fun searchPrinters() {
         viewModelScope.launch {
             val method = uiState.value.settings.printer.connectionMethod
+            logger.info("Searching for printers via method: $method", tag = LogTags.SETTINGS_VM)
             _isSearchingPrinters.value = true
             _discoveredPrinters.value = emptyList()
 
@@ -123,6 +132,7 @@ class SettingsViewModel(
 
     private fun updateSettings(transform: (Settings) -> Settings) {
         viewModelScope.launch {
+            logger.info("Updating settings", tag = LogTags.SETTINGS_VM)
             val currentSettings = uiState.value.settings
             val newSettings = transform(currentSettings)
             settingsRepository.updateSettings(newSettings)
@@ -131,6 +141,7 @@ class SettingsViewModel(
 
     private fun resetSettings() {
         viewModelScope.launch {
+            logger.info("Resetting settings to defaults", tag = LogTags.SETTINGS_VM)
             settingsRepository.resetSettings()
         }
     }

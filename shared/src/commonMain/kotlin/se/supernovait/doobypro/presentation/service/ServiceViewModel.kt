@@ -12,25 +12,30 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
+import se.supernovait.doobypro.domain.util.LogTags
 
 class ServiceViewModel(
     private val serviceRepository: ServiceRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val logger: Logger
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ServiceState())
     val uiState: StateFlow<ServiceState> = _uiState.asStateFlow()
 
     init {
+        logger.info("ServiceViewModel initialized", tag = LogTags.SERVICE_VM)
         loadServices()
         observeSettings()
     }
 
     fun onEvent(event: ServiceEvent) {
+        logger.debug("Handling event: $event", tag = LogTags.SERVICE_VM)
         when (event) {
             ServiceEvent.LoadServices -> loadServices()
             is ServiceEvent.EditService -> _uiState.update { it.copy(editingService = event.service) }
@@ -41,6 +46,7 @@ class ServiceViewModel(
 
     private fun loadServices() {
         viewModelScope.launch {
+            logger.debug("Loading services catalog", tag = LogTags.SERVICE_VM)
             _uiState.update { it.copy(isLoading = true) }
             serviceRepository.getServices().collect { services ->
                 _uiState.update { it.copy(services = services.sortedBy { s -> s.title }, isLoading = false) }
@@ -58,6 +64,7 @@ class ServiceViewModel(
 
     private fun saveService(event: ServiceEvent.SaveService) {
         viewModelScope.launch {
+            logger.info("Saving service '${event.title}'", tag = LogTags.SERVICE_VM)
             _uiState.update { it.copy(isSaving = true) }
             val currency = _uiState.value.currency
             val currentService = _uiState.value.editingService
@@ -74,8 +81,10 @@ class ServiceViewModel(
 
             val result = serviceRepository.saveService(serviceToSave)
             if (result is Result.Success) {
+                logger.info("Service '${event.title}' saved successfully", tag = LogTags.SERVICE_VM)
                 _uiState.update { it.copy(isSaving = false, editingService = null) }
             } else {
+                logger.error("Failed to save service '${event.title}'", tag = LogTags.SERVICE_VM)
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Service_error_save_failed) }
             }
         }
@@ -83,11 +92,14 @@ class ServiceViewModel(
 
     private fun deleteService(service: Service) {
         viewModelScope.launch {
+            logger.info("Deleting service with ID: ${service.id}", tag = LogTags.SERVICE_VM)
             _uiState.update { it.copy(isSaving = true) }
             val result = serviceRepository.deleteService(service)
             if (result is Result.Success) {
+                logger.info("Service with ID: ${service.id} deleted successfully", tag = LogTags.SERVICE_VM)
                 _uiState.update { it.copy(isSaving = false) }
             } else {
+                logger.error("Failed to delete service with ID: ${service.id}", tag = LogTags.SERVICE_VM)
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Service_error_delete_failed) }
             }
         }

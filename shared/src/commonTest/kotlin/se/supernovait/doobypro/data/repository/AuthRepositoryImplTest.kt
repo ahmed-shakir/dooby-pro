@@ -9,6 +9,7 @@ import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.doobypro.data.local.dao.FakeAccountDao
 import se.supernovait.doobypro.data.local.dao.FakeUserDao
 import se.supernovait.doobypro.data.repository.fake.FakeSessionRepository
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -44,7 +45,8 @@ class AuthRepositoryImplTest {
         repository = AuthRepositoryImpl(
             userDao = fakeUserDao,
             accountDao = fakeAccountDao,
-            sessionRepository = fakeSessionRepository
+            sessionRepository = fakeSessionRepository,
+            logger = FakeLogger()
         )
     }
 

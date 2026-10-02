@@ -16,9 +16,12 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
+import se.supernovait.app.core.domain.logging.LogLevel
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.notification.Notification
 import se.supernovait.app.core.domain.notification.NotificationManager
@@ -98,11 +101,18 @@ class OrderManagerTest : PlatformTestConfig() {
     }
 
     private fun createOrderManager(scope: CoroutineScope): OrderManager {
-        val storageManager = StorageLocationManager(fakeStorageRepo, fakeSettingsRepo)
+        val storageManager = StorageLocationManager(fakeStorageRepo, fakeSettingsRepo, FakeLogger())
         val notificationManager = NotificationManager(
+            logger = FakeLogger(),
             repository = fakeNotificationRepo,
             platformHandler = FakePlatformNotificationHandler(),
             deepLinkHandler = FakeDeepLinkHandler(),
+            managerScope = scope
+        )
+        val fakeAuth = FakeAuthRepository()
+        val authManager = AuthenticationManager(
+            logger = FakeLogger(),
+            authRepository = fakeAuth,
             managerScope = scope
         )
 
@@ -114,9 +124,11 @@ class OrderManagerTest : PlatformTestConfig() {
             settingsRepository = fakeSettingsRepo,
             notificationManager = notificationManager,
             shareConfiguration = ShareConfiguration.custom("doobypro"),
-            authRepository = FakeAuthRepository(),
+            authenticationManager = authManager,
+            authRepository = fakeAuth,
             accountRepository = FakeAccountRepository(),
-            businessHoursRepository = FakeBusinessHoursRepository()
+            businessHoursRepository = FakeBusinessHoursRepository(),
+            logger = FakeLogger()
         )
     }
 
@@ -373,5 +385,14 @@ class OrderManagerTest : PlatformTestConfig() {
     private class FakeDeepLinkHandler : DeepLinkHandler {
         override val events: SharedFlow<SharedData> = MutableSharedFlow()
         override fun handleDeepLink(url: String) {}
+    }
+
+    private class FakeLogger : Logger {
+        override fun trace(message: String, throwable: Throwable?, tag: String?) {}
+        override fun debug(message: String, throwable: Throwable?, tag: String?) {}
+        override fun info(message: String, throwable: Throwable?, tag: String?) {}
+        override fun warn(message: String, throwable: Throwable?, tag: String?) {}
+        override fun error(message: String, throwable: Throwable?, tag: String?) {}
+        override fun log(level: LogLevel, message: String, throwable: Throwable?, tag: String?) {}
     }
 }

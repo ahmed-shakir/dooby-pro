@@ -9,7 +9,7 @@ app-version-name = "1.0.0"
 ###########################
 agp-version = "9.4.1"
 ksp-version = "2.3.10"
-supernova-version = "1.12.0"
+supernova-version = "1.12.2"
 # KOTLIN
 kotlin-version = "2.4.20"
 kotlinx-datetime-version = "0.8.0"
@@ -26,7 +26,7 @@ androidx-startup-version = "1.2.0"
 androidx-splashscreen-version = "1.2.0"
 androidx-work-version = "2.12.0"
 # OTHER
-compose-multiplatform-version = "1.12.0"
+compose-multiplatform-version = "1.12.1"
 material3-version = "1.12.0-alpha03"
 ktor-version = "3.6.0"
 koin-version = "4.2.2"
@@ -36,7 +36,7 @@ androidx-espresso-version = "3.7.0"
 androidx-test-ext-version = "1.7.0"
 junit-version = "4.13.2"
 compose-test-version = "1.12.1"
-compose-multiplatform-test-version = "1.12.0"
+compose-multiplatform-test-version = "1.12.1"
 robolectric-version = "4.17"
 
 [libraries]

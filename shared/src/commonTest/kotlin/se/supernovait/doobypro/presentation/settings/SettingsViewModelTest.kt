@@ -18,6 +18,7 @@ import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.common.Currency
 import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -37,13 +38,22 @@ class SettingsViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         fakeDataStore = FakeDataStore()
-        settingsRepository = SettingsRepositoryImpl(fakeDataStore, Json { 
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-        })
+        settingsRepository = SettingsRepositoryImpl(
+            dataStore = fakeDataStore,
+            json = Json { 
+                ignoreUnknownKeys = true
+                encodeDefaults = true
+            },
+            logger = FakeLogger()
+        )
         serviceRepository = FakeServiceRepository()
         storageLocationRepository = FakeStorageLocationRepository()
-        viewModel = SettingsViewModel(settingsRepository, serviceRepository, storageLocationRepository)
+        viewModel = SettingsViewModel(
+            settingsRepository = settingsRepository,
+            serviceRepository = serviceRepository,
+            storageLocationRepository = storageLocationRepository,
+            logger = FakeLogger()
+        )
     }
 
     @AfterTest
@@ -62,10 +72,10 @@ class SettingsViewModelTest {
     @Test
     fun `onEvent UpdateCurrency should update state`() = runTest(testDispatcher) {
         val collectJob = launch { viewModel.uiState.collect {} }
-        viewModel.onEvent(SettingsScreenEvent.UpdateCurrency(Currency.AED))
+        viewModel.onEvent(SettingsScreenEvent.UpdateCurrency(Currency.USD))
         
-        val state = viewModel.uiState.filter { it.settings.common.currency == Currency.AED }.first()
-        assertEquals(Currency.AED, state.settings.common.currency)
+        val state = viewModel.uiState.filter { it.settings.common.currency == Currency.USD }.first()
+        assertEquals(Currency.USD, state.settings.common.currency)
         collectJob.cancel()
     }
 
@@ -121,9 +131,10 @@ class SettingsViewModelTest {
     @Test
     fun `onEvent ResetSettings should reset state`() = runTest(testDispatcher) {
         val collectJob = launch { viewModel.uiState.collect {} }
-        viewModel.onEvent(SettingsScreenEvent.UpdateCurrency(Currency.AED))
+        viewModel.onEvent(SettingsScreenEvent.UpdateCurrency(Currency.USD))
+        viewModel.uiState.filter { it.settings.common.currency == Currency.USD }.first()
+
         viewModel.onEvent(SettingsScreenEvent.ResetSettings)
-        
         val state = viewModel.uiState.filter { it.settings.common.currency == Currency.AED }.first()
         assertEquals(Settings(), state.settings)
         collectJob.cancel()

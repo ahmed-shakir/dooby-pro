@@ -11,9 +11,12 @@ import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.event.AppEvent
+import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.doobypro.domain.util.LogTags
 
 class WelcomeViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val logger: Logger
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WelcomeState())
@@ -22,7 +25,12 @@ class WelcomeViewModel(
     private val _events = Channel<AppEvent>()
     val events = _events.receiveAsFlow()
 
+    init {
+        logger.info("WelcomeViewModel initialized", tag = LogTags.WELCOME_VM)
+    }
+
     fun onEvent(event: WelcomeScreenEvent) {
+        logger.debug("Handling event: $event", tag = LogTags.WELCOME_VM)
         when (event) {
             WelcomeScreenEvent.ShowSignInForm -> {
                 _uiState.update { it.copy(showSignInForm = true, signInError = null, isUsernameEmpty = false) }
@@ -41,19 +49,23 @@ class WelcomeViewModel(
         _uiState.update { it.copy(signInError = null, isUsernameEmpty = false) }
 
         if (username.isBlank()) {
+            logger.warn("Sign in attempted with empty username", tag = LogTags.WELCOME_VM)
             _uiState.update { it.copy(isUsernameEmpty = true) }
             return
         }
 
         viewModelScope.launch {
+            logger.info("Initiating sign in for username: $username", tag = LogTags.WELCOME_VM)
             _uiState.update { it.copy(isSigningIn = true) }
             
             when (val result = authRepository.signIn(username)) {
                 is Result.Success -> {
+                    logger.info("Sign in succeeded for username: $username", tag = LogTags.WELCOME_VM)
                     _uiState.update { it.copy(isSigningIn = false, showSignInForm = false) }
                     _events.send(AppEvent.SignIn)
                 }
                 is Result.Failure -> {
+                    logger.warn("Sign in failed for username: $username with error: ${result.error}", tag = LogTags.WELCOME_VM)
                     _uiState.update { it.copy(
                         isSigningIn = false,
                         signInError = result.error

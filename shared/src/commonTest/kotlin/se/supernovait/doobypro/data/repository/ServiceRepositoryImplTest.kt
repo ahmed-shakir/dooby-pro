@@ -9,6 +9,7 @@ import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.data.local.dao.FakeServiceDao
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Service
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -35,7 +36,8 @@ class ServiceRepositoryImplTest {
     fun setUp() {
         fakeServiceDao = FakeServiceDao()
         repository = ServiceRepositoryImpl(
-            serviceDao = fakeServiceDao
+            serviceDao = fakeServiceDao,
+            logger = FakeLogger()
         )
     }
 

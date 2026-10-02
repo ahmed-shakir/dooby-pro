@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -15,12 +17,12 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import se.supernovait.app.core.data.persistence.dao.UserDao
-import se.supernovait.app.core.data.persistence.entity.UserEntity
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
+import se.supernovait.app.core.domain.logging.LogLevel
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.notification.Notification
 import se.supernovait.app.core.domain.notification.NotificationManager
@@ -29,6 +31,7 @@ import se.supernovait.app.core.domain.notification.PlatformNotificationHandler
 import se.supernovait.app.core.domain.sharing.DeepLinkHandler
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.app.core.domain.sharing.SharedData
+import se.supernovait.doobypro.data.local.dao.FakeUserDao
 import se.supernovait.doobypro.data.repository.fake.FakeAccountRepository
 import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
 import se.supernovait.doobypro.data.repository.fake.FakeBusinessHoursRepository
@@ -99,10 +102,11 @@ class OrderViewModelTest : PlatformTestConfig() {
         fakeNotificationRepo = FakeNotificationRepository()
         
         val storageManager = StorageLocationManager(
-            fakeStorageRepo, fakeSettingsRepo
+            fakeStorageRepo, fakeSettingsRepo, FakeLogger()
         )
 
         val notificationManager = NotificationManager(
+            logger = FakeLogger(),
             repository = fakeNotificationRepo,
             platformHandler = FakePlatformNotificationHandler(),
             deepLinkHandler = FakeDeepLinkHandler(),
@@ -111,6 +115,7 @@ class OrderViewModelTest : PlatformTestConfig() {
         
         val fakeAuth = FakeAuthRepository()
         val authManager = AuthenticationManager(
+            logger = FakeLogger(),
             authRepository = fakeAuth,
             managerScope = CoroutineScope(testDispatcher)
         )
@@ -123,11 +128,13 @@ class OrderViewModelTest : PlatformTestConfig() {
             settingsRepository = fakeSettingsRepo,
             notificationManager = notificationManager,
             shareConfiguration = ShareConfiguration.custom("doobypro"),
+            authenticationManager = authManager,
             authRepository = fakeAuth,
             accountRepository = FakeAccountRepository(),
-            businessHoursRepository = FakeBusinessHoursRepository()
+            businessHoursRepository = FakeBusinessHoursRepository(),
+            logger = FakeLogger()
         )
-        orderQueryManager = OrderQueryManager(fakeOrderRepo)
+        orderQueryManager = OrderQueryManager(fakeOrderRepo, FakeLogger())
         
         viewModel = OrderViewModel(
             savedStateHandle = SavedStateHandle(),
@@ -136,7 +143,8 @@ class OrderViewModelTest : PlatformTestConfig() {
             settingsRepository = fakeSettingsRepo,
             customerRepository = fakeCustomerRepo,
             orderManager = orderManager,
-            orderQueryManager = orderQueryManager
+            orderQueryManager = orderQueryManager,
+            logger = FakeLogger()
         )
     }
 
@@ -203,7 +211,8 @@ class OrderViewModelTest : PlatformTestConfig() {
             settingsRepository = fakeSettingsRepo,
             customerRepository = fakeCustomerRepo,
             orderManager = orderManager,
-            orderQueryManager = orderQueryManager
+            orderQueryManager = orderQueryManager,
+            logger = FakeLogger()
         )
         
         val collectJob = launch { vm.uiState.collect {} }
@@ -228,9 +237,9 @@ class OrderViewModelTest : PlatformTestConfig() {
             savedOrder = order
             return Result.Success(order.id ?: "gen")
         }
-        
+
         override suspend fun deleteOrder(order: Order): Result<Unit, DataError> = Result.Success(Unit)
-        
+
         override suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus): Result<Unit, DataError> {
             updatedStatus = newStatus
             return Result.Success(Unit)
@@ -238,57 +247,57 @@ class OrderViewModelTest : PlatformTestConfig() {
     }
 
     private class FakeServiceRepository : ServiceRepository {
-        override fun getServices(): Flow<List<Service>> = MutableStateFlow(emptyList())
-        override suspend fun getServiceById(id: String) = Result.Failure(DataError.NOT_FOUND)
-        override suspend fun saveService(service: Service) = Result.Success("")
-        override suspend fun deleteService(service: Service) = Result.Success(Unit)
+        override fun getServices(): Flow<List<Service>> = flowOf(emptyList())
+        override suspend fun getServiceById(id: String): Result<Service, DataError> = Result.Failure(DataError.NOT_FOUND)
+        override suspend fun saveService(service: Service): Result<String, DataError> = Result.Success("")
+        override suspend fun deleteService(service: Service): Result<Unit, DataError> = Result.Success(Unit)
     }
 
     private class FakeStorageLocationRepository : StorageLocationRepository {
-        private val _locations = MutableStateFlow<List<StorageLocation>>(emptyList())
-        override fun getActiveLocations(): Flow<List<StorageLocation>> = _locations
-        
+        private val locations = mutableMapOf<String, StorageLocation>()
+
+        override fun getActiveLocations(): Flow<List<StorageLocation>> = flowOf(locations.values.toList())
         override suspend fun getLocationById(id: String): Result<StorageLocation, DataError> {
-            return _locations.value.find { it.id == id }?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
+            return locations[id]?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
         }
-        
         override suspend fun getDefaultLocation(): Result<StorageLocation, DataError> {
-            return _locations.value.find { it.isDefault }?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
+            return locations.values.firstOrNull { it.isDefault }?.let { Result.Success(it) } ?: Result.Failure(DataError.NOT_FOUND)
         }
-        
         override suspend fun saveLocation(location: StorageLocation): Result<String, DataError> {
-            _locations.value = _locations.value + location
-            return Result.Success(location.id!!)
+            val id = location.id ?: "gen_id"
+            locations[id] = location.copy(id = id)
+            return Result.Success(id)
         }
-        
-        override suspend fun deleteLocation(location: StorageLocation) = Result.Success(Unit)
+        override suspend fun deleteLocation(location: StorageLocation): Result<Unit, DataError> = Result.Success(Unit)
         override suspend fun incrementOccupiedSlots(id: String) {}
         override suspend fun decrementOccupiedSlots(id: String) {}
     }
 
     private class FakeSettingsRepository : SettingsRepository {
-        override val settings: Flow<Settings> = MutableStateFlow(Settings())
-        override suspend fun updateSettings(settings: Settings) {}
-        override suspend fun resetSettings() {}
+        private val _settings = MutableStateFlow(Settings())
+        override val settings: Flow<Settings> = _settings.asStateFlow()
+        override suspend fun updateSettings(settings: Settings) { _settings.value = settings }
+        override suspend fun resetSettings() { _settings.value = Settings() }
     }
 
     private class FakeCustomerRepository : CustomerRepository {
-        private val _customers = MutableStateFlow<List<User>>(emptyList())
-        override fun getCustomers(): Flow<List<User>> = _customers
+        override fun getCustomers(): Flow<List<User>> = flowOf(emptyList())
         override suspend fun getCustomerById(id: String): Result<User, DataError> = Result.Failure(DataError.NOT_FOUND)
-        override suspend fun saveCustomer(customer: User): Result<String, DataError> {
-            _customers.value = _customers.value + customer
-            return Result.Success(customer.id ?: "gen")
-        }
+        override suspend fun saveCustomer(customer: User): Result<String, DataError> = Result.Success("")
         override suspend fun deleteCustomer(customer: User): Result<Unit, DataError> = Result.Success(Unit)
     }
 
     private class FakeNotificationRepository : NotificationRepository {
-        override fun getNotifications(): Flow<List<Notification>> = MutableStateFlow(emptyList())
-        override fun getUnreadCount(): Flow<Int> = MutableStateFlow(0)
+        val savedNotifications = mutableListOf<Notification>()
+
+        override fun getNotifications(): Flow<List<Notification>> = flowOf(savedNotifications)
+        override fun getUnreadCount(): Flow<Int> = flowOf(savedNotifications.count { !it.isRead })
         override suspend fun markAsRead(id: String): Result<Unit, DataError> = Result.Success(Unit)
         override suspend fun markAllAsRead(): Result<Unit, DataError> = Result.Success(Unit)
-        override suspend fun save(notification: Notification): Result<String, DataError> = Result.Success(notification.id)
+        override suspend fun save(notification: Notification): Result<String, DataError> {
+            savedNotifications.add(notification)
+            return Result.Success(notification.id)
+        }
         override suspend fun delete(notification: Notification): Result<Unit, DataError> = Result.Success(Unit)
         override suspend fun deleteAll(): Result<Unit, DataError> = Result.Success(Unit)
     }
@@ -302,14 +311,12 @@ class OrderViewModelTest : PlatformTestConfig() {
         override fun handleDeepLink(url: String) {}
     }
 
-    private class FakeUserDao : UserDao {
-        override suspend fun getCount(): Long = 0
-        override fun observeUserById(id: String): Flow<UserEntity?> = MutableStateFlow(null)
-        override fun getAll(): Flow<List<UserEntity>> = MutableStateFlow(emptyList())
-        override suspend fun getAllByIds(ids: List<String>): List<UserEntity> = emptyList()
-        override suspend fun getById(id: String): UserEntity? = null
-        override suspend fun getByUsername(username: String): UserEntity? = null
-        override suspend fun upsert(user: UserEntity) {}
-        override suspend fun delete(user: UserEntity) {}
+    private class FakeLogger : Logger {
+        override fun trace(message: String, throwable: Throwable?, tag: String?) {}
+        override fun debug(message: String, throwable: Throwable?, tag: String?) {}
+        override fun info(message: String, throwable: Throwable?, tag: String?) {}
+        override fun warn(message: String, throwable: Throwable?, tag: String?) {}
+        override fun error(message: String, throwable: Throwable?, tag: String?) {}
+        override fun log(level: LogLevel, message: String, throwable: Throwable?, tag: String?) {}
     }
 }

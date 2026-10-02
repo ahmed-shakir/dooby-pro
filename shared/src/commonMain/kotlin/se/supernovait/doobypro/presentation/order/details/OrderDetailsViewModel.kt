@@ -15,16 +15,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.event.AppEvent
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.repository.OrderRepository
+import se.supernovait.doobypro.domain.util.LogTags
 import se.supernovait.doobypro.presentation.navigation.Route
 
 class OrderDetailsViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val orderRepository: OrderRepository,
-    private val orderManager: OrderManager
+    private val orderManager: OrderManager,
+    private val logger: Logger
 ) : ViewModel() {
     private val args = savedStateHandle.toRoute<Route.OrderDetails>()
     private val orderId = args.id
@@ -36,10 +39,12 @@ class OrderDetailsViewModel(
     val events = _events.receiveAsFlow()
 
     init {
+        logger.info("OrderDetailsViewModel initialized for order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
         loadOrder()
     }
 
     fun onEvent(event: OrderDetailsEvent) {
+        logger.debug("Handling event: $event", tag = LogTags.ORDER_DETAILS_VM)
         when (event) {
             OrderDetailsEvent.LoadOrder -> loadOrder()
             OrderDetailsEvent.TransitionToNextStatus -> transitionStatus()
@@ -54,11 +59,13 @@ class OrderDetailsViewModel(
 
     private fun loadOrder() {
         viewModelScope.launch {
+            logger.info("Loading order details for order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
             _uiState.update { it.copy(isLoading = true) }
             val result = orderRepository.getOrderById(orderId)
             if (result is Result.Success) {
                 _uiState.update { it.copy(order = result.data, isLoading = false, error = null) }
             } else {
+                logger.warn("Order details not found for order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
                 _uiState.update { it.copy(isLoading = false, error = Res.string.screen_Order_error_not_found) }
             }
         }
@@ -67,6 +74,7 @@ class OrderDetailsViewModel(
     private fun transitionStatus() {
         viewModelScope.launch {
             val order = _uiState.value.order ?: return@launch
+            logger.info("Transitioning order with ID: $orderId from ${order.status} to next status", tag = LogTags.ORDER_DETAILS_VM)
             orderManager.transitionToNextStatus(order)
             loadOrder() // Refresh
         }
@@ -76,6 +84,7 @@ class OrderDetailsViewModel(
         viewModelScope.launch {
             val order = _uiState.value.order ?: return@launch
             val orderId = order.id ?: return@launch
+            logger.warn("Delivery failed for order with ID: $orderId, updating status and notifying", tag = LogTags.ORDER_DETAILS_VM)
             orderManager.updateOrderStatus(orderId, OrderStatus.READY)
             orderManager.notifyOrderNotDelivered(orderId)
             loadOrder() // Refresh
@@ -85,6 +94,7 @@ class OrderDetailsViewModel(
     private fun cancelOrder() {
         viewModelScope.launch {
             val order = _uiState.value.order ?: return@launch
+            logger.info("Cancelling order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
             orderManager.cancelOrder(order)
             loadOrder() // Refresh
         }
@@ -93,15 +103,19 @@ class OrderDetailsViewModel(
     private fun deleteOrder() {
         viewModelScope.launch {
             val order = _uiState.value.order ?: return@launch
+            logger.info("Deleting order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
             val result = orderManager.deleteOrder(order)
             if (result is Result.Success) {
                 _events.send(AppEvent.NavigateBack)
+            } else {
+                logger.error("Failed to delete order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
             }
         }
     }
 
     private fun saveOrder(updatedOrder: Order) {
         viewModelScope.launch {
+            logger.info("Saving edited order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
             orderRepository.saveOrder(updatedOrder)
             _uiState.update { it.copy(isEditing = false) }
             loadOrder()

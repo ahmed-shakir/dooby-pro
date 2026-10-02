@@ -24,7 +24,6 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.getString
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.AuthenticationState
@@ -36,6 +35,7 @@ import se.supernovait.app.core.domain.extension.isAlreadyNotifiedToday
 import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.extension.toUrl
 import se.supernovait.app.core.domain.extension.truncateToMinutes
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.app.core.domain.model.notification.NotificationType
 import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
@@ -51,6 +51,7 @@ import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
+import se.supernovait.doobypro.domain.util.LogTags
 import se.supernovait.doobypro.presentation.navigation.Route
 import kotlin.time.Clock
 
@@ -65,35 +66,32 @@ class OrderManager(
     private val settingsRepository: SettingsRepository,
     private val notificationManager: NotificationManager,
     private val shareConfiguration: ShareConfiguration,
+    private val authenticationManager: AuthenticationManager,
     private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository,
-    private val businessHoursRepository: BusinessHoursRepository
+    private val businessHoursRepository: BusinessHoursRepository,
+    private val logger: Logger
 ) : KoinComponent {
-
     private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val authenticationManager: AuthenticationManager? by lazy {
-        runCatching { get<AuthenticationManager>() }.getOrNull()
-    }
-
-    // TODO: IMPLEMENT LOGGING ALL OVER THE APP
 
     init {
+        logger.info("OrderManager initialized", tag = LogTags.ORDER_MANAGER)
         managerScope.launch {
             try {
-                authenticationManager?.authState
-                    ?.map { it is AuthenticationState.Authenticated }
-                    ?.distinctUntilChanged()
-                    ?.collect { isAuthenticated ->
+                authenticationManager.authState
+                    .map { it is AuthenticationState.Authenticated }
+                    .distinctUntilChanged()
+                    .collect { isAuthenticated ->
                         if (isAuthenticated) {
                             try {
                                 checkAndNotifyOrderAlerts()
-                            } catch (_: Exception) {
-                                // Ignore or log
+                            } catch (e: Exception) {
+                                logger.error("Error processing order alerts on auth state change", e, tag = LogTags.ORDER_MANAGER)
                             }
                         }
                     }
-            } catch (_: Exception) {
-                // Ignore or log
+            } catch (e: Exception) {
+                logger.error("Error observing auth state in OrderManager", e, tag = LogTags.ORDER_MANAGER)
             }
         }
     }
@@ -136,6 +134,7 @@ class OrderManager(
      * Creates a new order based on an existing order (re-issue pattern).
      */
     suspend fun reissueOrder(originalOrder: Order): Order {
+        logger.info("Reissuing order with ID: ${originalOrder.id}", tag = LogTags.ORDER_MANAGER)
         val template = createOrderTemplate(originalOrder.customer)
         return template.copy(
             service = originalOrder.service,
@@ -149,6 +148,7 @@ class OrderManager(
      * Creates a new order, assigning storage and calculating expected times.
      */
     suspend fun createOrder(order: Order): Result<String, DataError> {
+        logger.info("Creating order for customer: ${order.customer.username}", tag = LogTags.ORDER_MANAGER)
         return try {
             val assignedLocationId = storageLocationManager.assignStorageLocation(order.storageLocation.id)
             
@@ -163,6 +163,7 @@ class OrderManager(
             val result = orderRepository.saveOrder(finalizedOrder)
 
             if (result is Result.Success) {
+                logger.info("Order created successfully with ID: ${result.data}", tag = LogTags.ORDER_MANAGER)
                 val settings = settingsRepository.settings.first()
                 if (settings.notification.newOrders && order.id == null) {
                     notificationManager.notify(
@@ -175,7 +176,8 @@ class OrderManager(
                 }
             }
             result
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logger.error("Failed to create order", e, tag = LogTags.ORDER_MANAGER)
             Result.Failure(DataError.UNKNOWN)
         }
     }
@@ -185,6 +187,7 @@ class OrderManager(
      */
     suspend fun transitionToNextStatus(order: Order): Result<Unit, DataError> {
         val nextStatus = order.getNextStatus() ?: return Result.Failure(DataError.UNKNOWN)
+        logger.info("Transitioning order with ID: ${order.id} from ${order.status} to next status: $nextStatus", tag = LogTags.ORDER_MANAGER)
         return updateOrderStatus(order.id!!, nextStatus)
     }
 
@@ -192,6 +195,7 @@ class OrderManager(
      * Updates an order's status and handles side effects (like storage release).
      */
     suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus): Result<Unit, DataError> {
+        logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_MANAGER)
         val currentOrder = (orderRepository.getOrderById(orderId) as? Result.Success)?.data
         val result = orderRepository.updateOrderStatus(orderId, newStatus)
 
@@ -219,6 +223,7 @@ class OrderManager(
 
             if (newStatus.isTerminal()) {
                 if (currentOrder != null) {
+                    logger.info("Order with ID: $orderId reached terminal status. Releasing storage location with ID: ${currentOrder.storageLocation.id}", tag = LogTags.ORDER_MANAGER)
                     storageLocationManager.releaseStorageLocation(currentOrder.storageLocation.id!!)
                 }
             }
@@ -231,6 +236,7 @@ class OrderManager(
      * Triggers a "Not Delivered" warning notification if enabled in notification settings.
      */
     suspend fun notifyOrderNotDelivered(orderId: String) {
+        logger.warn("Notifying order not delivered for order with ID: $orderId", tag = LogTags.ORDER_MANAGER)
         val settings = settingsRepository.settings.first()
         if (settings.notification.orderNotDelivered) {
             val title = getString(Res.string.notification_order_not_delivered_title)
@@ -251,6 +257,7 @@ class OrderManager(
      * based on notification settings. Each alert type per order is sent at most once per day until resolved.
      */
     suspend fun checkAndNotifyOrderAlerts() {
+        logger.debug("Checking and processing order alerts", tag = LogTags.ORDER_MANAGER)
         if (!shouldSendPlatformNotification()) return
 
         val settings = settingsRepository.settings.first()
@@ -264,33 +271,39 @@ class OrderManager(
             if (settings.notification.lateOrders && order.isLate()) {
                 val title = getString(Res.string.notification_order_late_title)
                 if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
+                    logger.warn("Order with ID: $orderId is late, sending notification", tag = LogTags.ORDER_MANAGER)
                     val message = getString(Res.string.notification_order_late_message, orderId)
                     notificationManager.notify(
                         title = title,
                         message = message,
                         type = NotificationType.WARNING,
+                        showNativeAlert = true,
                         deepLink = deepLink
                     )
                 }
             } else if (settings.notification.orderNotPickedUp && order.isNotPickedUp()) {
                 val title = getString(Res.string.notification_order_not_picked_up_title)
                 if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
+                    logger.warn("Order with ID: $orderId is not picked up, sending notification", tag = LogTags.ORDER_MANAGER)
                     val message = getString(Res.string.notification_order_not_picked_up_message, orderId)
                     notificationManager.notify(
                         title = title,
                         message = message,
                         type = NotificationType.WARNING,
+                        showNativeAlert = true,
                         deepLink = deepLink
                     )
                 }
             } else if (settings.notification.orderNotDelivered && order.isNotDelivered()) {
                 val title = getString(Res.string.notification_order_not_delivered_title)
                 if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
+                    logger.warn("Order with ID: $orderId is not delivered, sending notification", tag = LogTags.ORDER_MANAGER)
                     val message = getString(Res.string.notification_order_not_delivered_message, orderId)
                     notificationManager.notify(
                         title = title,
                         message = message,
                         type = NotificationType.WARNING,
+                        showNativeAlert = true,
                         deepLink = deepLink
                     )
                 }
@@ -303,7 +316,7 @@ class OrderManager(
      */
     suspend fun cancelOrder(order: Order): Result<Unit, DataError> {
         if (order.status.isTerminal()) return Result.Failure(DataError.UNKNOWN)
-        
+        logger.info("Cancelling order with ID: ${order.id}", tag = LogTags.ORDER_MANAGER)
         return updateOrderStatus(order.id!!, OrderStatus.CANCELLED)
     }
 
@@ -312,7 +325,7 @@ class OrderManager(
      */
     suspend fun deleteOrder(order: Order): Result<Unit, DataError> {
         if (!order.canDelete()) return Result.Failure(DataError.UNKNOWN)
-        
+        logger.info("Deleting order with ID: ${order.id}", tag = LogTags.ORDER_MANAGER)
         val result = orderRepository.deleteOrder(order)
         if (result is Result.Success) {
             storageLocationManager.releaseStorageLocation(order.storageLocation.id!!)

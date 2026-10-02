@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import se.supernovait.doobypro.data.repository.fake.FakeAccountRepository
 import se.supernovait.doobypro.domain.model.AppDefaults
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -29,7 +30,8 @@ class AccountSetupWizardViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakeAccountRepository = FakeAccountRepository()
         viewModel = AccountSetupWizardViewModel(
-            accountRepository = fakeAccountRepository
+            accountRepository = fakeAccountRepository,
+            logger = FakeLogger()
         )
     }
 

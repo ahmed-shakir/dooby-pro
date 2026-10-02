@@ -9,7 +9,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import se.supernovait.app.core.domain.auth.AuthenticationManager
+import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.event.AppEvent
+import se.supernovait.app.core.domain.logging.LogLevel
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -29,6 +32,7 @@ class AppEventHandlerTest {
         Dispatchers.setMain(testDispatcher)
         authRepository = FakeAuthRepository()
         authManager = AuthenticationManager(
+            logger = FakeLogger(),
             authRepository = authRepository,
             managerScope = CoroutineScope(SupervisorJob() + testDispatcher),
         )
@@ -54,7 +58,7 @@ class AppEventHandlerTest {
     @Test
     fun `handleAppEvent SignOut should trigger authManager signOut`() = runTest(testDispatcher) {
         // Seed user and sign in
-        val user = se.supernovait.app.core.domain.auth.User(
+        val user = User(
             id = "user-1",
             username = "test",
             firstname = "",
@@ -68,5 +72,14 @@ class AppEventHandlerTest {
         handleAppEvent(AppEvent.SignOut, null, authManager)
 
         assertFalse(authManager.isAuthenticated(), "Should be signed out after event")
+    }
+
+    private class FakeLogger : Logger {
+        override fun trace(message: String, throwable: Throwable?, tag: String?) {}
+        override fun debug(message: String, throwable: Throwable?, tag: String?) {}
+        override fun info(message: String, throwable: Throwable?, tag: String?) {}
+        override fun warn(message: String, throwable: Throwable?, tag: String?) {}
+        override fun error(message: String, throwable: Throwable?, tag: String?) {}
+        override fun log(level: LogLevel, message: String, throwable: Throwable?, tag: String?) {}
     }
 }

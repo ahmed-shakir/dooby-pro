@@ -2,21 +2,25 @@ package se.supernovait.doobypro.domain.manager
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.order.OrderTab
 import se.supernovait.doobypro.domain.repository.OrderRepository
+import se.supernovait.doobypro.domain.util.LogTags
 
 /**
  * Manager responsible for read-only order queries and UI-specific data aggregation.
  */
 class OrderQueryManager(
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    private val logger: Logger
 ) {
     /**
      * Observes orders filtered by an operational tab.
      */
     fun getOrdersForTab(tab: OrderTab): Flow<List<Order>> {
+        logger.debug("Querying orders for tab: $tab", tag = LogTags.ORDER_QUERY_MANAGER)
         return orderRepository.getOrders().map { orders ->
             when (tab) {
                 OrderTab.NEW -> orders.filter { it.status == OrderStatus.NEW }
@@ -31,6 +35,7 @@ class OrderQueryManager(
      * Observes only cancelled orders.
      */
     fun getCancelledOrders(): Flow<List<Order>> {
+        logger.debug("Querying cancelled orders", tag = LogTags.ORDER_QUERY_MANAGER)
         return orderRepository.getOrders().map { orders ->
             orders.filter { it.status == OrderStatus.CANCELLED }
         }
@@ -41,6 +46,7 @@ class OrderQueryManager(
      * An order is considered late/overdue if its delivery deadline has passed.
      */
     fun getLateOrderCountPerTab(): Flow<Map<OrderTab, Int>> {
+        logger.debug("Calculating late order counts per tab", tag = LogTags.ORDER_QUERY_MANAGER)
         return orderRepository.getOrders().map { orders ->
             OrderTab.entries.associateWith { tab ->
                 orders.filter { it.isLate() || it.isNotPickedUp() || it.isNotDelivered() }.count { order ->

@@ -28,6 +28,7 @@ import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -123,7 +124,8 @@ class OrderRepositoryImplTest {
             userDao = fakeUserDao,
             orderDao = fakeOrderDao,
             serviceDao = fakeServiceDao,
-            storageLocationDao = fakeStorageDao
+            storageLocationDao = fakeStorageDao,
+            logger = FakeLogger()
         )
 
         // Seed fakes

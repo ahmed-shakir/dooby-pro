@@ -10,6 +10,7 @@ import se.supernovait.app.core.domain.model.license.LicenseStatus
 import se.supernovait.app.core.domain.model.license.Tier
 import se.supernovait.doobypro.data.local.dao.FakeLicenseDao
 import se.supernovait.doobypro.domain.model.IdType
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -42,7 +43,8 @@ class LicenseRepositoryImplTest {
     fun setUp() {
         fakeLicenseDao = FakeLicenseDao()
         repository = LicenseRepositoryImpl(
-            licenseDao = fakeLicenseDao
+            licenseDao = fakeLicenseDao,
+            logger = FakeLogger()
         )
     }
 

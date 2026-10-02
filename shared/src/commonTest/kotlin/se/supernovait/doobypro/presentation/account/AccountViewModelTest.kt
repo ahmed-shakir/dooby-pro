@@ -15,6 +15,8 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.location.Address
+import se.supernovait.app.core.domain.logging.LogLevel
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
 import se.supernovait.app.core.domain.model.license.License
@@ -111,7 +113,8 @@ class AccountViewModelTest {
             licenseRepository = FakeLicenseRepository(),
             agreementRepository = agreementRepository,
             accountDao = FakeAccountDao(),
-            userDao = FakeUserDao()
+            userDao = FakeUserDao(),
+            logger = FakeLogger()
         )
         
         // Seed initial data for "current user"
@@ -128,7 +131,7 @@ class AccountViewModelTest {
             )
         }
 
-        viewModel = AccountViewModel(authRepository, accountRepository, businessHoursRepository, fileStorage, pdfGenerator)
+        viewModel = AccountViewModel(authRepository, accountRepository, businessHoursRepository, fileStorage, pdfGenerator, FakeLogger())
         
         // Wait for initial load to start
         runTest(testDispatcher) {
@@ -312,5 +315,14 @@ class AccountViewModelTest {
         assertEquals(null, stateCleared.infoMessage)
         
         collectJob.cancel()
+    }
+
+    private class FakeLogger : Logger {
+        override fun trace(message: String, throwable: Throwable?, tag: String?) {}
+        override fun debug(message: String, throwable: Throwable?, tag: String?) {}
+        override fun info(message: String, throwable: Throwable?, tag: String?) {}
+        override fun warn(message: String, throwable: Throwable?, tag: String?) {}
+        override fun error(message: String, throwable: Throwable?, tag: String?) {}
+        override fun log(level: LogLevel, message: String, throwable: Throwable?, tag: String?) {}
     }
 }

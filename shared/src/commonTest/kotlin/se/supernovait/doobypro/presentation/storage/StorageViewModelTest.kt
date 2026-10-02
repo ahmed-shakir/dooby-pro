@@ -13,6 +13,7 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -28,7 +29,10 @@ class StorageViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = FakeStorageLocationRepository()
-        viewModel = StorageViewModel(fakeRepository)
+        viewModel = StorageViewModel(
+            storageLocationRepository = fakeRepository,
+            logger = FakeLogger()
+        )
     }
 
     @AfterTest

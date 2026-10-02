@@ -17,6 +17,7 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,7 +32,7 @@ class StorageLocationManagerTest {
     fun setUp() {
         fakeStorageRepo = FakeStorageLocationRepository()
         fakeSettingsRepo = FakeSettingsRepository()
-        manager = StorageLocationManager(fakeStorageRepo, fakeSettingsRepo)
+        manager = StorageLocationManager(fakeStorageRepo, fakeSettingsRepo, FakeLogger())
     }
 
     @Test

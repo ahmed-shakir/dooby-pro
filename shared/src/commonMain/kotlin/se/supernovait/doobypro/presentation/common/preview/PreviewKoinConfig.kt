@@ -20,6 +20,8 @@ import se.supernovait.app.core.domain.connectivity.NetworkType
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.initialization.AppInitializer
+import se.supernovait.app.core.domain.logging.LogLevel
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -28,9 +30,10 @@ object PreviewKoinConfig {
     val previewModule = module {
         single<ConnectivityManager> { connectivityManager }
         single<AuthRepository> { authRepository }
+        single<Logger> { fakeLogger }
         single<DataStore<Preferences>> { fakeDataStore }
-        single { AuthenticationManager(get()) }
-        single { AppInitializer(get(), get(), get(), minSplashDuration = 0.milliseconds) }
+        single { AuthenticationManager(get(), get()) }
+        single { AppInitializer(get(), get(), get(), get(), minSplashDuration = 0.milliseconds) }
 
         viewModelOf(::AccountSetupWizardViewModel)
     }
@@ -91,5 +94,14 @@ object PreviewKoinConfig {
             state.value = next
             return next
         }
+    }
+
+    val fakeLogger = object : Logger {
+        override fun trace(message: String, throwable: Throwable?, tag: String?) {}
+        override fun debug(message: String, throwable: Throwable?, tag: String?) {}
+        override fun info(message: String, throwable: Throwable?, tag: String?) {}
+        override fun warn(message: String, throwable: Throwable?, tag: String?) {}
+        override fun error(message: String, throwable: Throwable?, tag: String?) {}
+        override fun log(level: LogLevel, message: String, throwable: Throwable?, tag: String?) {}
     }
 }

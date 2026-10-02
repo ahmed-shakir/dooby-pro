@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.manager.OrderQueryManager
 import se.supernovait.doobypro.domain.model.Service
@@ -31,6 +32,7 @@ import se.supernovait.doobypro.domain.repository.CustomerRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
+import se.supernovait.doobypro.domain.util.LogTags
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OrderViewModel(
@@ -40,7 +42,8 @@ class OrderViewModel(
     private val settingsRepository: SettingsRepository,
     private val customerRepository: CustomerRepository,
     private val orderManager: OrderManager,
-    private val orderQueryManager: OrderQueryManager
+    private val orderQueryManager: OrderQueryManager,
+    private val logger: Logger
 ) : ViewModel() {
     private val _activeTab = MutableStateFlow(OrderTab.NEW)
     private val _isArchive = MutableStateFlow(false)
@@ -50,6 +53,20 @@ class OrderViewModel(
     private val _editingOrder = MutableStateFlow<Order?>(null)
     private val _isAddingCustomer = MutableStateFlow(false)
     private val _error = MutableStateFlow<StringResource?>(null)
+
+    init {
+        logger.info("OrderViewModel initialized", tag = LogTags.ORDER_VM)
+        // Observe reissue requests from navigation results
+        viewModelScope.launch {
+            savedStateHandle.getStateFlow<Order?>("reissue_order", null).collect { order ->
+                if (order != null) {
+                    logger.info("Received reissue request from navigation result for order with ID: ${order.id}", tag = LogTags.ORDER_VM)
+                    reissueOrder(order)
+                    savedStateHandle["reissue_order"] = null // Clear result
+                }
+            }
+        }
+    }
 
     val uiState: StateFlow<OrderState> = combine(
         combine(_activeTab, _isArchive) { tab, archive ->
@@ -132,19 +149,8 @@ class OrderViewModel(
         initialValue = OrderState(isLoading = true)
     )
 
-    init {
-        // Observe reissue requests from navigation results
-        viewModelScope.launch {
-            savedStateHandle.getStateFlow<Order?>("reissue_order", null).collect { order ->
-                if (order != null) {
-                    reissueOrder(order)
-                    savedStateHandle["reissue_order"] = null // Clear result
-                }
-            }
-        }
-    }
-
     fun onEvent(event: OrderEvent) {
+        logger.debug("Handling event: $event", tag = LogTags.ORDER_VM)
         when (event) {
             OrderEvent.LoadOrders -> { /* Handled by Flow */ }
             OrderEvent.CreateNewOrder -> startNewOrder()
@@ -166,6 +172,7 @@ class OrderViewModel(
     }
 
     private fun startNewOrder() {
+        logger.debug("Starting new order flow", tag = LogTags.ORDER_VM)
         _editingOrder.value = null
         _customerSearchQuery.value = ""
         _isAddingCustomer.value = false
@@ -173,6 +180,7 @@ class OrderViewModel(
 
     private fun reissueOrder(order: Order) {
         viewModelScope.launch {
+            logger.info("Reissuing order template from order with ID: ${order.id}", tag = LogTags.ORDER_VM)
             val template = orderManager.reissueOrder(order)
             _editingOrder.value = template
         }
@@ -180,6 +188,7 @@ class OrderViewModel(
 
     private fun selectCustomer(customer: User) {
         viewModelScope.launch {
+            logger.info("Selected customer '${customer.username}' for order creation", tag = LogTags.ORDER_VM)
             val template = orderManager.createOrderTemplate(customer = customer)
             _editingOrder.value = template
         }
@@ -187,13 +196,16 @@ class OrderViewModel(
 
     private fun saveNewCustomer(customer: User) {
         viewModelScope.launch {
+            logger.info("Saving new customer: ${customer.username}", tag = LogTags.ORDER_VM)
             _isSaving.value = true
             val result = customerRepository.saveCustomer(customer)
             if (result is Result.Success) {
+                logger.info("Customer '${customer.username}' saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
                 val newUser = customer.copy(id = result.data)
                 _isAddingCustomer.value = false
                 selectCustomer(newUser)
             } else {
+                logger.error("Failed to save customer '${customer.username}'", tag = LogTags.ORDER_VM)
                 _error.value = Res.string.screen_Order_error_customer_save_failed
             }
             _isSaving.value = false
@@ -202,11 +214,14 @@ class OrderViewModel(
 
     private fun saveOrder(order: Order) {
         viewModelScope.launch {
+            logger.info("Saving order for customer '${order.customer.username}'", tag = LogTags.ORDER_VM)
             _isSaving.value = true
             val result = orderManager.createOrder(order)
             if (result is Result.Success) {
+                logger.info("Order saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
                 _editingOrder.value = null
             } else {
+                logger.error("Failed to save order", tag = LogTags.ORDER_VM)
                 _error.value = Res.string.screen_Order_error_save_failed
             }
             _isSaving.value = false
@@ -215,9 +230,11 @@ class OrderViewModel(
 
     private fun deleteOrder(order: Order) {
         viewModelScope.launch {
+            logger.info("Deleting order with ID: ${order.id}", tag = LogTags.ORDER_VM)
             _isSaving.value = true
             val result = orderManager.deleteOrder(order)
             if (result !is Result.Success) {
+                logger.error("Failed to delete order with ID: ${order.id}", tag = LogTags.ORDER_VM)
                 _error.value = Res.string.screen_Order_error_delete_failed
             }
             _isSaving.value = false
@@ -226,6 +243,7 @@ class OrderViewModel(
 
     private fun updateStatus(orderId: String, newStatus: OrderStatus) {
         viewModelScope.launch {
+            logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_VM)
             orderManager.updateOrderStatus(orderId, newStatus)
         }
     }

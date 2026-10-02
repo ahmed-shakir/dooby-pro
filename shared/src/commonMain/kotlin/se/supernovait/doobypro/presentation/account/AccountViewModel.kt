@@ -21,12 +21,14 @@ import kotlinx.datetime.DayOfWeek
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.location.Address
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.company.BusinessHours
 import se.supernovait.doobypro.domain.model.company.DayHours
 import se.supernovait.doobypro.domain.repository.AccountRepository
 import se.supernovait.doobypro.domain.repository.BusinessHoursRepository
 import se.supernovait.doobypro.domain.util.FileStorage
+import se.supernovait.doobypro.domain.util.LogTags
 import se.supernovait.doobypro.domain.util.PdfGenerator
 import se.supernovait.doobypro.domain.util.PdfSection
 import kotlin.time.Clock
@@ -40,12 +42,14 @@ class AccountViewModel(
     private val accountRepository: AccountRepository,
     private val businessHoursRepository: BusinessHoursRepository,
     private val fileStorage: FileStorage,
-    private val pdfGenerator: PdfGenerator
+    private val pdfGenerator: PdfGenerator,
+    private val logger: Logger
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountState())
     val uiState: StateFlow<AccountState> = _uiState.asStateFlow()
 
     init {
+        logger.info("AccountViewModel initialized", tag = LogTags.ACCOUNT_VM)
         loadAccount()
     }
 
@@ -53,6 +57,7 @@ class AccountViewModel(
      * Handles incoming [AccountEvent]s.
      */
     fun onEvent(event: AccountEvent) {
+        logger.debug("Handling event: $event", tag = LogTags.ACCOUNT_VM)
         when (event) {
             AccountEvent.LoadAccount -> loadAccount()
             is AccountEvent.SwitchTab -> _uiState.update { it.copy(currentTab = event.tab) }
@@ -95,6 +100,7 @@ class AccountViewModel(
     }
 
     private fun loadAccount() {
+        logger.info("Loading account data", tag = LogTags.ACCOUNT_VM)
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             
@@ -103,6 +109,7 @@ class AccountViewModel(
                 val accountResult = accountRepository.getAccountByUserId(userIdResult.data)
                 if (accountResult is Result.Success) {
                     val account = accountResult.data
+                    logger.info("Account data loaded successfully for user ID: ${userIdResult.data}", tag = LogTags.ACCOUNT_VM)
                     val businessHours = (businessHoursRepository.getBusinessHours(account.company.id!!) as? Result.Success)?.data ?: BusinessHours(account.company.id!!)
                     _uiState.update { state ->
                         state.copy(
@@ -134,9 +141,11 @@ class AccountViewModel(
                         )
                     }
                 } else {
+                    logger.error("Failed to load account data for user ID: ${userIdResult.data}", tag = LogTags.ACCOUNT_VM)
                     _uiState.update { it.copy(isLoading = false, error = Res.string.screen_Account_error_load_failed) }
                 }
             } else {
+                logger.warn("Load account failed: User not authenticated", tag = LogTags.ACCOUNT_VM)
                 _uiState.update { it.copy(isLoading = false, error = Res.string.label_not_authenticated) }
             }
         }
@@ -145,6 +154,7 @@ class AccountViewModel(
     private fun saveUserProfile() {
         val currentAccount = _uiState.value.account ?: return
         val state = _uiState.value
+        logger.info("Saving user profile for user ID: ${currentAccount.user.id}", tag = LogTags.ACCOUNT_VM)
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
             
@@ -175,6 +185,7 @@ class AccountViewModel(
             val updatedAccount = currentAccount.copy(user = updatedUser)
             val result = accountRepository.saveAccount(updatedAccount)
             if (result is Result.Success) {
+                logger.info("User profile saved successfully", tag = LogTags.ACCOUNT_VM)
                 _uiState.update { 
                     it.copy(
                         account = updatedAccount, 
@@ -183,6 +194,7 @@ class AccountViewModel(
                     ) 
                 }
             } else {
+                logger.error("Failed to save user profile", tag = LogTags.ACCOUNT_VM)
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Account_error_save_user_failed) }
             }
         }
@@ -191,6 +203,7 @@ class AccountViewModel(
     private fun saveCompanyProfile() {
         val currentAccount = _uiState.value.account ?: return
         val state = _uiState.value
+        logger.info("Saving company profile for company ID: ${currentAccount.company.id}", tag = LogTags.ACCOUNT_VM)
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
 
@@ -215,6 +228,7 @@ class AccountViewModel(
             val updatedAccount = currentAccount.copy(company = updatedCompany)
             val result = accountRepository.saveAccount(updatedAccount)
             if (result is Result.Success) {
+                logger.info("Company profile saved successfully", tag = LogTags.ACCOUNT_VM)
                 _uiState.update { 
                     it.copy(
                         account = updatedAccount, 
@@ -223,6 +237,7 @@ class AccountViewModel(
                     ) 
                 }
             } else {
+                logger.error("Failed to save company profile", tag = LogTags.ACCOUNT_VM)
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Account_error_save_company_failed) }
             }
         }
@@ -231,6 +246,7 @@ class AccountViewModel(
     private fun updateCompanyLogo(bytes: ByteArray) {
         viewModelScope.launch {
             _uiState.value.account?.company?.let { company ->
+                logger.info("Updating company logo for company ID: ${company.id}", tag = LogTags.ACCOUNT_VM)
                 val logoUrl = fileStorage.saveFile("company_logo_${company.id}.png", bytes)
                 _uiState.update { it.copy(editCompanyLogoUrl = logoUrl) }
             }
@@ -239,6 +255,7 @@ class AccountViewModel(
 
     private fun updateDayHours(day: DayOfWeek, hours: DayHours) {
         val companyId = _uiState.value.account?.company?.id ?: return
+        logger.info("Updating business hours for $day in company ID: $companyId", tag = LogTags.ACCOUNT_VM)
         
         viewModelScope.launch {
             _uiState.update { state ->
@@ -247,6 +264,7 @@ class AccountViewModel(
             
             val result = businessHoursRepository.updateDayHours(companyId, day, hours)
             if (result is Result.Success) {
+                logger.info("Business hours for $day updated successfully", tag = LogTags.ACCOUNT_VM)
                 val updatedHoursResult = businessHoursRepository.getBusinessHours(companyId)
                 val updatedHours = (updatedHoursResult as? Result.Success)?.data
                 _uiState.update { state ->
@@ -259,6 +277,7 @@ class AccountViewModel(
                     )
                 }
             } else {
+                logger.error("Failed to update business hours for $day", tag = LogTags.ACCOUNT_VM)
                 _uiState.update { state ->
                     state.copy(
                         businessHoursState = state.businessHoursState.copy(
@@ -272,6 +291,7 @@ class AccountViewModel(
     }
 
     private fun signOut() {
+        logger.info("User initiated sign out from Account screen", tag = LogTags.ACCOUNT_VM)
         viewModelScope.launch {
             authRepository.signOut()
         }
@@ -279,18 +299,22 @@ class AccountViewModel(
 
     private fun deactivateAccount() {
         val accountId = _uiState.value.account?.id ?: return
+        logger.warn("Initiating account deactivation for account ID: $accountId", tag = LogTags.ACCOUNT_VM)
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
             val result = accountRepository.deleteAccount(accountId)
             if (result is Result.Success) {
+                logger.info("Account ID: $accountId deactivated successfully", tag = LogTags.ACCOUNT_VM)
                 authRepository.signOut()
             } else {
+                logger.error("Failed to deactivate account ID: $accountId", tag = LogTags.ACCOUNT_VM)
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Account_error_delete_failed) }
             }
         }
     }
 
     private fun toggleAgreement(id: String) {
+        logger.debug("Toggling agreement expansion for ID: $id", tag = LogTags.ACCOUNT_VM)
         _uiState.update { state ->
             val newSet = if (state.expandedAgreementIds.contains(id)) {
                 state.expandedAgreementIds - id
@@ -304,8 +328,12 @@ class AccountViewModel(
     private fun downloadAgreementsPdf() {
         val account = _uiState.value.account ?: return
         val agreements = account.agreements
-        if (agreements.isEmpty()) return
+        if (agreements.isEmpty()) {
+            logger.warn("Cannot download agreements PDF: Agreements list is empty", tag = LogTags.ACCOUNT_VM)
+            return
+        }
 
+        logger.info("Generating agreements PDF for account ID: ${account.id}", tag = LogTags.ACCOUNT_VM)
         viewModelScope.launch {
             val sections = mutableListOf<PdfSection>()
             sections.add(PdfSection.Header("User Information"))
@@ -331,15 +359,25 @@ class AccountViewModel(
                 sections = sections
             )
             if (path != null) {
+                logger.info("Agreements PDF successfully generated at path: $path", tag = LogTags.ACCOUNT_VM)
                 _uiState.update { it.copy(infoMessage = Res.string.screen_Account_agreements_download_success) }
+            } else {
+                logger.error("Failed to generate agreements PDF for account ID: ${account.id}", tag = LogTags.ACCOUNT_VM)
             }
         }
     }
 
     private fun downloadLicensePdf() {
-        val account = _uiState.value.account ?: return
-        val license = account.license ?: return
+        val account = _uiState.value.account ?: run {
+            logger.warn("Cannot download license PDF: Account is null", tag = LogTags.ACCOUNT_VM)
+            return
+        }
+        val license = account.license ?: run {
+            logger.warn("Cannot download license PDF: License is null", tag = LogTags.ACCOUNT_VM)
+            return
+        }
 
+        logger.info("Generating license PDF for account ID: ${account.id}", tag = LogTags.ACCOUNT_VM)
         viewModelScope.launch {
             val sections = mutableListOf<PdfSection>()
             sections.add(PdfSection.Header("User Information"))
@@ -367,7 +405,10 @@ class AccountViewModel(
                 sections = sections
             )
             if (path != null) {
+                logger.info("License PDF successfully generated at path: $path", tag = LogTags.ACCOUNT_VM)
                 _uiState.update { it.copy(infoMessage = Res.string.screen_Account_license_download_success) }
+            } else {
+                logger.error("Failed to generate license PDF for account ID: ${account.id}", tag = LogTags.ACCOUNT_VM)
             }
         }
     }

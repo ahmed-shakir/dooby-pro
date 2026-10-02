@@ -10,6 +10,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.logging.LogLevel
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.repository.fake.FakeAccountRepository
 import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
 import se.supernovait.doobypro.util.PlatformTestConfig
@@ -41,7 +43,11 @@ class SupportViewModelTest : PlatformTestConfig() {
         Dispatchers.setMain(testDispatcher)
         fakeAuthRepo = FakeAuthRepository()
         fakeAccountRepo = FakeAccountRepository()
-        viewModel = SupportViewModel(authRepository = fakeAuthRepo, accountRepository = fakeAccountRepo)
+        viewModel = SupportViewModel(
+            authRepository = fakeAuthRepo,
+            accountRepository = fakeAccountRepo,
+            logger = FakeLogger()
+        )
     }
 
     @AfterTest
@@ -77,5 +83,14 @@ class SupportViewModelTest : PlatformTestConfig() {
         assertTrue(decodedMailtoUrl.contains("john@example.com"))
         assertTrue(decodedMailtoUrl.contains("+971501234567"))
         assertTrue(decodedMailtoUrl.contains("Issue description"))
+    }
+
+    private class FakeLogger : Logger {
+        override fun trace(message: String, throwable: Throwable?, tag: String?) {}
+        override fun debug(message: String, throwable: Throwable?, tag: String?) {}
+        override fun info(message: String, throwable: Throwable?, tag: String?) {}
+        override fun warn(message: String, throwable: Throwable?, tag: String?) {}
+        override fun error(message: String, throwable: Throwable?, tag: String?) {}
+        override fun log(level: LogLevel, message: String, throwable: Throwable?, tag: String?) {}
     }
 }

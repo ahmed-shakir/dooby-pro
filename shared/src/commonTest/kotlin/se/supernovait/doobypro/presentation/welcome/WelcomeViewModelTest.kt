@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
+import se.supernovait.doobypro.util.FakeLogger
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -32,7 +33,10 @@ class WelcomeViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         authRepository = FakeAuthRepository()
-        viewModel = WelcomeViewModel(authRepository)
+        viewModel = WelcomeViewModel(
+            authRepository = authRepository,
+            logger = FakeLogger()
+        )
     }
 
     @AfterTest

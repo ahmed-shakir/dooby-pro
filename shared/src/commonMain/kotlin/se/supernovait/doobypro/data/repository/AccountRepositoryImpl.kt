@@ -14,6 +14,7 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.flatMap
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.error.DataError
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.local.dao.AccountDao
 import se.supernovait.doobypro.data.local.entity.AccountEntity
 import se.supernovait.doobypro.data.local.mapper.toDomain
@@ -24,6 +25,7 @@ import se.supernovait.doobypro.domain.repository.AccountRepository
 import se.supernovait.doobypro.domain.repository.AgreementRepository
 import se.supernovait.doobypro.domain.repository.CompanyRepository
 import se.supernovait.doobypro.domain.repository.LicenseRepository
+import se.supernovait.doobypro.domain.util.LogTags
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Clock
 
@@ -36,20 +38,31 @@ class AccountRepositoryImpl(
     private val licenseRepository: LicenseRepository,
     private val agreementRepository: AgreementRepository,
     private val accountDao: AccountDao,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val logger: Logger
 ) : AccountRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
     override suspend fun getAccount(id: String): Result<Account, DataError> {
         return withContext(ioContext) {
-            val entity = accountDao.getById(id) ?: return@withContext Result.Failure(DataError.NOT_FOUND)
+            logger.debug("Fetching account with ID: $id", tag = LogTags.ACCOUNT_REPO)
+            val entity = accountDao.getById(id)
+            if (entity == null) {
+                logger.warn("Account not found with ID: $id", tag = LogTags.ACCOUNT_REPO)
+                return@withContext Result.Failure(DataError.NOT_FOUND)
+            }
             assembleAccount(entity)
         }
     }
 
     override suspend fun getAccountByUserId(userId: String): Result<Account, DataError> {
         return withContext(ioContext) {
-            val entity = accountDao.getByUserId(userId) ?: return@withContext Result.Failure(DataError.NOT_FOUND)
+            logger.debug("Fetching account for user with ID: $userId", tag = LogTags.ACCOUNT_REPO)
+            val entity = accountDao.getByUserId(userId)
+            if (entity == null) {
+                logger.warn("Account not found for user with ID: $userId", tag = LogTags.ACCOUNT_REPO)
+                return@withContext Result.Failure(DataError.NOT_FOUND)
+            }
             assembleAccount(entity)
         }
     }
@@ -60,8 +73,14 @@ class AccountRepositoryImpl(
         val companyResult = companyRepository.getCompanyById(entity.id)
 
         // Return early if critical components are missing
-        if (userResult is Result.Failure) return Result.Failure(DataError.NOT_FOUND)
-        if (companyResult is Result.Failure) return Result.Failure(DataError.NOT_FOUND)
+        if (userResult is Result.Failure) {
+            logger.warn("Failed to find user with ID: ${entity.userId} while assembling account with ID: ${entity.id}", tag = LogTags.ACCOUNT_REPO)
+            return Result.Failure(DataError.NOT_FOUND)
+        }
+        if (companyResult is Result.Failure) {
+            logger.warn("Failed to find company profile for account with ID: ${entity.id}", tag = LogTags.ACCOUNT_REPO)
+            return Result.Failure(DataError.NOT_FOUND)
+        }
 
         val user = (userResult as Result.Success).data
         val company = (companyResult as Result.Success).data
@@ -75,7 +94,9 @@ class AccountRepositoryImpl(
 
     override suspend fun saveAccount(account: Account): Result<String, DataError> {
         return withContext(ioContext) {
-            if (account.id.isNullOrBlank()) {
+            val isNew = account.id.isNullOrBlank()
+            logger.info("Saving account with ID: ${account.id} (isNew=$isNew)", tag = LogTags.ACCOUNT_REPO)
+            if (isNew) {
                 saveNewAccount(account)
             } else {
                 updateExistingAccount(account)
@@ -86,7 +107,12 @@ class AccountRepositoryImpl(
     override suspend fun deleteAccount(id: String): Result<Unit, DataError> {
         return withContext(ioContext) {
             try {
-                val entity = accountDao.getById(id) ?: return@withContext Result.Failure(DataError.NOT_FOUND)
+                logger.info("Soft deleting account with ID: $id", tag = LogTags.ACCOUNT_REPO)
+                val entity = accountDao.getById(id)
+                if (entity == null) {
+                    logger.warn("Account not found with ID: $id for soft deletion", tag = LogTags.ACCOUNT_REPO)
+                    return@withContext Result.Failure(DataError.NOT_FOUND)
+                }
                 val timestamp = Clock.System.now()
                 // Soft delete: Mark for deletion and set deactivation timestamp
                 accountDao.upsert(entity.copy(deactivatedAt = timestamp, isMarkedForDeletion = true))
@@ -94,8 +120,10 @@ class AccountRepositoryImpl(
                 val user = userDao.getById(entity.userId)?.toDomain()
                 user?.let { userDao.upsert(it.softDelete().toEntity()) }
 
+                logger.info("Successfully marked account with ID: $id for soft deletion", tag = LogTags.ACCOUNT_REPO)
                 Result.Success(Unit)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logger.error("Error soft deleting account with ID: $id", e, tag = LogTags.ACCOUNT_REPO)
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -104,6 +132,7 @@ class AccountRepositoryImpl(
     override suspend fun purgeDeletedAccounts(): Result<Int, DataError> {
         return withContext(ioContext) {
             try {
+                logger.info("Checking for accounts marked for deletion to purge", tag = LogTags.ACCOUNT_REPO)
                 val accountsToPurge = accountDao.getAccountsMarkedForDeletion()
                 val now = Clock.System.now()
                 val threshold = now.minus(30, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
@@ -116,8 +145,10 @@ class AccountRepositoryImpl(
                         purgeCount++
                     }
                 }
+                logger.info("Purged $purgeCount accounts marked for deletion", tag = LogTags.ACCOUNT_REPO)
                 Result.Success(purgeCount)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logger.error("Error purging deleted accounts", e, tag = LogTags.ACCOUNT_REPO)
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
