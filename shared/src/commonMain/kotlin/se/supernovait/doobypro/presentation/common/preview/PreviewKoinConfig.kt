@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
@@ -17,6 +18,7 @@ import se.supernovait.app.core.domain.connectivity.ConnectivityPolicy
 import se.supernovait.app.core.domain.connectivity.ConnectivityStatus
 import se.supernovait.app.core.domain.connectivity.ConnectivityStatusType
 import se.supernovait.app.core.domain.connectivity.NetworkType
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.initialization.AppInitializer
@@ -31,9 +33,10 @@ object PreviewKoinConfig {
         single<ConnectivityManager> { connectivityManager }
         single<AuthRepository> { authRepository }
         single<Logger> { fakeLogger }
+        single<CrashReporter> { NoOpCrashReporter }
         single<DataStore<Preferences>> { fakeDataStore }
-        single { AuthenticationManager(get(), get()) }
-        single { AppInitializer(get(), get(), get(), get(), minSplashDuration = 0.milliseconds) }
+        single { AuthenticationManager(get(), get(), get()) }
+        single { AppInitializer(get(), get(), get(), get(), get(), minSplashDuration = 0.milliseconds) }
 
         viewModelOf(::AccountSetupWizardViewModel)
     }

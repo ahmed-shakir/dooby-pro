@@ -3,6 +3,7 @@ package se.supernovait.doobypro.data.repository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.location.Address
@@ -47,9 +48,10 @@ class CompanyRepositoryImplTest {
         fakeCompanyDao = FakeCompanyDao()
         fakeBusinessHoursDao = FakeBusinessHoursDao()
         repository = CompanyRepositoryImpl(
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter,
             companyDao = fakeCompanyDao,
-            businessHoursDao = fakeBusinessHoursDao,
-            logger = FakeLogger()
+            businessHoursDao = fakeBusinessHoursDao
         )
     }
 

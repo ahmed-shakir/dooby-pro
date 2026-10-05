@@ -9,11 +9,15 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.logging.LogEntry
+import se.supernovait.app.core.domain.logging.LogExporter
 import se.supernovait.app.core.domain.logging.LogLevel
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.repository.fake.FakeAccountRepository
 import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
+import se.supernovait.doobypro.domain.model.support.SupportRequestType
 import se.supernovait.doobypro.util.PlatformTestConfig
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -44,9 +48,11 @@ class SupportViewModelTest : PlatformTestConfig() {
         fakeAuthRepo = FakeAuthRepository()
         fakeAccountRepo = FakeAccountRepository()
         viewModel = SupportViewModel(
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter,
+            logExporter = FakeLogExporter(emptyList()),
             authRepository = fakeAuthRepo,
-            accountRepository = fakeAccountRepo,
-            logger = FakeLogger()
+            accountRepository = fakeAccountRepo
         )
     }
 
@@ -83,6 +89,50 @@ class SupportViewModelTest : PlatformTestConfig() {
         assertTrue(decodedMailtoUrl.contains("john@example.com"))
         assertTrue(decodedMailtoUrl.contains("+971501234567"))
         assertTrue(decodedMailtoUrl.contains("Issue description"))
+    }
+
+    @Test
+    fun `submitting BUG_REPORT request includes error logs attachment in mailto url`() = runTest(testDispatcher) {
+        fakeAuthRepo.signUp(testUser)
+        advanceUntilIdle()
+
+        val sampleLogs = listOf(
+            LogEntry(
+                timestamp = 1000L,
+                level = LogLevel.ERROR,
+                tag = "TestTag",
+                message = "Critical database failure"
+            )
+        )
+        val vmWithExporter = SupportViewModel(
+            authRepository = fakeAuthRepo,
+            accountRepository = fakeAccountRepo,
+            logExporter = FakeLogExporter(sampleLogs),
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter
+        )
+
+        vmWithExporter.onEvent(SupportEvent.UpdateRequestType(SupportRequestType.BUG_REPORT))
+        vmWithExporter.onEvent(SupportEvent.UpdateMessage("App crashed on click"))
+
+        var mailtoUrl = ""
+        vmWithExporter.onEvent(SupportEvent.SubmitRequest { url ->
+            mailtoUrl = url
+        })
+        advanceUntilIdle()
+
+        val decodedMailtoUrl = mailtoUrl.decodeURLQueryComponent()
+
+        assertTrue(decodedMailtoUrl.contains("--- ATTACHED ERROR LOGS ---"))
+        assertTrue(decodedMailtoUrl.contains("[ERROR] [TestTag] Critical database failure"))
+    }
+
+    private class FakeLogExporter(private val fakeLogs: List<LogEntry> = emptyList()) : LogExporter {
+        override fun getLogs(minLevel: LogLevel): List<LogEntry> = fakeLogs.filter { it.level >= minLevel }
+        override fun exportLogsToFile(destinationPath: String, minLevel: LogLevel): kotlin.Result<String> {
+            return kotlin.Result.success(destinationPath)
+        }
+        override fun clearLogs() {}
     }
 
     private class FakeLogger : Logger {

@@ -3,6 +3,7 @@ package se.supernovait.doobypro.data.repository
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
@@ -48,8 +49,9 @@ class AgreementRepositoryImplTest {
     fun setUp() {
         fakeAgreementDao = FakeAgreementDao()
         repository = AgreementRepositoryImpl(
-            agreementDao = fakeAgreementDao,
-            logger = FakeLogger()
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter,
+            agreementDao = fakeAgreementDao
         )
     }
 

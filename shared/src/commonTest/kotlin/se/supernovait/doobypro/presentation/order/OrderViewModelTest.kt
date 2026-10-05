@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
@@ -102,7 +103,7 @@ class OrderViewModelTest : PlatformTestConfig() {
         fakeNotificationRepo = FakeNotificationRepository()
         
         val storageManager = StorageLocationManager(
-            fakeStorageRepo, fakeSettingsRepo, FakeLogger()
+            FakeLogger(), NoOpCrashReporter, fakeStorageRepo, fakeSettingsRepo
         )
 
         val notificationManager = NotificationManager(
@@ -117,6 +118,7 @@ class OrderViewModelTest : PlatformTestConfig() {
         val authManager = AuthenticationManager(
             logger = FakeLogger(),
             authRepository = fakeAuth,
+            crashReporter = NoOpCrashReporter,
             managerScope = CoroutineScope(testDispatcher)
         )
 
@@ -132,7 +134,8 @@ class OrderViewModelTest : PlatformTestConfig() {
             authRepository = fakeAuth,
             accountRepository = FakeAccountRepository(),
             businessHoursRepository = FakeBusinessHoursRepository(),
-            logger = FakeLogger()
+            logger = FakeLogger(),
+            crashReporter = se.supernovait.app.core.data.crash.NoOpCrashReporter
         )
         orderQueryManager = OrderQueryManager(fakeOrderRepo, FakeLogger())
         
@@ -144,7 +147,8 @@ class OrderViewModelTest : PlatformTestConfig() {
             customerRepository = fakeCustomerRepo,
             orderManager = orderManager,
             orderQueryManager = orderQueryManager,
-            logger = FakeLogger()
+            logger = FakeLogger(),
+            crashReporter = se.supernovait.app.core.data.crash.NoOpCrashReporter
         )
     }
 
@@ -212,7 +216,8 @@ class OrderViewModelTest : PlatformTestConfig() {
             customerRepository = fakeCustomerRepo,
             orderManager = orderManager,
             orderQueryManager = orderQueryManager,
-            logger = FakeLogger()
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter
         )
         
         val collectJob = launch { vm.uiState.collect {} }

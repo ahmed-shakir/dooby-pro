@@ -2,6 +2,7 @@ package se.supernovait.doobypro.domain.manager
 
 import kotlinx.coroutines.flow.first
 import se.supernovait.app.core.domain.common.getOrNull
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.domain.repository.SettingsRepository
@@ -12,9 +13,10 @@ import se.supernovait.doobypro.domain.util.LogTags
  * Manager responsible for orchestrating storage location resources across the system.
  */
 class StorageLocationManager(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val storageLocationRepository: StorageLocationRepository,
-    private val settingsRepository: SettingsRepository,
-    private val logger: Logger
+    private val settingsRepository: SettingsRepository
 ) {
     /**
      * Assigns a storage location to an order based on the current allocation mode.
@@ -49,7 +51,9 @@ class StorageLocationManager(
                         storageLocationRepository.getDefaultLocation().getOrNull()
                     } ?: run {
                         logger.error("Selected storage location with ID: $selectedLocationId is full and no fallback default available", tag = LogTags.STORAGE_LOCATION_MANAGER)
-                        throw IllegalStateException("Selected storage location is full and no default is available.")
+                        val exc = IllegalStateException("Selected storage location is full and no default is available.")
+                        crashReporter.recordException(exc, mapOf("selectedLocationId" to selectedLocationId))
+                        throw exc
                     }
                     
                     storageLocationRepository.incrementOccupiedSlots(fallback.id!!)

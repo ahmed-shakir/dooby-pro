@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.model.IdType
@@ -19,8 +20,9 @@ import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 import se.supernovait.doobypro.domain.util.LogTags
 
 class StorageViewModel(
-    private val storageLocationRepository: StorageLocationRepository,
-    private val logger: Logger
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
+    private val storageLocationRepository: StorageLocationRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StorageState())
     val uiState: StateFlow<StorageState> = _uiState.asStateFlow()
@@ -76,6 +78,7 @@ class StorageViewModel(
                 _uiState.update { it.copy(isSaving = false, editingLocation = null) }
             } else {
                 logger.error("Failed to save storage location '${event.label}'", tag = LogTags.STORAGE_VM)
+                crashReporter.log("Failed to save storage location '${event.label}' in StorageViewModel")
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Storage_error_save_failed) }
             }
         }
@@ -91,6 +94,7 @@ class StorageViewModel(
                 _uiState.update { it.copy(isSaving = false) }
             } else {
                 logger.error("Failed to delete storage location with ID: ${location.id}", tag = LogTags.STORAGE_VM)
+                crashReporter.log("Failed to delete storage location with ID: ${location.id} in StorageViewModel")
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Storage_error_delete_failed) }
             }
         }

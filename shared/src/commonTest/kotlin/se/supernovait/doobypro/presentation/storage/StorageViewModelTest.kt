@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
@@ -31,7 +32,8 @@ class StorageViewModelTest {
         fakeRepository = FakeStorageLocationRepository()
         viewModel = StorageViewModel(
             storageLocationRepository = fakeRepository,
-            logger = FakeLogger()
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter
         )
     }
 

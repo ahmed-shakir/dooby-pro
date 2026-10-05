@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.repository.SettingsRepository
@@ -17,9 +18,10 @@ import se.supernovait.doobypro.domain.util.LogTags
 import kotlin.coroutines.CoroutineContext
 
 class SettingsRepositoryImpl(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val dataStore: DataStore<Preferences>,
-    private val json: Json,
-    private val logger: Logger
+    private val json: Json
 ) : SettingsRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
     private val settingsKey = stringPreferencesKey("app_settings")
@@ -31,6 +33,7 @@ class SettingsRepositoryImpl(
                 json.decodeFromString<Settings>(jsonString)
             } catch (e: Exception) {
                 logger.warn("Failed to decode settings, reverting to default", e, tag = LogTags.SETTINGS_REPO)
+                crashReporter.recordException(e, mapOf("action" to "decodeSettings"))
                 Settings()
             }
         } else {

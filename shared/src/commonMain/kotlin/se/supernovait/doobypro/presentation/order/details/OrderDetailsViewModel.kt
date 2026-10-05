@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.manager.OrderManager
@@ -24,10 +25,11 @@ import se.supernovait.doobypro.domain.util.LogTags
 import se.supernovait.doobypro.presentation.navigation.Route
 
 class OrderDetailsViewModel(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val savedStateHandle: SavedStateHandle,
     private val orderRepository: OrderRepository,
-    private val orderManager: OrderManager,
-    private val logger: Logger
+    private val orderManager: OrderManager
 ) : ViewModel() {
     private val args = savedStateHandle.toRoute<Route.OrderDetails>()
     private val orderId = args.id
@@ -109,6 +111,7 @@ class OrderDetailsViewModel(
                 _events.send(AppEvent.NavigateBack)
             } else {
                 logger.error("Failed to delete order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
+                crashReporter.log("Failed to delete order with ID: $orderId in OrderDetailsViewModel")
             }
         }
     }

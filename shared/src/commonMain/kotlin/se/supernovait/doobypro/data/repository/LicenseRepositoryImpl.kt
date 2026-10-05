@@ -7,6 +7,7 @@ import se.supernovait.app.core.data.persistence.dao.LicenseDao
 import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.app.core.domain.model.license.License
@@ -17,12 +18,14 @@ import kotlin.coroutines.CoroutineContext
 /**
  * Implementation of [LicenseRepository] using [LicenseDao].
  *
- * @param licenseDao The data access object for license entities.
  * @param logger The logger for license operations.
+ * @param crashReporter The crash reporter for error reporting.
+ * @param licenseDao The data access object for license entities.
  */
 class LicenseRepositoryImpl(
-    private val licenseDao: LicenseDao,
-    private val logger: Logger
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
+    private val licenseDao: LicenseDao
 ) : LicenseRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -54,6 +57,7 @@ class LicenseRepositoryImpl(
                 Result.Success(entityToSave.id)
             } catch (e: Exception) {
                 logger.error("Error saving license with ID: ${license.id}", e, tag = LogTags.LICENSE_REPO)
+                crashReporter.recordException(e, mapOf("action" to "saveLicense", "licenseId" to license.id))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -67,6 +71,7 @@ class LicenseRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error deleting license with ID: ${license.id}", e, tag = LogTags.LICENSE_REPO)
+                crashReporter.recordException(e, mapOf("action" to "deleteLicense", "licenseId" to license.id))
                 Result.Failure(DataError.UNKNOWN)
             }
         }

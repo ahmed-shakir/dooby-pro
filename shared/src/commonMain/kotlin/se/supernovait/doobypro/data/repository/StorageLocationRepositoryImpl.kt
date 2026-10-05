@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.local.dao.StorageLocationDao
@@ -17,8 +18,9 @@ import se.supernovait.doobypro.domain.util.LogTags
 import kotlin.coroutines.CoroutineContext
 
 class StorageLocationRepositoryImpl(
-    private val storageLocationDao: StorageLocationDao,
-    private val logger: Logger
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
+    private val storageLocationDao: StorageLocationDao
 ) : StorageLocationRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -63,6 +65,7 @@ class StorageLocationRepositoryImpl(
                 Result.Success(entityToSave.id)
             } catch (e: Exception) {
                 logger.error("Error saving storage location '${location.label}'", e, tag = LogTags.STORAGE_LOCATION_REPO)
+                crashReporter.recordException(e, mapOf("action" to "saveLocation", "label" to location.label))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -76,6 +79,7 @@ class StorageLocationRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error deleting storage location with ID: ${location.id}", e, tag = LogTags.STORAGE_LOCATION_REPO)
+                crashReporter.recordException(e, mapOf("action" to "deleteLocation", "locationId" to (location.id ?: "unknown")))
                 Result.Failure(DataError.UNKNOWN)
             }
         }

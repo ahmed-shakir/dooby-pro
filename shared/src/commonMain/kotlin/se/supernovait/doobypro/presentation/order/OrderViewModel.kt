@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.manager.OrderQueryManager
@@ -36,14 +37,15 @@ import se.supernovait.doobypro.domain.util.LogTags
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OrderViewModel(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val savedStateHandle: SavedStateHandle,
     private val serviceRepository: ServiceRepository,
     private val storageLocationRepository: StorageLocationRepository,
     private val settingsRepository: SettingsRepository,
     private val customerRepository: CustomerRepository,
     private val orderManager: OrderManager,
-    private val orderQueryManager: OrderQueryManager,
-    private val logger: Logger
+    private val orderQueryManager: OrderQueryManager
 ) : ViewModel() {
     private val _activeTab = MutableStateFlow(OrderTab.NEW)
     private val _isArchive = MutableStateFlow(false)
@@ -206,6 +208,7 @@ class OrderViewModel(
                 selectCustomer(newUser)
             } else {
                 logger.error("Failed to save customer '${customer.username}'", tag = LogTags.ORDER_VM)
+                crashReporter.log("Failed to save customer '${customer.username}' in OrderViewModel")
                 _error.value = Res.string.screen_Order_error_customer_save_failed
             }
             _isSaving.value = false
@@ -222,6 +225,7 @@ class OrderViewModel(
                 _editingOrder.value = null
             } else {
                 logger.error("Failed to save order", tag = LogTags.ORDER_VM)
+                crashReporter.log("Failed to save order for customer '${order.customer.username}' in OrderViewModel")
                 _error.value = Res.string.screen_Order_error_save_failed
             }
             _isSaving.value = false
@@ -235,6 +239,7 @@ class OrderViewModel(
             val result = orderManager.deleteOrder(order)
             if (result !is Result.Success) {
                 logger.error("Failed to delete order with ID: ${order.id}", tag = LogTags.ORDER_VM)
+                crashReporter.log("Failed to delete order with ID: ${order.id} in OrderViewModel")
                 _error.value = Res.string.screen_Order_error_delete_failed
             }
             _isSaving.value = false

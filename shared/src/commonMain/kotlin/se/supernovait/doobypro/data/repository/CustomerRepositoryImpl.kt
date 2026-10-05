@@ -10,6 +10,7 @@ import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.repository.CustomerRepository
@@ -17,8 +18,9 @@ import se.supernovait.doobypro.domain.util.LogTags
 import kotlin.coroutines.CoroutineContext
 
 class CustomerRepositoryImpl(
-    private val userDao: UserDao,
-    private val logger: Logger
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
+    private val userDao: UserDao
 ) : CustomerRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -50,6 +52,7 @@ class CustomerRepositoryImpl(
                 Result.Success(entity.id)
             } catch (e: Exception) {
                 logger.error("Error saving customer profile for customer: ${customer.username}", e, tag = LogTags.CUSTOMER_REPO)
+                crashReporter.recordException(e, mapOf("action" to "saveCustomer", "username" to customer.username))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -63,6 +66,7 @@ class CustomerRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error deleting customer profile for customer with ID: ${customer.id}", e, tag = LogTags.CUSTOMER_REPO)
+                crashReporter.recordException(e, mapOf("action" to "deleteCustomer", "customerId" to (customer.id ?: "unknown")))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }

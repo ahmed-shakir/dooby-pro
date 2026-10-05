@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.location.Address
 import se.supernovait.app.core.domain.logging.LogLevel
@@ -114,7 +115,8 @@ class AccountViewModelTest {
             agreementRepository = agreementRepository,
             accountDao = FakeAccountDao(),
             userDao = FakeUserDao(),
-            logger = FakeLogger()
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter
         )
         
         // Seed initial data for "current user"
@@ -131,7 +133,7 @@ class AccountViewModelTest {
             )
         }
 
-        viewModel = AccountViewModel(authRepository, accountRepository, businessHoursRepository, fileStorage, pdfGenerator, FakeLogger())
+        viewModel = AccountViewModel(FakeLogger(), NoOpCrashReporter, authRepository, accountRepository, businessHoursRepository, fileStorage, pdfGenerator)
         
         // Wait for initial load to start
         runTest(testDispatcher) {

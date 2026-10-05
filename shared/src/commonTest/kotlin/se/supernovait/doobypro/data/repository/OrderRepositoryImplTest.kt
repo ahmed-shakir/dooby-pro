@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.data.persistence.entity.AmountEntity
 import se.supernovait.app.core.data.persistence.entity.UserEntity
 import se.supernovait.app.core.domain.auth.User
@@ -121,11 +122,12 @@ class OrderRepositoryImplTest {
         fakeStorageRepo = FakeStorageLocationRepository()
         
         repository = OrderRepositoryImpl(
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter,
             userDao = fakeUserDao,
             orderDao = fakeOrderDao,
             serviceDao = fakeServiceDao,
-            storageLocationDao = fakeStorageDao,
-            logger = FakeLogger()
+            storageLocationDao = fakeStorageDao
         )
 
         // Seed fakes

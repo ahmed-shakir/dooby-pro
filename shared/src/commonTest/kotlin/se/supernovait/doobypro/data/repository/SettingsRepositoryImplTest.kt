@@ -3,6 +3,7 @@ package se.supernovait.doobypro.data.repository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.doobypro.data.local.preferences.FakeDataStore
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.common.Currency
@@ -19,12 +20,13 @@ class SettingsRepositoryImplTest {
     fun setup() {
         fakeDataStore = FakeDataStore()
         repository = SettingsRepositoryImpl(
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter,
             dataStore = fakeDataStore,
             json = Json { 
                 ignoreUnknownKeys = true
                 encodeDefaults = true
-            },
-            logger = FakeLogger()
+            }
         )
     }
 

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.settings.Settings
@@ -21,10 +22,11 @@ import se.supernovait.doobypro.domain.util.LogTags
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 
 class SettingsViewModel(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val settingsRepository: SettingsRepository,
     private val serviceRepository: ServiceRepository,
-    private val storageLocationRepository: StorageLocationRepository,
-    private val logger: Logger
+    private val storageLocationRepository: StorageLocationRepository
 ) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     private val _isSearchingPrinters = MutableStateFlow(false)
@@ -135,6 +137,7 @@ class SettingsViewModel(
             logger.info("Updating settings", tag = LogTags.SETTINGS_VM)
             val currentSettings = uiState.value.settings
             val newSettings = transform(currentSettings)
+            crashReporter.log("Updating app settings")
             settingsRepository.updateSettings(newSettings)
         }
     }
@@ -142,6 +145,7 @@ class SettingsViewModel(
     private fun resetSettings() {
         viewModelScope.launch {
             logger.info("Resetting settings to defaults", tag = LogTags.SETTINGS_VM)
+            crashReporter.log("Resetting app settings to defaults")
             settingsRepository.resetSettings()
         }
     }

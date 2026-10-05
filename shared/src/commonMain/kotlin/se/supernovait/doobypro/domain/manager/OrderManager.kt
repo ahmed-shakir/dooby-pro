@@ -30,6 +30,7 @@ import se.supernovait.app.core.domain.auth.AuthenticationState
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.extension.isAlreadyNotifiedToday
 import se.supernovait.app.core.domain.extension.now
@@ -59,6 +60,8 @@ import kotlin.time.Clock
  * Manager responsible for complex order-related business operations.
  */
 class OrderManager(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val orderRepository: OrderRepository,
     private val serviceRepository: ServiceRepository,
     private val storageLocationManager: StorageLocationManager,
@@ -69,8 +72,7 @@ class OrderManager(
     private val authenticationManager: AuthenticationManager,
     private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository,
-    private val businessHoursRepository: BusinessHoursRepository,
-    private val logger: Logger
+    private val businessHoursRepository: BusinessHoursRepository
 ) : KoinComponent {
     private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -87,11 +89,13 @@ class OrderManager(
                                 checkAndNotifyOrderAlerts()
                             } catch (e: Exception) {
                                 logger.error("Error processing order alerts on auth state change", e, tag = LogTags.ORDER_MANAGER)
+                                crashReporter.recordException(e, mapOf("context" to "OrderManager.checkAndNotifyOrderAlerts"))
                             }
                         }
                     }
             } catch (e: Exception) {
                 logger.error("Error observing auth state in OrderManager", e, tag = LogTags.ORDER_MANAGER)
+                crashReporter.recordException(e, mapOf("context" to "OrderManager.observeAuthState"))
             }
         }
     }
@@ -164,6 +168,7 @@ class OrderManager(
 
             if (result is Result.Success) {
                 logger.info("Order created successfully with ID: ${result.data}", tag = LogTags.ORDER_MANAGER)
+                crashReporter.log("Order created successfully with ID: ${result.data}")
                 val settings = settingsRepository.settings.first()
                 if (settings.notification.newOrders && order.id == null) {
                     notificationManager.notify(
@@ -178,6 +183,7 @@ class OrderManager(
             result
         } catch (e: Exception) {
             logger.error("Failed to create order", e, tag = LogTags.ORDER_MANAGER)
+            crashReporter.recordException(e, mapOf("action" to "createOrder", "customer" to order.customer.username))
             Result.Failure(DataError.UNKNOWN)
         }
     }

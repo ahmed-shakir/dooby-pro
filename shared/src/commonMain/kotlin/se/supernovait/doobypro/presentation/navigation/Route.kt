@@ -19,9 +19,12 @@ import doobypro.shared.generated.resources.navigation_item_storage_label
 import doobypro.shared.generated.resources.navigation_item_support_label
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import org.koin.mp.KoinPlatformTools
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.app.core.domain.navigation.NavigationRoute
 import se.supernovait.app.core.domain.navigation.NavigationRouteParser
 import se.supernovait.app.core.domain.navigation.ParameterizedRoute
+import se.supernovait.doobypro.domain.util.LogTags
 
 sealed interface Route : NavigationRoute {
 
@@ -173,7 +176,14 @@ sealed interface Route : NavigationRoute {
         }
 
         fun startScreen(isAuthenticated: Boolean): Route {
-            return if (isAuthenticated) Dashboard else Welcome
+            val route = if (isAuthenticated) Dashboard else Welcome
+            try {
+                KoinPlatformTools.defaultContext().getOrNull()?.getOrNull<Logger>()?.info(
+                    "Navigation route - startScreen determined: ${route::class.simpleName} (isAuthenticated=$isAuthenticated)",
+                    tag = LogTags.NAVIGATION
+                )
+            } catch (_: Exception) {}
+            return route
         }
     }
 }

@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.location.Address
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.model.AppDefaults
@@ -38,12 +39,13 @@ import kotlin.time.Clock
  * company profile updates, and agreement visibility.
  */
 class AccountViewModel(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository,
     private val businessHoursRepository: BusinessHoursRepository,
     private val fileStorage: FileStorage,
-    private val pdfGenerator: PdfGenerator,
-    private val logger: Logger
+    private val pdfGenerator: PdfGenerator
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountState())
     val uiState: StateFlow<AccountState> = _uiState.asStateFlow()
@@ -195,6 +197,7 @@ class AccountViewModel(
                 }
             } else {
                 logger.error("Failed to save user profile", tag = LogTags.ACCOUNT_VM)
+                crashReporter.log("Failed to save user profile for user ${currentAccount.user.id}")
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Account_error_save_user_failed) }
             }
         }

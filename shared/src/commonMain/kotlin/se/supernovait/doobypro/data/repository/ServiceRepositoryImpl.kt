@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.local.dao.ServiceDao
@@ -20,8 +21,9 @@ import kotlin.coroutines.CoroutineContext
  * Implementation of [ServiceRepository] using [ServiceDao].
  */
 class ServiceRepositoryImpl(
-    private val serviceDao: ServiceDao,
-    private val logger: Logger
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
+    private val serviceDao: ServiceDao
 ) : ServiceRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -53,6 +55,7 @@ class ServiceRepositoryImpl(
                 Result.Success(entityToSave.id)
             } catch (e: Exception) {
                 logger.error("Error saving service '${service.title}'", e, tag = LogTags.SERVICE_REPO)
+                crashReporter.recordException(e, mapOf("action" to "saveService", "serviceTitle" to service.title))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -66,6 +69,7 @@ class ServiceRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error deleting service with ID: ${service.id}", e, tag = LogTags.SERVICE_REPO)
+                crashReporter.recordException(e, mapOf("action" to "deleteService", "serviceId" to (service.id ?: "unknown")))
                 Result.Failure(DataError.UNKNOWN)
             }
         }

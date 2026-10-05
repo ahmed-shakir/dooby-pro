@@ -3,6 +3,7 @@ package se.supernovait.doobypro.data.repository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.doobypro.data.local.dao.FakeStorageLocationDao
 import se.supernovait.doobypro.data.local.mapper.toEntity
@@ -23,8 +24,9 @@ class StorageLocationRepositoryImplTest {
     fun setUp() {
         fakeDao = FakeStorageLocationDao()
         repository = StorageLocationRepositoryImpl(
-            storageLocationDao = fakeDao,
-            logger = FakeLogger()
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter,
+            storageLocationDao = fakeDao
         )
     }
 

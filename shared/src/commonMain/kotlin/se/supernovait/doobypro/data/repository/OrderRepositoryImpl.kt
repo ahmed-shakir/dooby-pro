@@ -13,6 +13,7 @@ import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.local.dao.OrderDao
@@ -34,11 +35,12 @@ import kotlin.time.Clock
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class OrderRepositoryImpl(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val userDao: UserDao,
     private val orderDao: OrderDao,
     private val serviceDao: ServiceDao,
-    private val storageLocationDao: StorageLocationDao,
-    private val logger: Logger
+    private val storageLocationDao: StorageLocationDao
 ) : OrderRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -121,6 +123,7 @@ class OrderRepositoryImpl(
                 Result.Success(entityToSave.id)
             } catch (e: Exception) {
                 logger.error("Error saving order with ID: ${order.id}", e, tag = LogTags.ORDER_REPO)
+                crashReporter.recordException(e, mapOf("action" to "saveOrder", "orderId" to (order.id ?: "new")))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -134,6 +137,7 @@ class OrderRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error deleting order with ID: ${order.id}", e, tag = LogTags.ORDER_REPO)
+                crashReporter.recordException(e, mapOf("action" to "deleteOrder", "orderId" to (order.id ?: "unknown")))
                 Result.Failure(DataError.UNKNOWN)
             }
         }
@@ -159,6 +163,7 @@ class OrderRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error updating status for order with ID: $orderId", e, tag = LogTags.ORDER_REPO)
+                crashReporter.recordException(e, mapOf("action" to "updateOrderStatus", "orderId" to orderId, "newStatus" to newStatus.name))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }

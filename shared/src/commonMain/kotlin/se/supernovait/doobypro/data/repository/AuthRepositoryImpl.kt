@@ -14,6 +14,7 @@ import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.SessionRepository
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
@@ -29,16 +30,18 @@ import kotlin.coroutines.CoroutineContext
  * This implementation uses [UserDao] for user data persistence and [DataStore] for
  * managing the session of the currently logged-in user.
  *
+ * @param logger The logger for authentication operations.
+ * @param crashReporter The crash reporter for reporting errors and updating crash context.
  * @param userDao The data access object for user entities.
  * @param accountDao The data access object for account entities.
  * @param sessionRepository The repository for session state.
- * @param logger The logger for authentication operations.
  */
 class AuthRepositoryImpl(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val userDao: UserDao,
     private val accountDao: AccountDao,
-    private val sessionRepository: SessionRepository,
-    private val logger: Logger
+    private val sessionRepository: SessionRepository
 ) : AuthRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -81,14 +84,19 @@ class AuthRepositoryImpl(
                 val savedUser = userDao.getById(id)
                 if (savedUser != null) {
                     sessionRepository.setCurrentUserId(id)
+                    crashReporter.setUserId(id)
+                    crashReporter.setCustomKey("username", user.username)
+                    crashReporter.log("User sign up successful with ID: $id")
                     logger.info("User sign up successful with ID: $id", tag = LogTags.AUTH_REPO)
                     Result.Success(savedUser.toDomain())
                 } else {
                     logger.error("User not found after insert for username: ${user.username}", tag = LogTags.AUTH_REPO)
+                    crashReporter.log("User sign up failed: user not found after insert for username ${user.username}")
                     Result.Failure(AuthError.USER_NOT_FOUND)
                 }
             } catch (e: Exception) {
                 logger.error("Error signing up user: ${user.username}", e, tag = LogTags.AUTH_REPO)
+                crashReporter.recordException(e, mapOf("action" to "signUp", "username" to user.username))
                 Result.Failure(AuthError.UNKNOWN)
             }
         }
@@ -99,6 +107,7 @@ class AuthRepositoryImpl(
             logger.info("Attempting sign in for username: $username", tag = LogTags.AUTH_REPO)
             val user = userDao.getByUsername(username)?.toDomain() ?: run {
                 logger.warn("Sign in failed: Username $username not found", tag = LogTags.AUTH_REPO)
+                crashReporter.log("Sign in failed: Username $username not found")
                 return@withContext Result.Failure(AuthError.USER_NOT_FOUND)
             }
 
@@ -106,15 +115,20 @@ class AuthRepositoryImpl(
             val account = accountDao.getByUserId(user.id!!)
             if (account != null && (account.deactivatedAt != null || account.isMarkedForDeletion)) {
                 logger.warn("Sign in failed: Account for user with ID: ${user.id} is deactivated/deleted", tag = LogTags.AUTH_REPO)
+                crashReporter.log("Sign in failed: Account for user ${user.id} is deactivated/deleted")
                 return@withContext Result.Failure(AuthError.ACCOUNT_DEACTIVATED)
             }
 
             if (user.canLogin()) {
                 sessionRepository.setCurrentUserId(user.id!!)
+                crashReporter.setUserId(user.id)
+                crashReporter.setCustomKey("username", username)
+                crashReporter.log("User sign in successful for username: $username")
                 logger.info("User sign in successful for username: $username", tag = LogTags.AUTH_REPO)
                 Result.Success(user)
             } else {
                 logger.warn("Sign in failed: User with ID: ${user.id} is deactivated", tag = LogTags.AUTH_REPO)
+                crashReporter.log("Sign in failed: User ${user.id} is deactivated")
                 Result.Failure(AuthError.USER_DEACTIVATED)
             }
         }
@@ -122,6 +136,8 @@ class AuthRepositoryImpl(
 
     override suspend fun signOut() {
         logger.info("Signing out current user", tag = LogTags.AUTH_REPO)
+        crashReporter.log("User signed out")
+        crashReporter.setUserId(null)
         sessionRepository.clearCurrentUserId()
     }
 }

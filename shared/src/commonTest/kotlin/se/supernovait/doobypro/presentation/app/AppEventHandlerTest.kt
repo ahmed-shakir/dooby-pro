@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.event.AppEvent
@@ -34,6 +35,7 @@ class AppEventHandlerTest {
         authManager = AuthenticationManager(
             logger = FakeLogger(),
             authRepository = authRepository,
+            crashReporter = NoOpCrashReporter,
             managerScope = CoroutineScope(SupervisorJob() + testDispatcher),
         )
     }

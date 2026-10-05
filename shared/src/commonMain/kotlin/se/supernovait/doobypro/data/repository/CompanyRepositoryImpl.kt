@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.DayOfWeek
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.local.dao.BusinessHoursDao
@@ -23,9 +24,10 @@ import kotlin.coroutines.CoroutineContext
  * Implementation of [CompanyRepository] using [CompanyDao].
  */
 class CompanyRepositoryImpl(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val companyDao: CompanyDao,
-    private val businessHoursDao: BusinessHoursDao,
-    private val logger: Logger
+    private val businessHoursDao: BusinessHoursDao
 ) : CompanyRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -71,6 +73,7 @@ class CompanyRepositoryImpl(
                 Result.Success(entityToSave.id)
             } catch (e: Exception) {
                 logger.error("Error saving company profile for company with ID: ${company.id}", e, tag = LogTags.COMPANY_REPO)
+                crashReporter.recordException(e, mapOf("action" to "saveCompany", "companyId" to (company.id ?: "new")))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -84,6 +87,7 @@ class CompanyRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error deleting company profile for company with ID: ${company.id}", e, tag = LogTags.COMPANY_REPO)
+                crashReporter.recordException(e, mapOf("action" to "deleteCompany", "companyId" to (company.id ?: "unknown")))
                 Result.Failure(DataError.UNKNOWN)
             }
         }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.app.core.domain.location.Address
@@ -22,11 +23,12 @@ import se.supernovait.doobypro.domain.util.LogTags
 
 /**
  * ViewModel for the Account Setup Wizard.
- * Manages the multi-step form state and handles user input events.
+ * Manages the multistep form state and handles user input events.
  */
 class AccountSetupWizardViewModel(
-    private val accountRepository: AccountRepository,
-    private val logger: Logger
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
+    private val accountRepository: AccountRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountSetupWizardState())
     val uiState = _uiState.asStateFlow()
@@ -140,9 +142,11 @@ class AccountSetupWizardViewModel(
             val result = accountRepository.saveAccount(account)
             if (result.isSuccess) {
                 logger.info("Account creation in wizard succeeded", tag = LogTags.ACCOUNT_SETUP_VM)
+                crashReporter.log("Account creation in wizard succeeded")
                 _events.send(AppEvent.SignIn)
             } else {
                 logger.error("Account creation in wizard failed", tag = LogTags.ACCOUNT_SETUP_VM)
+                crashReporter.log("Account creation in wizard failed")
                 _events.send(AppEvent.Failure(AuthError.UNKNOWN))
             }
 

@@ -10,13 +10,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.domain.util.LogTags
 
 class WelcomeViewModel(
-    private val authRepository: AuthRepository,
-    private val logger: Logger
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WelcomeState())
@@ -61,11 +63,13 @@ class WelcomeViewModel(
             when (val result = authRepository.signIn(username)) {
                 is Result.Success -> {
                     logger.info("Sign in succeeded for username: $username", tag = LogTags.WELCOME_VM)
+                    crashReporter.log("Sign in succeeded for username $username in WelcomeViewModel")
                     _uiState.update { it.copy(isSigningIn = false, showSignInForm = false) }
                     _events.send(AppEvent.SignIn)
                 }
                 is Result.Failure -> {
                     logger.warn("Sign in failed for username: $username with error: ${result.error}", tag = LogTags.WELCOME_VM)
+                    crashReporter.log("Sign in failed for username $username in WelcomeViewModel")
                     _uiState.update { it.copy(
                         isSigningIn = false,
                         signInError = result.error

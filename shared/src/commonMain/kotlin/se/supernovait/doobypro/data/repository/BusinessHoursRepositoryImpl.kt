@@ -5,6 +5,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.DayOfWeek
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.logging.Logger
@@ -18,8 +19,9 @@ import se.supernovait.doobypro.domain.util.LogTags
 import kotlin.coroutines.CoroutineContext
 
 class BusinessHoursRepositoryImpl(
-    private val businessHoursDao: BusinessHoursDao,
-    private val logger: Logger
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
+    private val businessHoursDao: BusinessHoursDao
 ) : BusinessHoursRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -43,6 +45,7 @@ class BusinessHoursRepositoryImpl(
                 )
             } catch (e: Exception) {
                 logger.error("Error fetching business hours for company with ID: $companyId", e, tag = LogTags.BUSINESS_HOURS_REPO)
+                crashReporter.recordException(e, mapOf("action" to "getBusinessHours", "companyId" to companyId))
                 Result.Failure(DataError.UNKNOWN)
             }
         }
@@ -63,6 +66,7 @@ class BusinessHoursRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error saving business hours for company with ID: ${businessHours.companyId}", e, tag = LogTags.BUSINESS_HOURS_REPO)
+                crashReporter.recordException(e, mapOf("action" to "saveBusinessHours", "companyId" to businessHours.companyId))
                 Result.Failure(DataError.UNKNOWN)
             }
         }
@@ -80,6 +84,7 @@ class BusinessHoursRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error updating business hours for company with ID: $companyId on $day", e, tag = LogTags.BUSINESS_HOURS_REPO)
+                crashReporter.recordException(e, mapOf("action" to "updateDayHours", "companyId" to companyId, "day" to day.name))
                 Result.Failure(DataError.UNKNOWN)
             }
         }

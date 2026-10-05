@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.local.dao.AgreementDao
@@ -18,8 +19,9 @@ import kotlin.coroutines.CoroutineContext
  * Implementation of [AgreementRepository] using [AgreementDao].
  */
 class AgreementRepositoryImpl(
-    private val agreementDao: AgreementDao,
-    private val logger: Logger
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
+    private val agreementDao: AgreementDao
 ) : AgreementRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -58,6 +60,7 @@ class AgreementRepositoryImpl(
                 Result.Success(entityToSave.id)
             } catch (e: Exception) {
                 logger.error("Error saving agreement with ID: ${agreement.id}", e, tag = LogTags.AGREEMENT_REPO)
+                crashReporter.recordException(e, mapOf("action" to "saveAgreement", "agreementId" to (agreement.id ?: "new")))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -71,6 +74,7 @@ class AgreementRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error deleting agreement with ID: ${agreement.id}", e, tag = LogTags.AGREEMENT_REPO)
+                crashReporter.recordException(e, mapOf("action" to "deleteAgreement", "agreementId" to (agreement.id ?: "unknown")))
                 Result.Failure(DataError.UNKNOWN)
             }
         }

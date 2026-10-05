@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.model.billing.Amount
@@ -41,7 +42,8 @@ class ServiceViewModelTest {
         viewModel = ServiceViewModel(
             serviceRepository = fakeServiceRepository,
             settingsRepository = fakeSettingsRepository,
-            logger = FakeLogger()
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter
         )
     }
 

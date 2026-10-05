@@ -36,4 +36,7 @@ object LogTags {
 
     // Workers & Services
     const val ORDER_ALERT_WORKER = "OrderAlertWorker"
+
+    // Navigation
+    const val NAVIGATION = "Navigation"
 }

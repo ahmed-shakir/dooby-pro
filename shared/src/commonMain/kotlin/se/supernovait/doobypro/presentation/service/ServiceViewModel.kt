@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.app.core.domain.model.billing.Amount
@@ -21,9 +22,10 @@ import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.util.LogTags
 
 class ServiceViewModel(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val serviceRepository: ServiceRepository,
-    private val settingsRepository: SettingsRepository,
-    private val logger: Logger
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ServiceState())
     val uiState: StateFlow<ServiceState> = _uiState.asStateFlow()
@@ -85,6 +87,7 @@ class ServiceViewModel(
                 _uiState.update { it.copy(isSaving = false, editingService = null) }
             } else {
                 logger.error("Failed to save service '${event.title}'", tag = LogTags.SERVICE_VM)
+                crashReporter.log("Failed to save service '${event.title}' in ServiceViewModel")
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Service_error_save_failed) }
             }
         }
@@ -100,6 +103,7 @@ class ServiceViewModel(
                 _uiState.update { it.copy(isSaving = false) }
             } else {
                 logger.error("Failed to delete service with ID: ${service.id}", tag = LogTags.SERVICE_VM)
+                crashReporter.log("Failed to delete service with ID: ${service.id} in ServiceViewModel")
                 _uiState.update { it.copy(isSaving = false, error = Res.string.screen_Service_error_delete_failed) }
             }
         }

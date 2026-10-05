@@ -11,8 +11,12 @@ import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
+import se.supernovait.app.core.domain.crash.CrashReporter
+import se.supernovait.app.core.domain.logging.LogExporter
+import se.supernovait.app.core.domain.logging.LogLevel
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.AppConfig
+import se.supernovait.doobypro.domain.model.support.SupportRequestType
 import se.supernovait.doobypro.domain.repository.AccountRepository
 import se.supernovait.doobypro.domain.util.LogTags
 
@@ -20,9 +24,11 @@ import se.supernovait.doobypro.domain.util.LogTags
  * ViewModel for the Support Center screen, handling support requests and FAQ search state.
  */
 class SupportViewModel(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
+    private val logExporter: LogExporter,
     private val authRepository: AuthRepository,
-    private val accountRepository: AccountRepository,
-    private val logger: Logger
+    private val accountRepository: AccountRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SupportState())
@@ -43,6 +49,7 @@ class SupportViewModel(
             is SupportEvent.UpdateWantsCallback -> _uiState.update { it.copy(wantsCallback = event.wantsCallback) }
             is SupportEvent.SubmitRequest -> {
                 logger.info("Submitting support request of type: ${_uiState.value.requestType}", tag = LogTags.SUPPORT_VM)
+                crashReporter.log("Submitting support request of type: ${_uiState.value.requestType}")
                 viewModelScope.launch {
                     val state = _uiState.value
                     var accountId = ""
@@ -67,6 +74,27 @@ class SupportViewModel(
                         }
                     }
 
+                    val logsAttachment = if (state.requestType == SupportRequestType.BUG_REPORT) {
+                        val errorLogs = logExporter.getLogs(LogLevel.ERROR)
+                            .ifEmpty { logExporter.getLogs(LogLevel.WARN) }
+                            .ifEmpty { logExporter.getLogs() }
+                            .takeLast(30)
+
+                        buildString {
+                            appendLine("--- ATTACHED ERROR LOGS ---")
+                            if (errorLogs.isEmpty()) {
+                                appendLine("No recorded error logs found.")
+                            } else {
+                                errorLogs.forEach { entry ->
+                                    appendLine("[${entry.level.name}] [${entry.tag}] ${entry.message}")
+                                    entry.throwable?.let { throwable ->
+                                        appendLine("   Exception: ${throwable.message ?: throwable::class.simpleName}")
+                                    }
+                                }
+                            }
+                        }
+                    } else ""
+
                     val subject = "[Support Request - ${state.requestType.name}] Dooby Pro"
                     val body = buildString {
                         appendLine("Request Type: ${state.requestType.name}")
@@ -80,6 +108,10 @@ class SupportViewModel(
                         appendLine()
                         appendLine("Message:")
                         appendLine(state.message)
+                        if (logsAttachment.isNotBlank()) {
+                            appendLine()
+                            append(logsAttachment)
+                        }
                     }
 
                     val mailtoUrl = "mailto:${AppConfig.SUPPORT_EMAIL}?subject=${uriEncode(subject)}&body=${uriEncode(body)}"

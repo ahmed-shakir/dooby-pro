@@ -13,6 +13,7 @@ import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.flatMap
 import se.supernovait.app.core.domain.common.getOrNull
+import se.supernovait.app.core.domain.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.doobypro.data.local.dao.AccountDao
@@ -33,13 +34,14 @@ import kotlin.time.Clock
  * Implementation of [AccountRepository] using the Assembly Pattern.
  */
 class AccountRepositoryImpl(
+    private val logger: Logger,
+    private val crashReporter: CrashReporter,
     private val authRepository: AuthRepository,
     private val companyRepository: CompanyRepository,
     private val licenseRepository: LicenseRepository,
     private val agreementRepository: AgreementRepository,
     private val accountDao: AccountDao,
-    private val userDao: UserDao,
-    private val logger: Logger
+    private val userDao: UserDao
 ) : AccountRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
@@ -124,6 +126,7 @@ class AccountRepositoryImpl(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 logger.error("Error soft deleting account with ID: $id", e, tag = LogTags.ACCOUNT_REPO)
+                crashReporter.recordException(e, mapOf("action" to "deleteAccount", "accountId" to id))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -149,6 +152,7 @@ class AccountRepositoryImpl(
                 Result.Success(purgeCount)
             } catch (e: Exception) {
                 logger.error("Error purging deleted accounts", e, tag = LogTags.ACCOUNT_REPO)
+                crashReporter.recordException(e, mapOf("action" to "purgeDeletedAccounts"))
                 Result.Failure(DataError.DATABASE_ERROR)
             }
         }
@@ -220,7 +224,8 @@ class AccountRepositoryImpl(
             val entityToSave = account.toEntity()
             accountDao.upsert(entityToSave)
             Result.Success(entityToSave.id)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            crashReporter.recordException(e, mapOf("action" to "updateExistingAccount", "accountId" to (account.id ?: "unknown")))
             Result.Failure(DataError.DATABASE_ERROR)
         }
     }
@@ -241,7 +246,8 @@ class AccountRepositoryImpl(
                 )
             )
             Result.Success(companyId)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            crashReporter.recordException(e, mapOf("action" to "linkAccount", "companyId" to companyId))
             Result.Failure(DataError.DATABASE_ERROR)
         }
     }

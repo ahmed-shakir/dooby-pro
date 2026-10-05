@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
@@ -35,7 +36,8 @@ class WelcomeViewModelTest {
         authRepository = FakeAuthRepository()
         viewModel = WelcomeViewModel(
             authRepository = authRepository,
-            logger = FakeLogger()
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter
         )
     }
 

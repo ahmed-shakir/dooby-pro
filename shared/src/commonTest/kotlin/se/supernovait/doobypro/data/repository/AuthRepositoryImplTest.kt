@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
+import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.doobypro.data.local.dao.FakeAccountDao
@@ -43,10 +44,11 @@ class AuthRepositoryImplTest {
         fakeAccountDao = FakeAccountDao()
         fakeSessionRepository = FakeSessionRepository()
         repository = AuthRepositoryImpl(
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter,
             userDao = fakeUserDao,
             accountDao = fakeAccountDao,
-            sessionRepository = fakeSessionRepository,
-            logger = FakeLogger()
+            sessionRepository = fakeSessionRepository
         )
     }
 
