@@ -18,6 +18,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
+            export(libs.supernova.app.core)
         }
     }
 

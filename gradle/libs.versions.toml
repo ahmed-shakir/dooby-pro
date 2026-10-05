@@ -9,7 +9,7 @@ app-version-name = "1.0.0"
 ###########################
 agp-version = "9.4.1"
 ksp-version = "2.3.10"
-supernova-version = "1.12.3"
+supernova-version = "1.12.5"
 # KOTLIN
 kotlin-version = "2.4.20"
 kotlinx-datetime-version = "0.8.0"
@@ -26,6 +26,8 @@ androidx-startup-version = "1.2.0"
 androidx-splashscreen-version = "1.2.0"
 androidx-work-version = "2.12.0"
 # OTHER
+google-services-version = "4.5.0"
+firebase-crashlytics-plugin-version = "3.0.8"
 compose-multiplatform-version = "1.12.1"
 material3-version = "1.12.0-alpha03"
 ktor-version = "3.6.0"
@@ -100,6 +102,8 @@ kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-version" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp-version" }
 androidx-room = { id = "androidx.room", version.ref = "androidx-room-version" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services-version" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin-version" }
 
 [bundles]
 ktor = [

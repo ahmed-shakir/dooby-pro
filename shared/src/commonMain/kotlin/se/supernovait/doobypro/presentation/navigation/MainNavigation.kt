@@ -13,6 +13,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import org.koin.compose.viewmodel.koinViewModel
+import se.supernovait.app.core.ui.component.action.SupernovaButton
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.presentation.order.CancelledOrdersScreen
@@ -37,6 +38,9 @@ fun NavGraphBuilder.mainGraph(
             modifier = Modifier.fillMaxSize().padding(MaterialTheme.spacing.mediumLarge)
         ) {
             SupernovaTitle(text = "My Dashboard")
+            SupernovaButton(label = "Crash", onClick = {
+                throw RuntimeException("Test Crash")
+            })
         }
     }
 

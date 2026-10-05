@@ -1,6 +1,8 @@
 import SwiftUI
 import UserNotifications
 import BackgroundTasks
+import FirebaseCore
+import FirebaseCrashlytics
 import Shared
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -8,6 +10,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
+        FirebaseApp.configure()
+        setupCrashlyticsBridge()
+
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if let error = error {
@@ -52,6 +57,36 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
         completionHandler([.banner, .sound, .badge, .list])
+    }
+}
+
+private func setupCrashlyticsBridge() {
+    // 1. Record Non-Fatal Exceptions
+    IosCrashReporterBridge.shared.onRecordException = { message, stackTrace, attributes in
+        let error = NSError(
+            domain: "se.supernovait.doobypro",
+            code: -1,
+            userInfo: [
+                NSLocalizedDescriptionKey: message,
+                "KotlinStackTrace": stackTrace ?? ""
+            ]
+        )
+        Crashlytics.crashlytics().record(error: error, userInfo: attributes)
+    }
+
+    // 2. Log Breadcrumbs
+    IosCrashReporterBridge.shared.onLog = { message in
+        Crashlytics.crashlytics().log(message)
+    }
+
+    // 3. Custom Metadata
+    IosCrashReporterBridge.shared.onSetCustomKey = { key, value in
+        Crashlytics.crashlytics().setCustomValue(value, forKey: key)
+    }
+
+    // 4. User ID Attribution
+    IosCrashReporterBridge.shared.onSetUserId = { userId in
+        Crashlytics.crashlytics().setUserID(userId ?? "")
     }
 }
 
