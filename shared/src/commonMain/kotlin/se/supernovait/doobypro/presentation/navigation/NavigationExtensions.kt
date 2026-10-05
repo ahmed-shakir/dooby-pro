@@ -2,8 +2,11 @@ package se.supernovait.doobypro.presentation.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import org.koin.mp.KoinPlatformTools
 import se.supernovait.app.core.domain.extension.computeOptions
+import se.supernovait.app.core.domain.logging.Logger
 import se.supernovait.app.core.domain.navigation.NavigationRoute
+import se.supernovait.doobypro.domain.util.LogTags
 
 /**
  * Custom navigation rules for Dooby Pro.
@@ -16,6 +19,14 @@ import se.supernovait.app.core.domain.navigation.NavigationRoute
  */
 fun NavController.navigateWithRules(route: NavigationRoute) {
     val options = route.computeOptions(currentRootRoute = graph.findStartDestination().route)
+
+    try {
+        val currentRoute = currentBackStackEntry?.destination?.route
+        KoinPlatformTools.defaultContext().getOrNull()?.getOrNull<Logger>()?.info(
+            message = "Navigating with rules to '${route.name}' (currentRoute=$currentRoute, routeName=${options.routeName}, isRoot=${options.isRoot}, popUpTo=${options.popUpToRoute}, popUpInclusive=${options.popUpInclusive})",
+            tag = LogTags.NAVIGATION
+        )
+    } catch (_: Exception) {}
 
     if (options.isRoot) {
         navigate(options.routeName) {

@@ -107,7 +107,7 @@ fun AppRoot() {
         LaunchedEffect(Unit) {
             deepLinkHandler.events.collect { sharedData ->
                 val route = Route.parse(sharedData.route, sharedData.data)
-                navController.navigate(route)
+                navController.navigateWithRules(route)
                 notificationManager.markAsRead(sharedData.data)
             }
         }
@@ -132,7 +132,7 @@ fun AppRoot() {
                     label = notificationsLabel,
                     contentDescription = notificationsLabel,
                     badgeCount = if (unreadCount > 0) unreadCount else null,
-                    onClick = { navController.navigate(Route.Notifications) }
+                    onClick = { navController.navigateWithRules(Route.Notifications) }
                 )
                 topBarState.actions(actions = listOf(notificationAction))
             } else if (!currentScreen.showNotificationAction && currentScreen != Route.Orders && currentScreen != Route.Notifications) {

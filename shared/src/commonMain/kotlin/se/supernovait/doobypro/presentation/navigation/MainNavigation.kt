@@ -52,8 +52,8 @@ fun NavGraphBuilder.mainGraph(
             uiState = uiState,
             onEvent = { event ->
                 when (event) {
-                    OrderEvent.ViewCancelledOrders -> navController.navigate(Route.CancelledOrders)
-                    is OrderEvent.ViewOrderDetails -> navController.navigate(Route.OrderDetails(event.id))
+                    OrderEvent.ViewCancelledOrders -> navController.navigateWithRules(Route.CancelledOrders)
+                    is OrderEvent.ViewOrderDetails -> navController.navigateWithRules(Route.OrderDetails(event.id))
                     else -> viewModel.onEvent(event)
                 }
             }
@@ -68,7 +68,7 @@ fun NavGraphBuilder.mainGraph(
             uiState = uiState,
             onEvent = { event ->
                 when (event) {
-                    is OrderEvent.ViewOrderDetails -> navController.navigate(Route.OrderDetails(event.id))
+                    is OrderEvent.ViewOrderDetails -> navController.navigateWithRules(Route.OrderDetails(event.id))
                     is OrderEvent.ReissueOrder -> {
                         viewModel.onEvent(event)
                         navController.popBackStack() // Go back to Hub to show the form

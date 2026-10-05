@@ -23,12 +23,12 @@ fun NavGraphBuilder.settingsGraph(
         SettingsMenuScreen(
             onNavigation = { event ->
                 when (event) {
-                    SettingsNavigationEvent.NavigateToCommon -> navController.navigate(Route.SettingsCommon)
-                    SettingsNavigationEvent.NavigateToOrder -> navController.navigate(Route.SettingsOrder)
-                    SettingsNavigationEvent.NavigateToStorage -> navController.navigate(Route.SettingsStorage)
-                    SettingsNavigationEvent.NavigateToReceipt -> navController.navigate(Route.SettingsReceipt)
-                    SettingsNavigationEvent.NavigateToPrinter -> navController.navigate(Route.SettingsPrinter)
-                    SettingsNavigationEvent.NavigateToNotifications -> navController.navigate(Route.SettingsNotification)
+                    SettingsNavigationEvent.NavigateToCommon -> navController.navigateWithRules(Route.SettingsCommon)
+                    SettingsNavigationEvent.NavigateToOrder -> navController.navigateWithRules(Route.SettingsOrder)
+                    SettingsNavigationEvent.NavigateToStorage -> navController.navigateWithRules(Route.SettingsStorage)
+                    SettingsNavigationEvent.NavigateToReceipt -> navController.navigateWithRules(Route.SettingsReceipt)
+                    SettingsNavigationEvent.NavigateToPrinter -> navController.navigateWithRules(Route.SettingsPrinter)
+                    SettingsNavigationEvent.NavigateToNotifications -> navController.navigateWithRules(Route.SettingsNotification)
                 }
             }
         )
