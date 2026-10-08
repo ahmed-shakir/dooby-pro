@@ -46,6 +46,7 @@ import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.AuthenticationState
 import se.supernovait.app.core.domain.connectivity.ConnectivityManager
 import se.supernovait.app.core.domain.notification.NotificationManager
+import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.sharing.DeepLinkHandler
 import se.supernovait.app.core.ui.component.drawer.LocalNavigationDrawerState
 import se.supernovait.app.core.ui.component.drawer.NavigationDrawerSection
@@ -77,6 +78,7 @@ fun AppRoot() {
         val notificationManager = koinInject<NotificationManager>()
         val unreadCount by notificationManager.unreadCount.collectAsStateWithLifecycle(0)
         val deepLinkHandler = koinInject<DeepLinkHandler>()
+        val analyticsTracker = koinInject<AnalyticsTracker>()
 
         val topBarState = LocalTopBarState.current
         val navigationBarState = LocalNavigationBarState.current
@@ -91,6 +93,7 @@ fun AppRoot() {
         val currentScreen = Route.parse(route = backStackEntry?.destination?.route, defaultRoute = startScreen)
 
         LaunchedEffect(currentScreen) {
+            analyticsTracker.trackScreenView(screenName = currentScreen.name, screenClass = currentScreen.name)
             if (!currentScreen.showFab) {
                 fabState.clear()
             }

@@ -13,16 +13,17 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
-import se.supernovait.app.core.data.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
+import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.location.Address
-import se.supernovait.app.core.domain.observability.logging.LogLevel
-import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
 import se.supernovait.app.core.domain.model.license.License
 import se.supernovait.app.core.domain.model.license.LicenseStatus
 import se.supernovait.app.core.domain.model.license.Tier
+import se.supernovait.app.core.domain.observability.logging.LogLevel
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.data.local.dao.FakeAccountDao
 import se.supernovait.doobypro.data.local.dao.FakeUserDao
 import se.supernovait.doobypro.data.repository.AccountRepositoryImpl
@@ -133,7 +134,16 @@ class AccountViewModelTest {
             )
         }
 
-        viewModel = AccountViewModel(FakeLogger(), NoOpCrashReporter, authRepository, accountRepository, businessHoursRepository, fileStorage, pdfGenerator)
+        viewModel = AccountViewModel(
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter,
+            analyticsTracker = NoOpAnalyticsTracker,
+            authRepository = authRepository,
+            accountRepository = accountRepository,
+            businessHoursRepository = businessHoursRepository,
+            fileStorage = fileStorage,
+            pdfGenerator = pdfGenerator
+        )
         
         // Wait for initial load to start
         runTest(testDispatcher) {

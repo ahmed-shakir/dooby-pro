@@ -10,7 +10,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
-import se.supernovait.app.core.data.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
+import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
 import se.supernovait.doobypro.data.repository.fake.FakeAccountRepository
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.util.FakeLogger
@@ -31,9 +32,10 @@ class AccountSetupWizardViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakeAccountRepository = FakeAccountRepository()
         viewModel = AccountSetupWizardViewModel(
-            accountRepository = fakeAccountRepository,
             logger = FakeLogger(),
-            crashReporter = NoOpCrashReporter
+            crashReporter = NoOpCrashReporter,
+            analyticsTracker = NoOpAnalyticsTracker,
+            accountRepository = fakeAccountRepository
         )
     }
 

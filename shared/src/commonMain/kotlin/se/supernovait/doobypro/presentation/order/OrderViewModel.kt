@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
+import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.manager.OrderManager
@@ -39,6 +40,7 @@ import se.supernovait.doobypro.domain.util.LogTags
 class OrderViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val analyticsTracker: AnalyticsTracker,
     private val savedStateHandle: SavedStateHandle,
     private val serviceRepository: ServiceRepository,
     private val storageLocationRepository: StorageLocationRepository,
@@ -161,20 +163,32 @@ class OrderViewModel(
             is OrderEvent.SaveOrder -> saveOrder(event.order)
             is OrderEvent.DeleteOrder -> deleteOrder(event.order)
             is OrderEvent.UpdateStatus -> updateStatus(event.orderId, event.newStatus)
-            is OrderEvent.SelectTab -> _activeTab.value = event.tab
-            is OrderEvent.SearchOrders -> _orderSearchQuery.value = event.query
+            is OrderEvent.SelectTab -> {
+                analyticsTracker.trackEvent("order_tab_selected", mapOf("tab" to event.tab.name))
+                _activeTab.value = event.tab
+            }
+            is OrderEvent.SearchOrders -> {
+                if (event.query.isNotBlank()) {
+                    analyticsTracker.trackEvent("order_searched", mapOf("query" to event.query))
+                }
+                _orderSearchQuery.value = event.query
+            }
             is OrderEvent.SearchCustomers -> _customerSearchQuery.value = event.query
             is OrderEvent.SelectCustomer -> selectCustomer(event.customer)
             OrderEvent.StartAddingCustomer -> _isAddingCustomer.value = true
             is OrderEvent.SaveNewCustomer -> saveNewCustomer(event.customer)
             is OrderEvent.ViewOrderDetails -> { /* Handled by navigation */ }
             OrderEvent.ViewCancelledOrders -> { /* Handled by navigation */ }
-            is OrderEvent.ToggleArchive -> _isArchive.value = event.isArchive
+            is OrderEvent.ToggleArchive -> {
+                analyticsTracker.trackEvent("order_archive_toggled", mapOf("is_archive" to event.isArchive))
+                _isArchive.value = event.isArchive
+            }
         }
     }
 
     private fun startNewOrder() {
         logger.debug("Starting new order flow", tag = LogTags.ORDER_VM)
+        analyticsTracker.trackEvent("order_creation_started")
         _editingOrder.value = null
         _customerSearchQuery.value = ""
         _isAddingCustomer.value = false
@@ -183,6 +197,7 @@ class OrderViewModel(
     private fun reissueOrder(order: Order) {
         viewModelScope.launch {
             logger.info("Reissuing order template from order with ID: ${order.id}", tag = LogTags.ORDER_VM)
+            analyticsTracker.trackEvent("order_reissued", mapOf("order_id" to (order.id ?: "")))
             val template = orderManager.reissueOrder(order)
             _editingOrder.value = template
         }
@@ -203,6 +218,7 @@ class OrderViewModel(
             val result = customerRepository.saveCustomer(customer)
             if (result is Result.Success) {
                 logger.info("Customer '${customer.username}' saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
+                analyticsTracker.trackEvent("customer_created", mapOf("username" to customer.username))
                 val newUser = customer.copy(id = result.data)
                 _isAddingCustomer.value = false
                 selectCustomer(newUser)
@@ -222,6 +238,7 @@ class OrderViewModel(
             val result = orderManager.createOrder(order)
             if (result is Result.Success) {
                 logger.info("Order saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
+                analyticsTracker.trackEvent("order_saved", mapOf("customer" to order.customer.username, "status" to order.status.name))
                 _editingOrder.value = null
             } else {
                 logger.error("Failed to save order", tag = LogTags.ORDER_VM)
@@ -237,7 +254,9 @@ class OrderViewModel(
             logger.info("Deleting order with ID: ${order.id}", tag = LogTags.ORDER_VM)
             _isSaving.value = true
             val result = orderManager.deleteOrder(order)
-            if (result !is Result.Success) {
+            if (result is Result.Success) {
+                analyticsTracker.trackEvent("order_deleted", mapOf("order_id" to (order.id ?: "")))
+            } else {
                 logger.error("Failed to delete order with ID: ${order.id}", tag = LogTags.ORDER_VM)
                 crashReporter.log("Failed to delete order with ID: ${order.id} in OrderViewModel")
                 _error.value = Res.string.screen_Order_error_delete_failed
@@ -249,6 +268,7 @@ class OrderViewModel(
     private fun updateStatus(orderId: String, newStatus: OrderStatus) {
         viewModelScope.launch {
             logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_VM)
+            analyticsTracker.trackEvent("order_status_updated", mapOf("order_id" to orderId, "new_status" to newStatus.name))
             orderManager.updateOrderStatus(orderId, newStatus)
         }
     }

@@ -17,18 +17,19 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import se.supernovait.app.core.data.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
+import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
-import se.supernovait.app.core.domain.observability.logging.LogLevel
-import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.notification.Notification
 import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.notification.NotificationRepository
 import se.supernovait.app.core.domain.notification.PlatformNotificationHandler
+import se.supernovait.app.core.domain.observability.logging.LogLevel
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.app.core.domain.sharing.DeepLinkHandler
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.app.core.domain.sharing.SharedData
@@ -135,20 +136,21 @@ class OrderViewModelTest : PlatformTestConfig() {
             accountRepository = FakeAccountRepository(),
             businessHoursRepository = FakeBusinessHoursRepository(),
             logger = FakeLogger(),
-            crashReporter = se.supernovait.app.core.data.crash.NoOpCrashReporter
+            crashReporter = NoOpCrashReporter
         )
         orderQueryManager = OrderQueryManager(fakeOrderRepo, FakeLogger())
         
         viewModel = OrderViewModel(
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter,
+            analyticsTracker = NoOpAnalyticsTracker,
             savedStateHandle = SavedStateHandle(),
             serviceRepository = fakeServiceRepo,
             storageLocationRepository = fakeStorageRepo,
             settingsRepository = fakeSettingsRepo,
             customerRepository = fakeCustomerRepo,
             orderManager = orderManager,
-            orderQueryManager = orderQueryManager,
-            logger = FakeLogger(),
-            crashReporter = se.supernovait.app.core.data.crash.NoOpCrashReporter
+            orderQueryManager = orderQueryManager
         )
     }
 
@@ -209,15 +211,16 @@ class OrderViewModelTest : PlatformTestConfig() {
     fun `SavedStateHandle reissue_order should trigger editing state`() = runTest(testDispatcher) {
         val savedStateHandle = SavedStateHandle(mapOf("reissue_order" to testOrder))
         val vm = OrderViewModel(
+            logger = FakeLogger(),
+            crashReporter = NoOpCrashReporter,
+            analyticsTracker = NoOpAnalyticsTracker,
             savedStateHandle = savedStateHandle,
             serviceRepository = fakeServiceRepo,
             storageLocationRepository = fakeStorageRepo,
             settingsRepository = fakeSettingsRepo,
             customerRepository = fakeCustomerRepo,
             orderManager = orderManager,
-            orderQueryManager = orderQueryManager,
-            logger = FakeLogger(),
-            crashReporter = NoOpCrashReporter
+            orderQueryManager = orderQueryManager
         )
         
         val collectJob = launch { vm.uiState.collect {} }

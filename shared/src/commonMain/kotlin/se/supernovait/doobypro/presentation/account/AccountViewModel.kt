@@ -20,8 +20,9 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
-import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.location.Address
+import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.company.BusinessHours
@@ -41,6 +42,7 @@ import kotlin.time.Clock
 class AccountViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val analyticsTracker: AnalyticsTracker,
     private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository,
     private val businessHoursRepository: BusinessHoursRepository,
@@ -62,7 +64,10 @@ class AccountViewModel(
         logger.debug("Handling event: $event", tag = LogTags.ACCOUNT_VM)
         when (event) {
             AccountEvent.LoadAccount -> loadAccount()
-            is AccountEvent.SwitchTab -> _uiState.update { it.copy(currentTab = event.tab) }
+            is AccountEvent.SwitchTab -> {
+                analyticsTracker.trackEvent("account_tab_switched", mapOf("tab" to event.tab.name))
+                _uiState.update { it.copy(currentTab = event.tab) }
+            }
             is AccountEvent.EnterEditMode -> _uiState.update { it.copy(editingCardId = event.cardId) }
             AccountEvent.ExitEditMode -> _uiState.update { it.copy(editingCardId = null) }
 
@@ -188,6 +193,7 @@ class AccountViewModel(
             val result = accountRepository.saveAccount(updatedAccount)
             if (result is Result.Success) {
                 logger.info("User profile saved successfully", tag = LogTags.ACCOUNT_VM)
+                analyticsTracker.trackEvent("user_profile_updated")
                 _uiState.update { 
                     it.copy(
                         account = updatedAccount, 
@@ -232,6 +238,7 @@ class AccountViewModel(
             val result = accountRepository.saveAccount(updatedAccount)
             if (result is Result.Success) {
                 logger.info("Company profile saved successfully", tag = LogTags.ACCOUNT_VM)
+                analyticsTracker.trackEvent("company_profile_updated")
                 _uiState.update { 
                     it.copy(
                         account = updatedAccount, 
@@ -268,6 +275,7 @@ class AccountViewModel(
             val result = businessHoursRepository.updateDayHours(companyId, day, hours)
             if (result is Result.Success) {
                 logger.info("Business hours for $day updated successfully", tag = LogTags.ACCOUNT_VM)
+                analyticsTracker.trackEvent("business_hours_updated", mapOf("day" to day.name))
                 val updatedHoursResult = businessHoursRepository.getBusinessHours(companyId)
                 val updatedHours = (updatedHoursResult as? Result.Success)?.data
                 _uiState.update { state ->
@@ -295,6 +303,8 @@ class AccountViewModel(
 
     private fun signOut() {
         logger.info("User initiated sign out from Account screen", tag = LogTags.ACCOUNT_VM)
+        analyticsTracker.trackEvent("sign_out")
+        analyticsTracker.setUserId(null)
         viewModelScope.launch {
             authRepository.signOut()
         }
@@ -308,6 +318,8 @@ class AccountViewModel(
             val result = accountRepository.deleteAccount(accountId)
             if (result is Result.Success) {
                 logger.info("Account ID: $accountId deactivated successfully", tag = LogTags.ACCOUNT_VM)
+                analyticsTracker.trackEvent("account_deactivated")
+                analyticsTracker.setUserId(null)
                 authRepository.signOut()
             } else {
                 logger.error("Failed to deactivate account ID: $accountId", tag = LogTags.ACCOUNT_VM)
@@ -363,6 +375,7 @@ class AccountViewModel(
             )
             if (path != null) {
                 logger.info("Agreements PDF successfully generated at path: $path", tag = LogTags.ACCOUNT_VM)
+                analyticsTracker.trackEvent("agreements_pdf_downloaded")
                 _uiState.update { it.copy(infoMessage = Res.string.screen_Account_agreements_download_success) }
             } else {
                 logger.error("Failed to generate agreements PDF for account ID: ${account.id}", tag = LogTags.ACCOUNT_VM)
@@ -409,6 +422,7 @@ class AccountViewModel(
             )
             if (path != null) {
                 logger.info("License PDF successfully generated at path: $path", tag = LogTags.ACCOUNT_VM)
+                analyticsTracker.trackEvent("license_pdf_downloaded")
                 _uiState.update { it.copy(infoMessage = Res.string.screen_Account_license_download_success) }
             } else {
                 logger.error("Failed to generate license PDF for account ID: ${account.id}", tag = LogTags.ACCOUNT_VM)

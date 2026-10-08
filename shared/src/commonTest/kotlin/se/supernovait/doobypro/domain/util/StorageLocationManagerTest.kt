@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
-import se.supernovait.app.core.data.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.domain.manager.StorageLocationManager

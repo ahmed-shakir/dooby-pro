@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
+import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.LogExporter
 import se.supernovait.app.core.domain.observability.logging.LogLevel
@@ -26,6 +27,7 @@ import se.supernovait.doobypro.domain.util.LogTags
 class SupportViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val analyticsTracker: AnalyticsTracker,
     private val logExporter: LogExporter,
     private val authRepository: AuthRepository,
     private val accountRepository: AccountRepository
@@ -50,6 +52,7 @@ class SupportViewModel(
             is SupportEvent.SubmitRequest -> {
                 logger.info("Submitting support request of type: ${_uiState.value.requestType}", tag = LogTags.SUPPORT_VM)
                 crashReporter.log("Submitting support request of type: ${_uiState.value.requestType}")
+                analyticsTracker.trackEvent("support_request_submitted", mapOf("request_type" to _uiState.value.requestType.name))
                 viewModelScope.launch {
                     val state = _uiState.value
                     var accountId = ""

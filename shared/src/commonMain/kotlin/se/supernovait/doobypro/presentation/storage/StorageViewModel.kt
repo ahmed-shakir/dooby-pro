@@ -11,8 +11,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.common.Result
-import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
+import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
@@ -22,6 +23,7 @@ import se.supernovait.doobypro.domain.util.LogTags
 class StorageViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val analyticsTracker: AnalyticsTracker,
     private val storageLocationRepository: StorageLocationRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StorageState())
@@ -75,6 +77,7 @@ class StorageViewModel(
             val result = storageLocationRepository.saveLocation(locationToSave)
             if (result is Result.Success) {
                 logger.info("Storage location '${event.label}' saved successfully", tag = LogTags.STORAGE_VM)
+                analyticsTracker.trackEvent("storage_location_saved", mapOf("label" to event.label))
                 _uiState.update { it.copy(isSaving = false, editingLocation = null) }
             } else {
                 logger.error("Failed to save storage location '${event.label}'", tag = LogTags.STORAGE_VM)
@@ -91,6 +94,7 @@ class StorageViewModel(
             val result = storageLocationRepository.deleteLocation(location)
             if (result is Result.Success) {
                 logger.info("Storage location with ID: ${location.id} deleted successfully", tag = LogTags.STORAGE_VM)
+                analyticsTracker.trackEvent("storage_location_deleted", mapOf("location_id" to (location.id ?: "")))
                 _uiState.update { it.copy(isSaving = false) }
             } else {
                 logger.error("Failed to delete storage location with ID: ${location.id}", tag = LogTags.STORAGE_VM)

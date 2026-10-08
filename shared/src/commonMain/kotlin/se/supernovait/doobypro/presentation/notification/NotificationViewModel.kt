@@ -7,15 +7,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import se.supernovait.app.core.domain.observability.crash.CrashReporter
-import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.app.core.domain.model.notification.Notification
 import se.supernovait.app.core.domain.notification.NotificationManager
+import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.util.LogTags
 
 class NotificationViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val analyticsTracker: AnalyticsTracker,
     private val notificationManager: NotificationManager
 ) : ViewModel() {
 
@@ -50,6 +52,7 @@ class NotificationViewModel(
 
     private fun markAsRead(notificationId: String) {
         logger.debug("Marking notification $notificationId as read", tag = LogTags.NOTIFICATION_VM)
+        analyticsTracker.trackEvent("notification_marked_read", mapOf("notification_id" to notificationId))
         viewModelScope.launch {
             notificationManager.markAsRead(notificationId)
         }
@@ -57,6 +60,7 @@ class NotificationViewModel(
 
     private fun markAllAsRead() {
         logger.info("Marking all notifications as read", tag = LogTags.NOTIFICATION_VM)
+        analyticsTracker.trackEvent("notifications_marked_all_read")
         viewModelScope.launch {
             notificationManager.markAllAsRead()
         }
@@ -64,6 +68,7 @@ class NotificationViewModel(
 
     private fun deleteNotification(notification: Notification) {
         logger.info("Deleting notification ${notification.id}", tag = LogTags.NOTIFICATION_VM)
+        analyticsTracker.trackEvent("notification_deleted", mapOf("notification_id" to notification.id))
         viewModelScope.launch {
             notificationManager.delete(notification)
         }
@@ -72,6 +77,7 @@ class NotificationViewModel(
     private fun handleNotificationClick(notification: Notification) {
         logger.info("Handling click for notification ${notification.id}", tag = LogTags.NOTIFICATION_VM)
         crashReporter.log("Clicked notification ${notification.id}")
+        analyticsTracker.trackEvent("notification_clicked", mapOf("notification_id" to notification.id))
         viewModelScope.launch {
             notificationManager.handleNotificationClick(notification)
         }

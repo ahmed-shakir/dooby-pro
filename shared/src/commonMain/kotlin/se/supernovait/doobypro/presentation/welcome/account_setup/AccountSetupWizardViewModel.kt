@@ -10,10 +10,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
-import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.app.core.domain.location.Address
+import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.AppDefaults
@@ -28,6 +29,7 @@ import se.supernovait.doobypro.domain.util.LogTags
 class AccountSetupWizardViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val analyticsTracker: AnalyticsTracker,
     private val accountRepository: AccountRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountSetupWizardState())
@@ -67,6 +69,7 @@ class AccountSetupWizardViewModel(
     private fun onNextStep() {
         if (_uiState.value.currentStep < 4) {
             logger.debug("Advancing to next wizard step from step ${_uiState.value.currentStep}", tag = LogTags.ACCOUNT_SETUP_VM)
+            analyticsTracker.trackEvent("wizard_step_advanced", mapOf("step" to _uiState.value.currentStep))
             _uiState.update { currentState ->
                 currentState.copy(
                     phoneNumber = if (currentState.phoneNumber.isNotBlank()) formatPhoneNumber(currentState.phoneNumber) else "",
@@ -143,10 +146,13 @@ class AccountSetupWizardViewModel(
             if (result.isSuccess) {
                 logger.info("Account creation in wizard succeeded", tag = LogTags.ACCOUNT_SETUP_VM)
                 crashReporter.log("Account creation in wizard succeeded")
+                analyticsTracker.setUserId(state.username)
+                analyticsTracker.trackEvent("account_created", mapOf("username" to state.username, "company" to state.companyLegalName))
                 _events.send(AppEvent.SignIn)
             } else {
                 logger.error("Account creation in wizard failed", tag = LogTags.ACCOUNT_SETUP_VM)
                 crashReporter.log("Account creation in wizard failed")
+                analyticsTracker.trackEvent("account_creation_failed")
                 _events.send(AppEvent.Failure(AuthError.UNKNOWN))
             }
 

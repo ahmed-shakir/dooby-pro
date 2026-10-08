@@ -11,10 +11,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.common.Result
-import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
-import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.repository.ServiceRepository
@@ -24,6 +25,7 @@ import se.supernovait.doobypro.domain.util.LogTags
 class ServiceViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val analyticsTracker: AnalyticsTracker,
     private val serviceRepository: ServiceRepository,
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
@@ -84,6 +86,7 @@ class ServiceViewModel(
             val result = serviceRepository.saveService(serviceToSave)
             if (result is Result.Success) {
                 logger.info("Service '${event.title}' saved successfully", tag = LogTags.SERVICE_VM)
+                analyticsTracker.trackEvent("service_saved", mapOf("title" to event.title))
                 _uiState.update { it.copy(isSaving = false, editingService = null) }
             } else {
                 logger.error("Failed to save service '${event.title}'", tag = LogTags.SERVICE_VM)
@@ -100,6 +103,7 @@ class ServiceViewModel(
             val result = serviceRepository.deleteService(service)
             if (result is Result.Success) {
                 logger.info("Service with ID: ${service.id} deleted successfully", tag = LogTags.SERVICE_VM)
+                analyticsTracker.trackEvent("service_deleted", mapOf("service_id" to (service.id ?: "")))
                 _uiState.update { it.copy(isSaving = false) }
             } else {
                 logger.error("Failed to delete service with ID: ${service.id}", tag = LogTags.SERVICE_VM)

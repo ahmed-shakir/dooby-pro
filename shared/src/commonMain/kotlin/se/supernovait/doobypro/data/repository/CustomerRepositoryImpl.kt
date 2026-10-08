@@ -10,8 +10,8 @@ import se.supernovait.app.core.data.persistence.mapper.toDomain
 import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
-import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.repository.CustomerRepository
 import se.supernovait.doobypro.domain.util.LogTags

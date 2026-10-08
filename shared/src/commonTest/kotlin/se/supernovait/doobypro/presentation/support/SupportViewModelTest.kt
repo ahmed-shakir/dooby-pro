@@ -9,7 +9,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
-import se.supernovait.app.core.data.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
+import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.observability.logging.LogEntry
 import se.supernovait.app.core.domain.observability.logging.LogExporter
@@ -50,6 +51,7 @@ class SupportViewModelTest : PlatformTestConfig() {
         viewModel = SupportViewModel(
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
+            analyticsTracker = NoOpAnalyticsTracker,
             logExporter = FakeLogExporter(emptyList()),
             authRepository = fakeAuthRepo,
             accountRepository = fakeAccountRepo
@@ -105,11 +107,12 @@ class SupportViewModelTest : PlatformTestConfig() {
             )
         )
         val vmWithExporter = SupportViewModel(
-            authRepository = fakeAuthRepo,
-            accountRepository = fakeAccountRepo,
-            logExporter = FakeLogExporter(sampleLogs),
             logger = FakeLogger(),
-            crashReporter = NoOpCrashReporter
+            crashReporter = NoOpCrashReporter,
+            analyticsTracker = NoOpAnalyticsTracker,
+            logExporter = FakeLogExporter(sampleLogs),
+            authRepository = fakeAuthRepo,
+            accountRepository = fakeAccountRepo
         )
 
         vmWithExporter.onEvent(SupportEvent.UpdateRequestType(SupportRequestType.BUG_REPORT))

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.model.Service
@@ -24,6 +25,7 @@ import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 class SettingsViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val analyticsTracker: AnalyticsTracker,
     private val settingsRepository: SettingsRepository,
     private val serviceRepository: ServiceRepository,
     private val storageLocationRepository: StorageLocationRepository
@@ -119,6 +121,7 @@ class SettingsViewModel(
         viewModelScope.launch {
             val method = uiState.value.settings.printer.connectionMethod
             logger.info("Searching for printers via method: $method", tag = LogTags.SETTINGS_VM)
+            analyticsTracker.trackEvent("printer_search_started")
             _isSearchingPrinters.value = true
             _discoveredPrinters.value = emptyList()
 
@@ -138,6 +141,7 @@ class SettingsViewModel(
             val currentSettings = uiState.value.settings
             val newSettings = transform(currentSettings)
             crashReporter.log("Updating app settings")
+            analyticsTracker.trackEvent("settings_updated")
             settingsRepository.updateSettings(newSettings)
         }
     }
@@ -146,6 +150,7 @@ class SettingsViewModel(
         viewModelScope.launch {
             logger.info("Resetting settings to defaults", tag = LogTags.SETTINGS_VM)
             crashReporter.log("Resetting app settings to defaults")
+            analyticsTracker.trackEvent("settings_reset")
             settingsRepository.resetSettings()
         }
     }

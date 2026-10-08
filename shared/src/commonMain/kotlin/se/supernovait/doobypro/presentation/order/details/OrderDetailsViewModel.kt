@@ -14,8 +14,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.common.Result
-import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.event.AppEvent
+import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.model.order.Order
@@ -27,6 +28,7 @@ import se.supernovait.doobypro.presentation.navigation.Route
 class OrderDetailsViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val analyticsTracker: AnalyticsTracker,
     private val savedStateHandle: SavedStateHandle,
     private val orderRepository: OrderRepository,
     private val orderManager: OrderManager
@@ -77,6 +79,7 @@ class OrderDetailsViewModel(
         viewModelScope.launch {
             val order = _uiState.value.order ?: return@launch
             logger.info("Transitioning order with ID: $orderId from ${order.status} to next status", tag = LogTags.ORDER_DETAILS_VM)
+            analyticsTracker.trackEvent("order_status_transitioned", mapOf("order_id" to orderId))
             orderManager.transitionToNextStatus(order)
             loadOrder() // Refresh
         }
@@ -87,6 +90,7 @@ class OrderDetailsViewModel(
             val order = _uiState.value.order ?: return@launch
             val orderId = order.id ?: return@launch
             logger.warn("Delivery failed for order with ID: $orderId, updating status and notifying", tag = LogTags.ORDER_DETAILS_VM)
+            analyticsTracker.trackEvent("order_delivery_failed", mapOf("order_id" to orderId))
             orderManager.updateOrderStatus(orderId, OrderStatus.READY)
             orderManager.notifyOrderNotDelivered(orderId)
             loadOrder() // Refresh
@@ -97,6 +101,7 @@ class OrderDetailsViewModel(
         viewModelScope.launch {
             val order = _uiState.value.order ?: return@launch
             logger.info("Cancelling order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
+            analyticsTracker.trackEvent("order_cancelled", mapOf("order_id" to orderId))
             orderManager.cancelOrder(order)
             loadOrder() // Refresh
         }
@@ -108,6 +113,7 @@ class OrderDetailsViewModel(
             logger.info("Deleting order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
             val result = orderManager.deleteOrder(order)
             if (result is Result.Success) {
+                analyticsTracker.trackEvent("order_deleted_from_details", mapOf("order_id" to orderId))
                 _events.send(AppEvent.NavigateBack)
             } else {
                 logger.error("Failed to delete order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
@@ -119,6 +125,7 @@ class OrderDetailsViewModel(
     private fun saveOrder(updatedOrder: Order) {
         viewModelScope.launch {
             logger.info("Saving edited order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
+            analyticsTracker.trackEvent("order_updated", mapOf("order_id" to orderId))
             orderRepository.saveOrder(updatedOrder)
             _uiState.update { it.copy(isEditing = false) }
             loadOrder()
