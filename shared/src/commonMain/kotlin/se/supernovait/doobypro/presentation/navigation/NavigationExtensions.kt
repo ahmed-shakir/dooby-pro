@@ -23,7 +23,7 @@ fun NavController.navigateWithRules(route: NavigationRoute) {
     try {
         val currentRoute = currentBackStackEntry?.destination?.route
         KoinPlatformTools.defaultContext().getOrNull()?.getOrNull<Logger>()?.info(
-            message = "Navigating with rules to '${route.name}' (currentRoute=$currentRoute, routeName=${options.routeName}, isRoot=${options.isRoot}, popUpTo=${options.popUpToRoute}, popUpInclusive=${options.popUpInclusive})",
+            message = "Navigating with rules to '${route.name}' (currentRoute=${Route.parse(currentRoute).name}, routeName=${Route.parse(options.routeName).name}, isRoot=${options.isRoot}, popUpTo=${Route.parse(options.popUpToRoute).name}, popUpInclusive=${options.popUpInclusive})",
             tag = LogTags.NAVIGATION
         )
     } catch (_: Exception) {}

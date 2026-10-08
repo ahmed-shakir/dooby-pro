@@ -3,6 +3,7 @@ import UserNotifications
 import BackgroundTasks
 import FirebaseCore
 import FirebaseCrashlytics
+import FirebaseAnalytics
 import Shared
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -12,6 +13,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     ) -> Bool {
         FirebaseApp.configure()
         setupCrashlyticsBridge()
+        setupAnalyticsBridge()
 
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
@@ -87,6 +89,34 @@ private func setupCrashlyticsBridge() {
     // 4. User ID Attribution
     IosCrashReporterBridge.shared.onSetUserId = { userId in
         Crashlytics.crashlytics().setUserID(userId ?? "")
+    }
+}
+
+private func setupAnalyticsBridge() {
+    // 1. Track Events
+    IosAnalyticsBridge.shared.onTrackEvent = { name, properties in
+        Analytics.logEvent(name, parameters: properties)
+    }
+
+    // 2. Track Screen Views
+    IosAnalyticsBridge.shared.onTrackScreenView = { screenName, screenClass in
+        var parameters: [String: Any] = [
+            AnalyticsParameterScreenName: screenName
+        ]
+        if let screenClass = screenClass {
+            parameters[AnalyticsParameterScreenClass] = screenClass
+        }
+        Analytics.logEvent(AnalyticsEventScreenView, parameters: parameters)
+    }
+
+    // 3. Set User Properties
+    IosAnalyticsBridge.shared.onSetUserProperty = { key, value in
+        Analytics.setUserProperty(value, forName: key)
+    }
+
+    // 4. User ID Attribution
+    IosAnalyticsBridge.shared.onSetUserId = { userId in
+        Analytics.setUserID(userId)
     }
 }
 
