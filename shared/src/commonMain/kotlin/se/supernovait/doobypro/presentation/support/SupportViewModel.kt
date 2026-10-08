@@ -11,10 +11,10 @@ import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
-import se.supernovait.app.core.domain.crash.CrashReporter
-import se.supernovait.app.core.domain.logging.LogExporter
-import se.supernovait.app.core.domain.logging.LogLevel
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.logging.LogExporter
+import se.supernovait.app.core.domain.observability.logging.LogLevel
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.AppConfig
 import se.supernovait.doobypro.domain.model.support.SupportRequestType
 import se.supernovait.doobypro.domain.repository.AccountRepository

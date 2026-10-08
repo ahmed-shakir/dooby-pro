@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import se.supernovait.app.core.domain.crash.CrashReporter
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.util.LogTags

@@ -16,8 +16,8 @@ import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.location.Address
-import se.supernovait.app.core.domain.logging.LogLevel
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.LogLevel
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.billing.BillingFrequency
 import se.supernovait.app.core.domain.model.license.License

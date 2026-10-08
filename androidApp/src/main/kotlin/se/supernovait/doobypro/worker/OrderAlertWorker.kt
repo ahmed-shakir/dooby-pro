@@ -5,8 +5,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import se.supernovait.app.core.domain.crash.CrashReporter
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.util.LogTags
 

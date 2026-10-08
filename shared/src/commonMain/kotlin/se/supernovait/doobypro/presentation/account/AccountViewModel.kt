@@ -20,9 +20,9 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.common.Result
-import se.supernovait.app.core.domain.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.location.Address
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.company.BusinessHours
 import se.supernovait.doobypro.domain.model.company.DayHours

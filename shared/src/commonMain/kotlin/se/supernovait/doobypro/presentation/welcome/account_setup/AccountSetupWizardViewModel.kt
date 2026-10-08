@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.domain.auth.User
-import se.supernovait.app.core.domain.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.app.core.domain.location.Address
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.company.Company

@@ -12,8 +12,8 @@ import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.event.AppEvent
-import se.supernovait.app.core.domain.logging.LogLevel
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.LogLevel
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest

@@ -30,13 +30,13 @@ import se.supernovait.app.core.domain.auth.AuthenticationState
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.common.getOrNull
-import se.supernovait.app.core.domain.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.extension.isAlreadyNotifiedToday
 import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.extension.toUrl
 import se.supernovait.app.core.domain.extension.truncateToMinutes
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.app.core.domain.model.notification.NotificationType
 import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.sharing.ShareConfiguration

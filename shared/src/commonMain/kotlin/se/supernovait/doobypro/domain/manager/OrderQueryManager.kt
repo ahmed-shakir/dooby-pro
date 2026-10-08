@@ -2,7 +2,7 @@ package se.supernovait.doobypro.domain.manager
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.order.OrderTab

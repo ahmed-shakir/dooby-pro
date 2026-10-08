@@ -11,10 +11,10 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.data.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.User
-import se.supernovait.app.core.domain.logging.LogEntry
-import se.supernovait.app.core.domain.logging.LogExporter
-import se.supernovait.app.core.domain.logging.LogLevel
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.LogEntry
+import se.supernovait.app.core.domain.observability.logging.LogExporter
+import se.supernovait.app.core.domain.observability.logging.LogLevel
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.data.repository.fake.FakeAccountRepository
 import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
 import se.supernovait.doobypro.domain.model.support.SupportRequestType

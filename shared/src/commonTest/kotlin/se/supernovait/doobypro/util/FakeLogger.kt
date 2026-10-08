@@ -1,7 +1,7 @@
 package se.supernovait.doobypro.util
 
-import se.supernovait.app.core.domain.logging.LogLevel
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.LogLevel
+import se.supernovait.app.core.domain.observability.logging.Logger
 
 /**
  * Fake implementation of [Logger] for unit tests.

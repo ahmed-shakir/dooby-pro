@@ -18,8 +18,8 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
-import se.supernovait.app.core.domain.crash.CrashReporter
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.manager.OrderQueryManager
 import se.supernovait.doobypro.domain.model.Service

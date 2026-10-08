@@ -14,11 +14,11 @@ import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.SessionRepository
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
-import se.supernovait.app.core.domain.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.data.local.dao.AccountDao
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.util.LogTags

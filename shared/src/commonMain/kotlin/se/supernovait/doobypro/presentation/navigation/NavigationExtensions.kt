@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import org.koin.mp.KoinPlatformTools
 import se.supernovait.app.core.domain.extension.computeOptions
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.app.core.domain.navigation.NavigationRoute
 import se.supernovait.doobypro.domain.util.LogTags
 

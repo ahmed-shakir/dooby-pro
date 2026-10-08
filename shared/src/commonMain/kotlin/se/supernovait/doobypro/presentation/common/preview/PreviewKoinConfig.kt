@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import se.supernovait.app.core.data.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
@@ -18,12 +18,12 @@ import se.supernovait.app.core.domain.connectivity.ConnectivityPolicy
 import se.supernovait.app.core.domain.connectivity.ConnectivityStatus
 import se.supernovait.app.core.domain.connectivity.ConnectivityStatusType
 import se.supernovait.app.core.domain.connectivity.NetworkType
-import se.supernovait.app.core.domain.crash.CrashReporter
+import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.initialization.AppInitializer
-import se.supernovait.app.core.domain.logging.LogLevel
-import se.supernovait.app.core.domain.logging.Logger
+import se.supernovait.app.core.domain.observability.logging.LogLevel
+import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -35,8 +35,8 @@ object PreviewKoinConfig {
         single<Logger> { fakeLogger }
         single<CrashReporter> { NoOpCrashReporter }
         single<DataStore<Preferences>> { fakeDataStore }
-        single { AuthenticationManager(get(), get(), get()) }
-        single { AppInitializer(get(), get(), get(), get(), get(), minSplashDuration = 0.milliseconds) }
+        single { AuthenticationManager(get(), get(), get(), get(), get()) }
+        single { AppInitializer(get(), get(), get(), get(), get(), get(), get(), minSplashDuration = 0.milliseconds) }
 
         viewModelOf(::AccountSetupWizardViewModel)
     }
