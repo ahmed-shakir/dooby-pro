@@ -19,6 +19,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
@@ -104,7 +105,7 @@ class OrderViewModelTest : PlatformTestConfig() {
         fakeNotificationRepo = FakeNotificationRepository()
         
         val storageManager = StorageLocationManager(
-            FakeLogger(), NoOpCrashReporter, fakeStorageRepo, fakeSettingsRepo
+            FakeLogger(), NoOpCrashReporter, NoOpPerformanceMonitor, fakeStorageRepo, fakeSettingsRepo
         )
 
         val notificationManager = NotificationManager(
@@ -136,7 +137,8 @@ class OrderViewModelTest : PlatformTestConfig() {
             accountRepository = FakeAccountRepository(),
             businessHoursRepository = FakeBusinessHoursRepository(),
             logger = FakeLogger(),
-            crashReporter = NoOpCrashReporter
+            crashReporter = NoOpCrashReporter,
+            performanceMonitor = NoOpPerformanceMonitor
         )
         orderQueryManager = OrderQueryManager(fakeOrderRepo, FakeLogger())
         
@@ -144,6 +146,7 @@ class OrderViewModelTest : PlatformTestConfig() {
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
+            performanceMonitor = NoOpPerformanceMonitor,
             savedStateHandle = SavedStateHandle(),
             serviceRepository = fakeServiceRepo,
             storageLocationRepository = fakeStorageRepo,
@@ -214,6 +217,7 @@ class OrderViewModelTest : PlatformTestConfig() {
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
+            performanceMonitor = NoOpPerformanceMonitor,
             savedStateHandle = savedStateHandle,
             serviceRepository = fakeServiceRepo,
             storageLocationRepository = fakeStorageRepo,

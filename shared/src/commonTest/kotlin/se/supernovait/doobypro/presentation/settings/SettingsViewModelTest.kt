@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
 import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.doobypro.data.local.preferences.FakeDataStore
 import se.supernovait.doobypro.data.repository.SettingsRepositoryImpl
 import se.supernovait.doobypro.data.repository.fake.FakeServiceRepository
@@ -47,7 +48,8 @@ class SettingsViewModelTest {
                 encodeDefaults = true
             },
             logger = FakeLogger(),
-            crashReporter = NoOpCrashReporter
+            crashReporter = NoOpCrashReporter,
+            performanceMonitor = NoOpPerformanceMonitor
         )
         serviceRepository = FakeServiceRepository()
         storageLocationRepository = FakeStorageLocationRepository()
@@ -55,6 +57,7 @@ class SettingsViewModelTest {
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
+            performanceMonitor = NoOpPerformanceMonitor,
             settingsRepository = settingsRepository,
             serviceRepository = serviceRepository,
             storageLocationRepository = storageLocationRepository

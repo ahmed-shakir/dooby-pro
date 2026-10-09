@@ -39,6 +39,8 @@ import se.supernovait.app.core.domain.model.notification.NotificationType
 import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
+import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.company.Company
@@ -62,6 +64,7 @@ import kotlin.time.Clock
 class OrderManager(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val performanceMonitor: PerformanceMonitor,
     private val orderRepository: OrderRepository,
     private val serviceRepository: ServiceRepository,
     private val storageLocationManager: StorageLocationManager,
@@ -104,87 +107,93 @@ class OrderManager(
      * Creates a new order template populated with default values from settings.
      */
     suspend fun createOrderTemplate(customer: User): Order {
-        val orderSettings = settingsRepository.settings.first().order
-        val storageSettings = settingsRepository.settings.first().storage
-        val orderDatetime = LocalDateTime.now().truncateToMinutes()
-        val deliveryDatetime = Clock.System.now()
-            .plus(orderSettings.defaultDeliveryDaysOffset, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-            .truncateToMinutes()
+        return performanceMonitor.traceAsync("OrderManager.createOrderTemplate") {
+            val orderSettings = settingsRepository.settings.first().order
+            val storageSettings = settingsRepository.settings.first().storage
+            val orderDatetime = LocalDateTime.now().truncateToMinutes()
+            val deliveryDatetime = Clock.System.now()
+                .plus(orderSettings.defaultDeliveryDaysOffset, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .truncateToMinutes()
 
-        val defaultService = orderSettings.defaultServiceId?.let { id ->
-            serviceRepository.getServiceById(id).getOrNull()
-        } ?: Service()
+            val defaultService = orderSettings.defaultServiceId?.let { id ->
+                serviceRepository.getServiceById(id).getOrNull()
+            } ?: Service()
 
-        val defaultStorage = storageLocationRepository.getLocationById(storageSettings.defaultStorageLocationId).getOrNull()
-            ?: storageLocationRepository.getDefaultLocation().getOrNull()
-            ?: StorageLocation()
+            val defaultStorage = storageLocationRepository.getLocationById(storageSettings.defaultStorageLocationId).getOrNull()
+                ?: storageLocationRepository.getDefaultLocation().getOrNull()
+                ?: StorageLocation()
 
-        return Order(
-            customer = customer,
-            service = defaultService,
-            storageLocation = defaultStorage,
-            status = OrderStatus.NEW,
-            orderDatetime = orderDatetime,
-            deliveryDatetime = deliveryDatetime,
-            deliveryOption = orderSettings.defaultDeliveryOption,
-            deliveryMethod = orderSettings.defaultDeliveryMethod,
-            isPaymentDone = false,
-            notes = null
-        )
+            Order(
+                customer = customer,
+                service = defaultService,
+                storageLocation = defaultStorage,
+                status = OrderStatus.NEW,
+                orderDatetime = orderDatetime,
+                deliveryDatetime = deliveryDatetime,
+                deliveryOption = orderSettings.defaultDeliveryOption,
+                deliveryMethod = orderSettings.defaultDeliveryMethod,
+                isPaymentDone = false,
+                notes = null
+            )
+        }
     }
 
     /**
      * Creates a new order based on an existing order (re-issue pattern).
      */
     suspend fun reissueOrder(originalOrder: Order): Order {
-        logger.info("Reissuing order with ID: ${originalOrder.id}", tag = LogTags.ORDER_MANAGER)
-        val template = createOrderTemplate(originalOrder.customer)
-        return template.copy(
-            service = originalOrder.service,
-            deliveryOption = originalOrder.deliveryOption,
-            deliveryMethod = originalOrder.deliveryMethod,
-            notes = originalOrder.notes
-        )
+        return performanceMonitor.traceAsync("OrderManager.reissueOrder") {
+            logger.info("Reissuing order with ID: ${originalOrder.id}", tag = LogTags.ORDER_MANAGER)
+            val template = createOrderTemplate(originalOrder.customer)
+            template.copy(
+                service = originalOrder.service,
+                deliveryOption = originalOrder.deliveryOption,
+                deliveryMethod = originalOrder.deliveryMethod,
+                notes = originalOrder.notes
+            )
+        }
     }
 
     /**
      * Creates a new order, assigning storage and calculating expected times.
      */
     suspend fun createOrder(order: Order): Result<String, DataError> {
-        logger.info("Creating order for customer: ${order.customer.username}", tag = LogTags.ORDER_MANAGER)
-        return try {
-            val assignedLocationId = storageLocationManager.assignStorageLocation(order.storageLocation.id)
-            
-            // Hydrate the full storage location object before saving
-            val fullLocation = storageLocationRepository.getLocationById(assignedLocationId).getOrNull()
-                ?: throw IllegalStateException("Assigned storage location not found.")
+        return performanceMonitor.traceAsync("OrderManager.createOrder") {
+            logger.info("Creating order for customer: ${order.customer.username}", tag = LogTags.ORDER_MANAGER)
+            try {
+                val assignedLocationId = storageLocationManager.assignStorageLocation(order.storageLocation.id)
+                
+                // Hydrate the full storage location object before saving
+                val fullLocation = storageLocationRepository.getLocationById(assignedLocationId).getOrNull()
+                    ?: throw IllegalStateException("Assigned storage location not found.")
 
-            val finalizedOrder = order.copy(
-                storageLocation = fullLocation
-            )
-            
-            val result = orderRepository.saveOrder(finalizedOrder)
+                val finalizedOrder = order.copy(
+                    storageLocation = fullLocation
+                )
+                
+                val result = orderRepository.saveOrder(finalizedOrder)
 
-            if (result is Result.Success) {
-                logger.info("Order created successfully with ID: ${result.data}", tag = LogTags.ORDER_MANAGER)
-                crashReporter.log("Order created successfully with ID: ${result.data}")
-                val settings = settingsRepository.settings.first()
-                if (settings.notification.newOrders && order.id == null) {
-                    notificationManager.notify(
-                        title = getString(Res.string.screen_Order_label_new_order),
-                        message = getString(Res.string.notification_order_updated_message, result.data, getString(OrderStatus.NEW.label)),
-                        type = NotificationType.SUCCESS,
-                        showNativeAlert = shouldSendPlatformNotification(),
-                        deepLink = Route.OrderDetails(result.data).toUrl(shareConfiguration)
-                    )
+                if (result is Result.Success) {
+                    logger.info("Order created successfully with ID: ${result.data}", tag = LogTags.ORDER_MANAGER)
+                    crashReporter.log("Order created successfully with ID: ${result.data}")
+                    val settings = settingsRepository.settings.first()
+                    if (settings.notification.newOrders && order.id == null) {
+                        notificationManager.notify(
+                            title = getString(Res.string.screen_Order_label_new_order),
+                            message = getString(Res.string.notification_order_updated_message, result.data, getString(OrderStatus.NEW.label)),
+                            type = NotificationType.SUCCESS,
+                            showNativeAlert = shouldSendPlatformNotification(),
+                            deepLink = Route.OrderDetails(result.data).toUrl(shareConfiguration)
+                        )
+                    }
                 }
+                result
+            } catch (e: Exception) {
+                logger.error("Failed to create order", e, tag = LogTags.ORDER_MANAGER)
+                crashReporter.recordException(e, mapOf("action" to "createOrder", "customer" to order.customer.username))
+                Result.Failure(DataError.UNKNOWN)
             }
-            result
-        } catch (e: Exception) {
-            logger.error("Failed to create order", e, tag = LogTags.ORDER_MANAGER)
-            crashReporter.recordException(e, mapOf("action" to "createOrder", "customer" to order.customer.username))
-            Result.Failure(DataError.UNKNOWN)
         }
     }
 
@@ -192,69 +201,75 @@ class OrderManager(
      * Transitions an order to its next logical status.
      */
     suspend fun transitionToNextStatus(order: Order): Result<Unit, DataError> {
-        val nextStatus = order.getNextStatus() ?: return Result.Failure(DataError.UNKNOWN)
-        logger.info("Transitioning order with ID: ${order.id} from ${order.status} to next status: $nextStatus", tag = LogTags.ORDER_MANAGER)
-        return updateOrderStatus(order.id!!, nextStatus)
+        return performanceMonitor.traceAsync("OrderManager.transitionToNextStatus") {
+            val nextStatus = order.getNextStatus() ?: return@traceAsync Result.Failure(DataError.UNKNOWN)
+            logger.info("Transitioning order with ID: ${order.id} from ${order.status} to next status: $nextStatus", tag = LogTags.ORDER_MANAGER)
+            updateOrderStatus(order.id!!, nextStatus)
+        }
     }
 
     /**
      * Updates an order's status and handles side effects (like storage release).
      */
     suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus): Result<Unit, DataError> {
-        logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_MANAGER)
-        val currentOrder = (orderRepository.getOrderById(orderId) as? Result.Success)?.data
-        val result = orderRepository.updateOrderStatus(orderId, newStatus)
+        return performanceMonitor.traceAsync("OrderManager.updateOrderStatus") {
+            logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_MANAGER)
+            val currentOrder = (orderRepository.getOrderById(orderId) as? Result.Success)?.data
+            val result = orderRepository.updateOrderStatus(orderId, newStatus)
 
-        if (result is Result.Success) {
-            val settings = settingsRepository.settings.first()
+            if (result is Result.Success) {
+                val settings = settingsRepository.settings.first()
 
-            val shouldNotify = when (newStatus) {
-                OrderStatus.READY -> settings.notification.readyOrders
-                else -> false
-            }
+                val shouldNotify = when (newStatus) {
+                    OrderStatus.READY -> settings.notification.readyOrders
+                    else -> false
+                }
 
-            if (shouldNotify) {
-                val title = getString(Res.string.notification_order_updated_title)
-                val statusName = getString(newStatus.label)
-                val message = getString(Res.string.notification_order_updated_message, orderId, statusName)
+                if (shouldNotify) {
+                    val title = getString(Res.string.notification_order_updated_title)
+                    val statusName = getString(newStatus.label)
+                    val message = getString(Res.string.notification_order_updated_message, orderId, statusName)
 
-                notificationManager.notify(
-                    title = title,
-                    message = message,
-                    type = NotificationType.INFO,
-                    showNativeAlert = shouldSendPlatformNotification(),
-                    deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
-                )
-            }
+                    notificationManager.notify(
+                        title = title,
+                        message = message,
+                        type = NotificationType.INFO,
+                        showNativeAlert = shouldSendPlatformNotification(),
+                        deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
+                    )
+                }
 
-            if (newStatus.isTerminal()) {
-                if (currentOrder != null) {
-                    logger.info("Order with ID: $orderId reached terminal status. Releasing storage location with ID: ${currentOrder.storageLocation.id}", tag = LogTags.ORDER_MANAGER)
-                    storageLocationManager.releaseStorageLocation(currentOrder.storageLocation.id!!)
+                if (newStatus.isTerminal()) {
+                    if (currentOrder != null) {
+                        logger.info("Order with ID: $orderId reached terminal status. Releasing storage location with ID: ${currentOrder.storageLocation.id}", tag = LogTags.ORDER_MANAGER)
+                        storageLocationManager.releaseStorageLocation(currentOrder.storageLocation.id!!)
+                    }
                 }
             }
-        }
 
-        return result
+            result
+        }
     }
 
     /**
      * Triggers a "Not Delivered" warning notification if enabled in notification settings.
      */
     suspend fun notifyOrderNotDelivered(orderId: String) {
-        logger.warn("Notifying order not delivered for order with ID: $orderId", tag = LogTags.ORDER_MANAGER)
-        val settings = settingsRepository.settings.first()
-        if (settings.notification.orderNotDelivered) {
-            val title = getString(Res.string.notification_order_not_delivered_title)
-            val message = getString(Res.string.notification_order_not_delivered_message, orderId)
+        performanceMonitor.traceAsync("OrderManager.notifyOrderNotDelivered") {
+            logger.warn("Notifying order not delivered for order with ID: $orderId", tag = LogTags.ORDER_MANAGER)
+            val settings = settingsRepository.settings.first()
+            if (settings.notification.orderNotDelivered) {
+                val title = getString(Res.string.notification_order_not_delivered_title)
+                val message = getString(Res.string.notification_order_not_delivered_message, orderId)
 
-            notificationManager.notify(
-                title = title,
-                message = message,
-                type = NotificationType.WARNING,
-                showNativeAlert = shouldSendPlatformNotification(),
-                deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
-            )
+                notificationManager.notify(
+                    title = title,
+                    message = message,
+                    type = NotificationType.WARNING,
+                    showNativeAlert = shouldSendPlatformNotification(),
+                    deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
+                )
+            }
         }
     }
 
@@ -263,55 +278,57 @@ class OrderManager(
      * based on notification settings. Each alert type per order is sent at most once per day until resolved.
      */
     suspend fun checkAndNotifyOrderAlerts() {
-        logger.debug("Checking and processing order alerts", tag = LogTags.ORDER_MANAGER)
-        if (!shouldSendPlatformNotification()) return
+        performanceMonitor.traceAsync("OrderManager.checkAndNotifyOrderAlerts") {
+            logger.debug("Checking and processing order alerts", tag = LogTags.ORDER_MANAGER)
+            if (!shouldSendPlatformNotification()) return@traceAsync
 
-        val settings = settingsRepository.settings.first()
-        val orders = orderRepository.getOrders().first()
-        val allNotifications = notificationManager.notifications.first()
+            val settings = settingsRepository.settings.first()
+            val orders = orderRepository.getOrders().first()
+            val allNotifications = notificationManager.notifications.first()
 
-        orders.forEach { order ->
-            val orderId = order.id ?: return@forEach
-            val deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
+            orders.forEach { order ->
+                val orderId = order.id ?: return@forEach
+                val deepLink = Route.OrderDetails(orderId).toUrl(shareConfiguration)
 
-            if (settings.notification.lateOrders && order.isLate()) {
-                val title = getString(Res.string.notification_order_late_title)
-                if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
-                    logger.warn("Order with ID: $orderId is late, sending notification", tag = LogTags.ORDER_MANAGER)
-                    val message = getString(Res.string.notification_order_late_message, orderId)
-                    notificationManager.notify(
-                        title = title,
-                        message = message,
-                        type = NotificationType.WARNING,
-                        showNativeAlert = true,
-                        deepLink = deepLink
-                    )
-                }
-            } else if (settings.notification.orderNotPickedUp && order.isNotPickedUp()) {
-                val title = getString(Res.string.notification_order_not_picked_up_title)
-                if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
-                    logger.warn("Order with ID: $orderId is not picked up, sending notification", tag = LogTags.ORDER_MANAGER)
-                    val message = getString(Res.string.notification_order_not_picked_up_message, orderId)
-                    notificationManager.notify(
-                        title = title,
-                        message = message,
-                        type = NotificationType.WARNING,
-                        showNativeAlert = true,
-                        deepLink = deepLink
-                    )
-                }
-            } else if (settings.notification.orderNotDelivered && order.isNotDelivered()) {
-                val title = getString(Res.string.notification_order_not_delivered_title)
-                if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
-                    logger.warn("Order with ID: $orderId is not delivered, sending notification", tag = LogTags.ORDER_MANAGER)
-                    val message = getString(Res.string.notification_order_not_delivered_message, orderId)
-                    notificationManager.notify(
-                        title = title,
-                        message = message,
-                        type = NotificationType.WARNING,
-                        showNativeAlert = true,
-                        deepLink = deepLink
-                    )
+                if (settings.notification.lateOrders && order.isLate()) {
+                    val title = getString(Res.string.notification_order_late_title)
+                    if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
+                        logger.warn("Order with ID: $orderId is late, sending notification", tag = LogTags.ORDER_MANAGER)
+                        val message = getString(Res.string.notification_order_late_message, orderId)
+                        notificationManager.notify(
+                            title = title,
+                            message = message,
+                            type = NotificationType.WARNING,
+                            showNativeAlert = true,
+                            deepLink = deepLink
+                        )
+                    }
+                } else if (settings.notification.orderNotPickedUp && order.isNotPickedUp()) {
+                    val title = getString(Res.string.notification_order_not_picked_up_title)
+                    if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
+                        logger.warn("Order with ID: $orderId is not picked up, sending notification", tag = LogTags.ORDER_MANAGER)
+                        val message = getString(Res.string.notification_order_not_picked_up_message, orderId)
+                        notificationManager.notify(
+                            title = title,
+                            message = message,
+                            type = NotificationType.WARNING,
+                            showNativeAlert = true,
+                            deepLink = deepLink
+                        )
+                    }
+                } else if (settings.notification.orderNotDelivered && order.isNotDelivered()) {
+                    val title = getString(Res.string.notification_order_not_delivered_title)
+                    if (!allNotifications.isAlreadyNotifiedToday(title, deepLink)) {
+                        logger.warn("Order with ID: $orderId is not delivered, sending notification", tag = LogTags.ORDER_MANAGER)
+                        val message = getString(Res.string.notification_order_not_delivered_message, orderId)
+                        notificationManager.notify(
+                            title = title,
+                            message = message,
+                            type = NotificationType.WARNING,
+                            showNativeAlert = true,
+                            deepLink = deepLink
+                        )
+                    }
                 }
             }
         }
@@ -321,22 +338,26 @@ class OrderManager(
      * Cancels an order and releases its storage slot.
      */
     suspend fun cancelOrder(order: Order): Result<Unit, DataError> {
-        if (order.status.isTerminal()) return Result.Failure(DataError.UNKNOWN)
-        logger.info("Cancelling order with ID: ${order.id}", tag = LogTags.ORDER_MANAGER)
-        return updateOrderStatus(order.id!!, OrderStatus.CANCELLED)
+        return performanceMonitor.traceAsync("OrderManager.cancelOrder") {
+            if (order.status.isTerminal()) return@traceAsync Result.Failure(DataError.UNKNOWN)
+            logger.info("Cancelling order with ID: ${order.id}", tag = LogTags.ORDER_MANAGER)
+            updateOrderStatus(order.id!!, OrderStatus.CANCELLED)
+        }
     }
 
     /**
      * Deletes an order if it is in the NEW status.
      */
     suspend fun deleteOrder(order: Order): Result<Unit, DataError> {
-        if (!order.canDelete()) return Result.Failure(DataError.UNKNOWN)
-        logger.info("Deleting order with ID: ${order.id}", tag = LogTags.ORDER_MANAGER)
-        val result = orderRepository.deleteOrder(order)
-        if (result is Result.Success) {
-            storageLocationManager.releaseStorageLocation(order.storageLocation.id!!)
+        return performanceMonitor.traceAsync("OrderManager.deleteOrder") {
+            if (!order.canDelete()) return@traceAsync Result.Failure(DataError.UNKNOWN)
+            logger.info("Deleting order with ID: ${order.id}", tag = LogTags.ORDER_MANAGER)
+            val result = orderRepository.deleteOrder(order)
+            if (result is Result.Success) {
+                storageLocationManager.releaseStorageLocation(order.storageLocation.id!!)
+            }
+            result
         }
-        return result
     }
 
     private suspend fun shouldSendPlatformNotification(): Boolean {

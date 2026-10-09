@@ -16,6 +16,8 @@ import se.supernovait.app.core.domain.location.Address
 import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
+import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.doobypro.domain.model.Account
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.company.Company
@@ -30,6 +32,7 @@ class AccountSetupWizardViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
     private val analyticsTracker: AnalyticsTracker,
+    private val performanceMonitor: PerformanceMonitor,
     private val accountRepository: AccountRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountSetupWizardState())
@@ -112,51 +115,53 @@ class AccountSetupWizardViewModel(
 
     private fun createAccount() {
         viewModelScope.launch {
-            logger.info("Submitting new account setup wizard form", tag = LogTags.ACCOUNT_SETUP_VM)
-            _uiState.value = _uiState.value.copy(isCreatingAccount = true)
-            
-            val state = _uiState.value
-            val account = Account(
-                user = User(
-                    username = state.username,
-                    firstname = state.firstName,
-                    lastname = state.lastName,
-                    birthdate = state.birthDate,
-                    email = state.email,
-                    phoneNumber = state.phoneNumber
-                ),
-                company = Company(
-                    legalName = state.companyLegalName,
-                    displayName = state.companyDisplayName,
-                    licenseNumber = state.licenseNumber,
-                    phoneNumber = state.companyPhone,
-                    email = state.companyEmail,
-                    address = Address(
-                        street = state.streetAddress,
-                        city = state.city,
-                        subdivision = state.subdivision,
-                        postalCode = state.postalCode.ifBlank { null },
-                        country = state.country,
-                        notes = state.notes.ifBlank { null }
+            performanceMonitor.traceAsync("AccountSetupWizardViewModel.createAccount") {
+                logger.info("Submitting new account setup wizard form", tag = LogTags.ACCOUNT_SETUP_VM)
+                _uiState.value = _uiState.value.copy(isCreatingAccount = true)
+                
+                val state = _uiState.value
+                val account = Account(
+                    user = User(
+                        username = state.username,
+                        firstname = state.firstName,
+                        lastname = state.lastName,
+                        birthdate = state.birthDate,
+                        email = state.email,
+                        phoneNumber = state.phoneNumber
+                    ),
+                    company = Company(
+                        legalName = state.companyLegalName,
+                        displayName = state.companyDisplayName,
+                        licenseNumber = state.licenseNumber,
+                        phoneNumber = state.companyPhone,
+                        email = state.companyEmail,
+                        address = Address(
+                            street = state.streetAddress,
+                            city = state.city,
+                            subdivision = state.subdivision,
+                            postalCode = state.postalCode.ifBlank { null },
+                            country = state.country,
+                            notes = state.notes.ifBlank { null }
+                        )
                     )
                 )
-            )
-            
-            val result = accountRepository.saveAccount(account)
-            if (result.isSuccess) {
-                logger.info("Account creation in wizard succeeded", tag = LogTags.ACCOUNT_SETUP_VM)
-                crashReporter.log("Account creation in wizard succeeded")
-                analyticsTracker.setUserId(state.username)
-                analyticsTracker.trackEvent("account_created", mapOf("username" to state.username, "company" to state.companyLegalName))
-                _events.send(AppEvent.SignIn)
-            } else {
-                logger.error("Account creation in wizard failed", tag = LogTags.ACCOUNT_SETUP_VM)
-                crashReporter.log("Account creation in wizard failed")
-                analyticsTracker.trackEvent("account_creation_failed")
-                _events.send(AppEvent.Failure(AuthError.UNKNOWN))
-            }
+                
+                val result = accountRepository.saveAccount(account)
+                if (result.isSuccess) {
+                    logger.info("Account creation in wizard succeeded", tag = LogTags.ACCOUNT_SETUP_VM)
+                    crashReporter.log("Account creation in wizard succeeded")
+                    analyticsTracker.setUserId(state.username)
+                    analyticsTracker.trackEvent("account_created", mapOf("username" to state.username, "company" to state.companyLegalName))
+                    _events.send(AppEvent.SignIn)
+                } else {
+                    logger.error("Account creation in wizard failed", tag = LogTags.ACCOUNT_SETUP_VM)
+                    crashReporter.log("Account creation in wizard failed")
+                    analyticsTracker.trackEvent("account_creation_failed")
+                    _events.send(AppEvent.Failure(AuthError.UNKNOWN))
+                }
 
-            _uiState.value = _uiState.value.copy(isCreatingAccount = false)
+                _uiState.value = _uiState.value.copy(isCreatingAccount = false)
+            }
         }
     }
 

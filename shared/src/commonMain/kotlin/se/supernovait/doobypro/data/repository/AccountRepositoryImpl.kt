@@ -16,6 +16,8 @@ import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
+import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.doobypro.data.local.dao.AccountDao
 import se.supernovait.doobypro.data.local.entity.AccountEntity
 import se.supernovait.doobypro.data.local.mapper.toDomain
@@ -36,6 +38,7 @@ import kotlin.time.Clock
 class AccountRepositoryImpl(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val performanceMonitor: PerformanceMonitor,
     private val authRepository: AuthRepository,
     private val companyRepository: CompanyRepository,
     private val licenseRepository: LicenseRepository,
@@ -47,25 +50,29 @@ class AccountRepositoryImpl(
 
     override suspend fun getAccount(id: String): Result<Account, DataError> {
         return withContext(ioContext) {
-            logger.debug("Fetching account with ID: $id", tag = LogTags.ACCOUNT_REPO)
-            val entity = accountDao.getById(id)
-            if (entity == null) {
-                logger.warn("Account not found with ID: $id", tag = LogTags.ACCOUNT_REPO)
-                return@withContext Result.Failure(DataError.NOT_FOUND)
+            performanceMonitor.traceAsync("AccountRepository.getAccount") {
+                logger.debug("Fetching account with ID: $id", tag = LogTags.ACCOUNT_REPO)
+                val entity = accountDao.getById(id)
+                if (entity == null) {
+                    logger.warn("Account not found with ID: $id", tag = LogTags.ACCOUNT_REPO)
+                    return@traceAsync Result.Failure(DataError.NOT_FOUND)
+                }
+                assembleAccount(entity)
             }
-            assembleAccount(entity)
         }
     }
 
     override suspend fun getAccountByUserId(userId: String): Result<Account, DataError> {
         return withContext(ioContext) {
-            logger.debug("Fetching account for user with ID: $userId", tag = LogTags.ACCOUNT_REPO)
-            val entity = accountDao.getByUserId(userId)
-            if (entity == null) {
-                logger.warn("Account not found for user with ID: $userId", tag = LogTags.ACCOUNT_REPO)
-                return@withContext Result.Failure(DataError.NOT_FOUND)
+            performanceMonitor.traceAsync("AccountRepository.getAccountByUserId") {
+                logger.debug("Fetching account for user with ID: $userId", tag = LogTags.ACCOUNT_REPO)
+                val entity = accountDao.getByUserId(userId)
+                if (entity == null) {
+                    logger.warn("Account not found for user with ID: $userId", tag = LogTags.ACCOUNT_REPO)
+                    return@traceAsync Result.Failure(DataError.NOT_FOUND)
+                }
+                assembleAccount(entity)
             }
-            assembleAccount(entity)
         }
     }
 
@@ -96,64 +103,70 @@ class AccountRepositoryImpl(
 
     override suspend fun saveAccount(account: Account): Result<String, DataError> {
         return withContext(ioContext) {
-            val isNew = account.id.isNullOrBlank()
-            logger.info("Saving account with ID: ${account.id} (isNew=$isNew)", tag = LogTags.ACCOUNT_REPO)
-            if (isNew) {
-                saveNewAccount(account)
-            } else {
-                updateExistingAccount(account)
+            performanceMonitor.traceAsync("AccountRepository.saveAccount") {
+                val isNew = account.id.isNullOrBlank()
+                logger.info("Saving account with ID: ${account.id} (isNew=$isNew)", tag = LogTags.ACCOUNT_REPO)
+                if (isNew) {
+                    saveNewAccount(account)
+                } else {
+                    updateExistingAccount(account)
+                }
             }
         }
     }
 
     override suspend fun deleteAccount(id: String): Result<Unit, DataError> {
         return withContext(ioContext) {
-            try {
-                logger.info("Soft deleting account with ID: $id", tag = LogTags.ACCOUNT_REPO)
-                val entity = accountDao.getById(id)
-                if (entity == null) {
-                    logger.warn("Account not found with ID: $id for soft deletion", tag = LogTags.ACCOUNT_REPO)
-                    return@withContext Result.Failure(DataError.NOT_FOUND)
+            performanceMonitor.traceAsync("AccountRepository.deleteAccount") {
+                try {
+                    logger.info("Soft deleting account with ID: $id", tag = LogTags.ACCOUNT_REPO)
+                    val entity = accountDao.getById(id)
+                    if (entity == null) {
+                        logger.warn("Account not found with ID: $id for soft deletion", tag = LogTags.ACCOUNT_REPO)
+                        return@traceAsync Result.Failure(DataError.NOT_FOUND)
+                    }
+                    val timestamp = Clock.System.now()
+                    // Soft delete: Mark for deletion and set deactivation timestamp
+                    accountDao.upsert(entity.copy(deactivatedAt = timestamp, isMarkedForDeletion = true))
+
+                    val user = userDao.getById(entity.userId)?.toDomain()
+                    user?.let { userDao.upsert(it.softDelete().toEntity()) }
+
+                    logger.info("Successfully marked account with ID: $id for soft deletion", tag = LogTags.ACCOUNT_REPO)
+                    Result.Success(Unit)
+                } catch (e: Exception) {
+                    logger.error("Error soft deleting account with ID: $id", e, tag = LogTags.ACCOUNT_REPO)
+                    crashReporter.recordException(e, mapOf("action" to "deleteAccount", "accountId" to id))
+                    Result.Failure(DataError.DATABASE_ERROR)
                 }
-                val timestamp = Clock.System.now()
-                // Soft delete: Mark for deletion and set deactivation timestamp
-                accountDao.upsert(entity.copy(deactivatedAt = timestamp, isMarkedForDeletion = true))
-
-                val user = userDao.getById(entity.userId)?.toDomain()
-                user?.let { userDao.upsert(it.softDelete().toEntity()) }
-
-                logger.info("Successfully marked account with ID: $id for soft deletion", tag = LogTags.ACCOUNT_REPO)
-                Result.Success(Unit)
-            } catch (e: Exception) {
-                logger.error("Error soft deleting account with ID: $id", e, tag = LogTags.ACCOUNT_REPO)
-                crashReporter.recordException(e, mapOf("action" to "deleteAccount", "accountId" to id))
-                Result.Failure(DataError.DATABASE_ERROR)
             }
         }
     }
 
     override suspend fun purgeDeletedAccounts(): Result<Int, DataError> {
         return withContext(ioContext) {
-            try {
-                logger.info("Checking for accounts marked for deletion to purge", tag = LogTags.ACCOUNT_REPO)
-                val accountsToPurge = accountDao.getAccountsMarkedForDeletion()
-                val now = Clock.System.now()
-                val threshold = now.minus(30, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
-                
-                var purgeCount = 0
-                accountsToPurge.forEach { entity ->
-                    val deactivationInstant = entity.deactivatedAt
-                    if (deactivationInstant != null && deactivationInstant < threshold) {
-                        hardDeleteAccountStructure(entity)
-                        purgeCount++
+            performanceMonitor.traceAsync("AccountRepository.purgeDeletedAccounts") {
+                try {
+                    logger.info("Checking for accounts marked for deletion to purge", tag = LogTags.ACCOUNT_REPO)
+                    val accountsToPurge = accountDao.getAccountsMarkedForDeletion()
+                    val now = Clock.System.now()
+                    val threshold = now.minus(30, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+                    
+                    var purgeCount = 0
+                    accountsToPurge.forEach { entity ->
+                        val deactivationInstant = entity.deactivatedAt
+                        if (deactivationInstant != null && deactivationInstant < threshold) {
+                            hardDeleteAccountStructure(entity)
+                            purgeCount++
+                        }
                     }
+                    logger.info("Purged $purgeCount accounts marked for deletion", tag = LogTags.ACCOUNT_REPO)
+                    Result.Success(purgeCount)
+                } catch (e: Exception) {
+                    logger.error("Error purging deleted accounts", e, tag = LogTags.ACCOUNT_REPO)
+                    crashReporter.recordException(e, mapOf("action" to "purgeDeletedAccounts"))
+                    Result.Failure(DataError.DATABASE_ERROR)
                 }
-                logger.info("Purged $purgeCount accounts marked for deletion", tag = LogTags.ACCOUNT_REPO)
-                Result.Success(purgeCount)
-            } catch (e: Exception) {
-                logger.error("Error purging deleted accounts", e, tag = LogTags.ACCOUNT_REPO)
-                crashReporter.recordException(e, mapOf("action" to "purgeDeletedAccounts"))
-                Result.Failure(DataError.DATABASE_ERROR)
             }
         }
     }

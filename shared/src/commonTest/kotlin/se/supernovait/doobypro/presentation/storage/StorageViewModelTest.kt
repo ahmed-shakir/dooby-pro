@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
@@ -35,6 +36,7 @@ class StorageViewModelTest {
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
+            performanceMonitor = NoOpPerformanceMonitor,
             storageLocationRepository = fakeRepository
         )
     }

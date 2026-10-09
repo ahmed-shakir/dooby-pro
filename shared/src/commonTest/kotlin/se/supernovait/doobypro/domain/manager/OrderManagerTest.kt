@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.common.Result
@@ -102,7 +103,7 @@ class OrderManagerTest : PlatformTestConfig() {
     }
 
     private fun createOrderManager(scope: CoroutineScope): OrderManager {
-        val storageManager = StorageLocationManager(FakeLogger(), NoOpCrashReporter, fakeStorageRepo, fakeSettingsRepo)
+        val storageManager = StorageLocationManager(FakeLogger(), NoOpCrashReporter, NoOpPerformanceMonitor, fakeStorageRepo, fakeSettingsRepo)
         val notificationManager = NotificationManager(
             logger = FakeLogger(),
             repository = fakeNotificationRepo,
@@ -131,7 +132,8 @@ class OrderManagerTest : PlatformTestConfig() {
             accountRepository = FakeAccountRepository(),
             businessHoursRepository = FakeBusinessHoursRepository(),
             logger = FakeLogger(),
-            crashReporter = NoOpCrashReporter
+            crashReporter = NoOpCrashReporter,
+            performanceMonitor = NoOpPerformanceMonitor
         )
     }
 

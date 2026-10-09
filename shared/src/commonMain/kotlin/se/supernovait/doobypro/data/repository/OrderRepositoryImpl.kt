@@ -16,6 +16,8 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
+import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.doobypro.data.local.dao.OrderDao
 import se.supernovait.doobypro.data.local.dao.ServiceDao
 import se.supernovait.doobypro.data.local.dao.StorageLocationDao
@@ -37,6 +39,7 @@ import kotlin.time.Clock
 class OrderRepositoryImpl(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val performanceMonitor: PerformanceMonitor,
     private val userDao: UserDao,
     private val orderDao: OrderDao,
     private val serviceDao: ServiceDao,
@@ -93,78 +96,86 @@ class OrderRepositoryImpl(
 
     override suspend fun getOrderById(id: String): Result<Order, DataError> {
         return withContext(ioContext) {
-            logger.debug("Fetching order with ID: $id", tag = LogTags.ORDER_REPO)
-            val order = orderDao.getById(id)
+            performanceMonitor.traceAsync("OrderRepository.getOrderById") {
+                logger.debug("Fetching order with ID: $id", tag = LogTags.ORDER_REPO)
+                val order = orderDao.getById(id)
 
-            if (order != null) {
-                val user = userDao.getById(order.customerId)?.toDomain()
-                val service = serviceDao.getById(order.serviceId)?.toDomain()
-                val storageLocation = storageLocationDao.getById(order.storageLocationId)?.toDomain()
+                if (order != null) {
+                    val user = userDao.getById(order.customerId)?.toDomain()
+                    val service = serviceDao.getById(order.serviceId)?.toDomain()
+                    val storageLocation = storageLocationDao.getById(order.storageLocationId)?.toDomain()
 
-                if (user != null && service != null && storageLocation != null) {
-                    Result.Success(order.toDomain(user, service, storageLocation))
+                    if (user != null && service != null && storageLocation != null) {
+                        Result.Success(order.toDomain(user, service, storageLocation))
+                    } else {
+                        logger.warn("Order with ID: $id is missing dependent components (user=$user, service=$service, storage=$storageLocation)", tag = LogTags.ORDER_REPO)
+                        Result.Failure(DataError.NOT_FOUND)
+                    }
                 } else {
-                    logger.warn("Order with ID: $id is missing dependent components (user=$user, service=$service, storage=$storageLocation)", tag = LogTags.ORDER_REPO)
+                    logger.warn("Order entity not found with ID: $id", tag = LogTags.ORDER_REPO)
                     Result.Failure(DataError.NOT_FOUND)
                 }
-            } else {
-                logger.warn("Order entity not found with ID: $id", tag = LogTags.ORDER_REPO)
-                Result.Failure(DataError.NOT_FOUND)
             }
         }
     }
 
     override suspend fun saveOrder(order: Order): Result<String, DataError> {
         return withContext(ioContext) {
-            try {
-                logger.info("Saving order with ID: ${order.id}", tag = LogTags.ORDER_REPO)
-                val entityToSave = order.toEntity()
-                orderDao.upsert(entityToSave)
-                Result.Success(entityToSave.id)
-            } catch (e: Exception) {
-                logger.error("Error saving order with ID: ${order.id}", e, tag = LogTags.ORDER_REPO)
-                crashReporter.recordException(e, mapOf("action" to "saveOrder", "orderId" to (order.id ?: "new")))
-                Result.Failure(DataError.DATABASE_ERROR)
+            performanceMonitor.traceAsync("OrderRepository.saveOrder") {
+                try {
+                    logger.info("Saving order with ID: ${order.id}", tag = LogTags.ORDER_REPO)
+                    val entityToSave = order.toEntity()
+                    orderDao.upsert(entityToSave)
+                    Result.Success(entityToSave.id)
+                } catch (e: Exception) {
+                    logger.error("Error saving order with ID: ${order.id}", e, tag = LogTags.ORDER_REPO)
+                    crashReporter.recordException(e, mapOf("action" to "saveOrder", "orderId" to (order.id ?: "new")))
+                    Result.Failure(DataError.DATABASE_ERROR)
+                }
             }
         }
     }
 
     override suspend fun deleteOrder(order: Order): Result<Unit, DataError> {
         return withContext(ioContext) {
-            try {
-                logger.info("Deleting order with ID: ${order.id}", tag = LogTags.ORDER_REPO)
-                orderDao.delete(order.toEntity())
-                Result.Success(Unit)
-            } catch (e: Exception) {
-                logger.error("Error deleting order with ID: ${order.id}", e, tag = LogTags.ORDER_REPO)
-                crashReporter.recordException(e, mapOf("action" to "deleteOrder", "orderId" to (order.id ?: "unknown")))
-                Result.Failure(DataError.UNKNOWN)
+            performanceMonitor.traceAsync("OrderRepository.deleteOrder") {
+                try {
+                    logger.info("Deleting order with ID: ${order.id}", tag = LogTags.ORDER_REPO)
+                    orderDao.delete(order.toEntity())
+                    Result.Success(Unit)
+                } catch (e: Exception) {
+                    logger.error("Error deleting order with ID: ${order.id}", e, tag = LogTags.ORDER_REPO)
+                    crashReporter.recordException(e, mapOf("action" to "deleteOrder", "orderId" to (order.id ?: "unknown")))
+                    Result.Failure(DataError.UNKNOWN)
+                }
             }
         }
     }
 
     override suspend fun updateOrderStatus(orderId: String, newStatus: OrderStatus): Result<Unit, DataError> {
         return withContext(ioContext) {
-            try {
-                logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_REPO)
-                val order = orderDao.getById(orderId)
-                if (order == null) {
-                    logger.warn("Cannot update status: Order not found with ID: $orderId", tag = LogTags.ORDER_REPO)
-                    return@withContext Result.Failure(DataError.NOT_FOUND)
-                }
+            performanceMonitor.traceAsync("OrderRepository.updateOrderStatus") {
+                try {
+                    logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_REPO)
+                    val order = orderDao.getById(orderId)
+                    if (order == null) {
+                        logger.warn("Cannot update status: Order not found with ID: $orderId", tag = LogTags.ORDER_REPO)
+                        return@traceAsync Result.Failure(DataError.NOT_FOUND)
+                    }
 
-                // If transitioning to a terminal status, release the storage slot
-                if (newStatus.isTerminal()) {
-                    logger.info("Order with ID: $orderId reached terminal status $newStatus, releasing storage slot for location with ID: ${order.storageLocationId}", tag = LogTags.ORDER_REPO)
-                    storageLocationDao.decrementOccupiedSlots(order.storageLocationId)
-                }
+                    // If transitioning to a terminal status, release the storage slot
+                    if (newStatus.isTerminal()) {
+                        logger.info("Order with ID: $orderId reached terminal status $newStatus, releasing storage slot for location with ID: ${order.storageLocationId}", tag = LogTags.ORDER_REPO)
+                        storageLocationDao.decrementOccupiedSlots(order.storageLocationId)
+                    }
 
-                orderDao.updateOrderStatus(orderId, newStatus, Clock.System.now())
-                Result.Success(Unit)
-            } catch (e: Exception) {
-                logger.error("Error updating status for order with ID: $orderId", e, tag = LogTags.ORDER_REPO)
-                crashReporter.recordException(e, mapOf("action" to "updateOrderStatus", "orderId" to orderId, "newStatus" to newStatus.name))
-                Result.Failure(DataError.DATABASE_ERROR)
+                    orderDao.updateOrderStatus(orderId, newStatus, Clock.System.now())
+                    Result.Success(Unit)
+                } catch (e: Exception) {
+                    logger.error("Error updating status for order with ID: $orderId", e, tag = LogTags.ORDER_REPO)
+                    crashReporter.recordException(e, mapOf("action" to "updateOrderStatus", "orderId" to orderId, "newStatus" to newStatus.name))
+                    Result.Failure(DataError.DATABASE_ERROR)
+                }
             }
         }
     }

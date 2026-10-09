@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
+import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.printer.ConnectionMethod
@@ -26,9 +28,10 @@ class SettingsViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
     private val analyticsTracker: AnalyticsTracker,
+    private val performanceMonitor: PerformanceMonitor,
     private val settingsRepository: SettingsRepository,
-    private val serviceRepository: ServiceRepository,
-    private val storageLocationRepository: StorageLocationRepository
+    serviceRepository: ServiceRepository,
+    storageLocationRepository: StorageLocationRepository
 ) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     private val _isSearchingPrinters = MutableStateFlow(false)
@@ -119,39 +122,45 @@ class SettingsViewModel(
 
     private fun searchPrinters() {
         viewModelScope.launch {
-            val method = uiState.value.settings.printer.connectionMethod
-            logger.info("Searching for printers via method: $method", tag = LogTags.SETTINGS_VM)
-            analyticsTracker.trackEvent("printer_search_started")
-            _isSearchingPrinters.value = true
-            _discoveredPrinters.value = emptyList()
+            performanceMonitor.traceAsync("SettingsViewModel.searchPrinters") {
+                val method = uiState.value.settings.printer.connectionMethod
+                logger.info("Searching for printers via method: $method", tag = LogTags.SETTINGS_VM)
+                analyticsTracker.trackEvent("printer_search_started")
+                _isSearchingPrinters.value = true
+                _discoveredPrinters.value = emptyList()
 
-            // TODO: call printer service to search and connect to printer
-            _discoveredPrinters.value = if (method == ConnectionMethod.BLUETOOTH) {
-                listOf()
-            } else {
-                listOf()
+                // TODO: call printer service to search and connect to printer
+                _discoveredPrinters.value = if (method == ConnectionMethod.BLUETOOTH) {
+                    listOf()
+                } else {
+                    listOf()
+                }
+                _isSearchingPrinters.value = false
             }
-            _isSearchingPrinters.value = false
         }
     }
 
     private fun updateSettings(transform: (Settings) -> Settings) {
         viewModelScope.launch {
-            logger.info("Updating settings", tag = LogTags.SETTINGS_VM)
-            val currentSettings = uiState.value.settings
-            val newSettings = transform(currentSettings)
-            crashReporter.log("Updating app settings")
-            analyticsTracker.trackEvent("settings_updated")
-            settingsRepository.updateSettings(newSettings)
+            performanceMonitor.traceAsync("SettingsViewModel.updateSettings") {
+                logger.info("Updating settings", tag = LogTags.SETTINGS_VM)
+                val currentSettings = uiState.value.settings
+                val newSettings = transform(currentSettings)
+                crashReporter.log("Updating app settings")
+                analyticsTracker.trackEvent("settings_updated")
+                settingsRepository.updateSettings(newSettings)
+            }
         }
     }
 
     private fun resetSettings() {
         viewModelScope.launch {
-            logger.info("Resetting settings to defaults", tag = LogTags.SETTINGS_VM)
-            crashReporter.log("Resetting app settings to defaults")
-            analyticsTracker.trackEvent("settings_reset")
-            settingsRepository.resetSettings()
+            performanceMonitor.traceAsync("SettingsViewModel.resetSettings") {
+                logger.info("Resetting settings to defaults", tag = LogTags.SETTINGS_VM)
+                crashReporter.log("Resetting app settings to defaults")
+                analyticsTracker.trackEvent("settings_reset")
+                settingsRepository.resetSettings()
+            }
         }
     }
 }

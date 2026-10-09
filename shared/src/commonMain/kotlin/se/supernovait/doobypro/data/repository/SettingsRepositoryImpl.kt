@@ -12,6 +12,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
+import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.util.LogTags
@@ -20,6 +22,7 @@ import kotlin.coroutines.CoroutineContext
 class SettingsRepositoryImpl(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val performanceMonitor: PerformanceMonitor,
     private val dataStore: DataStore<Preferences>,
     private val json: Json
 ) : SettingsRepository {
@@ -43,18 +46,22 @@ class SettingsRepositoryImpl(
 
     override suspend fun updateSettings(settings: Settings) {
         withContext(ioContext) {
-            logger.info("Updating app settings", tag = LogTags.SETTINGS_REPO)
-            dataStore.edit { preferences ->
-                preferences[settingsKey] = json.encodeToString(settings)
+            performanceMonitor.traceAsync("SettingsRepository.updateSettings") {
+                logger.info("Updating app settings", tag = LogTags.SETTINGS_REPO)
+                dataStore.edit { preferences ->
+                    preferences[settingsKey] = json.encodeToString(settings)
+                }
             }
         }
     }
 
     override suspend fun resetSettings() {
         withContext(ioContext) {
-            logger.info("Resetting app settings to default", tag = LogTags.SETTINGS_REPO)
-            dataStore.edit { preferences ->
-                preferences.remove(settingsKey)
+            performanceMonitor.traceAsync("SettingsRepository.resetSettings") {
+                logger.info("Resetting app settings to default", tag = LogTags.SETTINGS_REPO)
+                dataStore.edit { preferences ->
+                    preferences.remove(settingsKey)
+                }
             }
         }
     }

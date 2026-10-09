@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.observability.logging.LogEntry
 import se.supernovait.app.core.domain.observability.logging.LogExporter
@@ -52,6 +53,7 @@ class SupportViewModelTest : PlatformTestConfig() {
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
+            performanceMonitor = NoOpPerformanceMonitor,
             logExporter = FakeLogExporter(emptyList()),
             authRepository = fakeAuthRepo,
             accountRepository = fakeAccountRepo
@@ -110,6 +112,7 @@ class SupportViewModelTest : PlatformTestConfig() {
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
+            performanceMonitor = NoOpPerformanceMonitor,
             logExporter = FakeLogExporter(sampleLogs),
             authRepository = fakeAuthRepo,
             accountRepository = fakeAccountRepo
@@ -132,8 +135,8 @@ class SupportViewModelTest : PlatformTestConfig() {
 
     private class FakeLogExporter(private val fakeLogs: List<LogEntry> = emptyList()) : LogExporter {
         override fun getLogs(minLevel: LogLevel): List<LogEntry> = fakeLogs.filter { it.level >= minLevel }
-        override fun exportLogsToFile(destinationPath: String, minLevel: LogLevel): kotlin.Result<String> {
-            return kotlin.Result.success(destinationPath)
+        override fun exportLogsToFile(destinationPath: String, minLevel: LogLevel): Result<String> {
+            return Result.success(destinationPath)
         }
         override fun clearLogs() {}
     }

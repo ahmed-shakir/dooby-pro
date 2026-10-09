@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.location.Address
 import se.supernovait.app.core.domain.model.billing.Amount
@@ -117,7 +118,8 @@ class AccountViewModelTest {
             accountDao = FakeAccountDao(),
             userDao = FakeUserDao(),
             logger = FakeLogger(),
-            crashReporter = NoOpCrashReporter
+            crashReporter = NoOpCrashReporter,
+            performanceMonitor = NoOpPerformanceMonitor
         )
         
         // Seed initial data for "current user"
@@ -138,6 +140,7 @@ class AccountViewModelTest {
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
+            performanceMonitor = NoOpPerformanceMonitor,
             authRepository = authRepository,
             accountRepository = accountRepository,
             businessHoursRepository = businessHoursRepository,

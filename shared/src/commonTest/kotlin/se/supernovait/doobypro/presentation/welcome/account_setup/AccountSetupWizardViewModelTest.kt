@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.doobypro.data.repository.fake.FakeAccountRepository
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.util.FakeLogger
@@ -35,6 +36,7 @@ class AccountSetupWizardViewModelTest {
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
+            performanceMonitor = NoOpPerformanceMonitor,
             accountRepository = fakeAccountRepository
         )
     }

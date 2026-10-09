@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.doobypro.data.repository.fake.FakeAuthRepository
@@ -39,6 +40,7 @@ class WelcomeViewModelTest {
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
+            performanceMonitor = NoOpPerformanceMonitor,
             authRepository = authRepository
         )
     }

@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.app.core.domain.common.getOrNull
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.app.core.domain.model.billing.Amount
@@ -39,6 +40,7 @@ class ServiceRepositoryImplTest {
         repository = ServiceRepositoryImpl(
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
+            performanceMonitor = NoOpPerformanceMonitor,
             serviceDao = fakeServiceDao
         )
     }

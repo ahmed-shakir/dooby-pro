@@ -14,12 +14,15 @@ import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
+import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.doobypro.domain.util.LogTags
 
 class WelcomeViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
     private val analyticsTracker: AnalyticsTracker,
+    private val performanceMonitor: PerformanceMonitor,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -59,27 +62,29 @@ class WelcomeViewModel(
         }
 
         viewModelScope.launch {
-            logger.info("Initiating sign in for username: $username", tag = LogTags.WELCOME_VM)
-            _uiState.update { it.copy(isSigningIn = true) }
-            
-            when (val result = authRepository.signIn(username)) {
-                is Result.Success -> {
-                    logger.info("Sign in succeeded for username: $username", tag = LogTags.WELCOME_VM)
-                    crashReporter.log("Sign in succeeded for username $username in WelcomeViewModel")
-                    analyticsTracker.setUserId(result.data.id ?: username)
-                    analyticsTracker.trackEvent("sign_in_success", mapOf("username" to username))
-                    _uiState.update { it.copy(isSigningIn = false, showSignInForm = false) }
-                    _events.send(AppEvent.SignIn)
-                }
-                is Result.Failure -> {
-                    logger.warn("Sign in failed for username: $username with error: ${result.error}", tag = LogTags.WELCOME_VM)
-                    crashReporter.log("Sign in failed for username $username in WelcomeViewModel")
-                    analyticsTracker.trackEvent("sign_in_failed", mapOf("username" to username, "error" to result.error.toString()))
-                    _uiState.update { it.copy(
-                        isSigningIn = false,
-                        signInError = result.error
-                    ) }
-                    _events.send(AppEvent.Failure(result.error))
+            performanceMonitor.traceAsync("WelcomeViewModel.signIn") {
+                logger.info("Initiating sign in for username: $username", tag = LogTags.WELCOME_VM)
+                _uiState.update { it.copy(isSigningIn = true) }
+                
+                when (val result = authRepository.signIn(username)) {
+                    is Result.Success -> {
+                        logger.info("Sign in succeeded for username: $username", tag = LogTags.WELCOME_VM)
+                        crashReporter.log("Sign in succeeded for username $username in WelcomeViewModel")
+                        analyticsTracker.setUserId(result.data.id ?: username)
+                        analyticsTracker.trackEvent("sign_in_success", mapOf("username" to username))
+                        _uiState.update { it.copy(isSigningIn = false, showSignInForm = false) }
+                        _events.send(AppEvent.SignIn)
+                    }
+                    is Result.Failure -> {
+                        logger.warn("Sign in failed for username: $username with error: ${result.error}", tag = LogTags.WELCOME_VM)
+                        crashReporter.log("Sign in failed for username $username in WelcomeViewModel")
+                        analyticsTracker.trackEvent("sign_in_failed", mapOf("username" to username, "error" to result.error.toString()))
+                        _uiState.update { it.copy(
+                            isSigningIn = false,
+                            signInError = result.error
+                        ) }
+                        _events.send(AppEvent.Failure(result.error))
+                    }
                 }
             }
         }

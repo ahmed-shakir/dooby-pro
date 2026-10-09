@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.doobypro.data.local.preferences.FakeDataStore
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.common.Currency
@@ -22,6 +23,7 @@ class SettingsRepositoryImplTest {
         repository = SettingsRepositoryImpl(
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
+            performanceMonitor = NoOpPerformanceMonitor,
             dataStore = fakeDataStore,
             json = Json { 
                 ignoreUnknownKeys = true

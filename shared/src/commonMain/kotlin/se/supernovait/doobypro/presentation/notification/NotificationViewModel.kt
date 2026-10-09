@@ -12,12 +12,15 @@ import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
+import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.doobypro.domain.util.LogTags
 
 class NotificationViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
     private val analyticsTracker: AnalyticsTracker,
+    private val performanceMonitor: PerformanceMonitor,
     private val notificationManager: NotificationManager
 ) : ViewModel() {
 
@@ -54,7 +57,9 @@ class NotificationViewModel(
         logger.debug("Marking notification $notificationId as read", tag = LogTags.NOTIFICATION_VM)
         analyticsTracker.trackEvent("notification_marked_read", mapOf("notification_id" to notificationId))
         viewModelScope.launch {
-            notificationManager.markAsRead(notificationId)
+            performanceMonitor.traceAsync("NotificationViewModel.markAsRead") {
+                notificationManager.markAsRead(notificationId)
+            }
         }
     }
 
@@ -62,7 +67,9 @@ class NotificationViewModel(
         logger.info("Marking all notifications as read", tag = LogTags.NOTIFICATION_VM)
         analyticsTracker.trackEvent("notifications_marked_all_read")
         viewModelScope.launch {
-            notificationManager.markAllAsRead()
+            performanceMonitor.traceAsync("NotificationViewModel.markAllAsRead") {
+                notificationManager.markAllAsRead()
+            }
         }
     }
 
@@ -70,7 +77,9 @@ class NotificationViewModel(
         logger.info("Deleting notification ${notification.id}", tag = LogTags.NOTIFICATION_VM)
         analyticsTracker.trackEvent("notification_deleted", mapOf("notification_id" to notification.id))
         viewModelScope.launch {
-            notificationManager.delete(notification)
+            performanceMonitor.traceAsync("NotificationViewModel.deleteNotification") {
+                notificationManager.delete(notification)
+            }
         }
     }
 
@@ -79,7 +88,9 @@ class NotificationViewModel(
         crashReporter.log("Clicked notification ${notification.id}")
         analyticsTracker.trackEvent("notification_clicked", mapOf("notification_id" to notification.id))
         viewModelScope.launch {
-            notificationManager.handleNotificationClick(notification)
+            performanceMonitor.traceAsync("NotificationViewModel.handleNotificationClick") {
+                notificationManager.handleNotificationClick(notification)
+            }
         }
     }
 }

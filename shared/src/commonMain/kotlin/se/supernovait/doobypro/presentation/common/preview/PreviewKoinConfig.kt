@@ -10,6 +10,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.auth.AuthenticationManager
 import se.supernovait.app.core.domain.auth.User
@@ -26,6 +27,7 @@ import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.LogLevel
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
 import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWizardViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -37,6 +39,7 @@ object PreviewKoinConfig {
         single<Logger> { fakeLogger }
         single<CrashReporter> { NoOpCrashReporter }
         single<AnalyticsTracker> { NoOpAnalyticsTracker }
+        single<PerformanceMonitor> { NoOpPerformanceMonitor }
         single<DataStore<Preferences>> { fakeDataStore }
         single { AuthenticationManager(get(), get(), get(), get(), get()) }
         single { AppInitializer(get(), get(), get(), get(), get(), get(), get(), minSplashDuration = 0.milliseconds) }

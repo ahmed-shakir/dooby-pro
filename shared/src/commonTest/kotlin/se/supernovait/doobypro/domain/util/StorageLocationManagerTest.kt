@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.doobypro.domain.manager.StorageLocationManager
@@ -33,7 +34,7 @@ class StorageLocationManagerTest {
     fun setUp() {
         fakeStorageRepo = FakeStorageLocationRepository()
         fakeSettingsRepo = FakeSettingsRepository()
-        manager = StorageLocationManager(FakeLogger(), NoOpCrashReporter, fakeStorageRepo, fakeSettingsRepo)
+        manager = StorageLocationManager(FakeLogger(), NoOpCrashReporter, NoOpPerformanceMonitor, fakeStorageRepo, fakeSettingsRepo)
     }
 
     @Test

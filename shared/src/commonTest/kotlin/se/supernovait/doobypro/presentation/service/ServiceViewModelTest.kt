@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import se.supernovait.app.core.data.observability.analytics.NoOpAnalyticsTracker
 import se.supernovait.app.core.data.observability.crash.NoOpCrashReporter
+import se.supernovait.app.core.data.observability.performance.NoOpPerformanceMonitor
 import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.model.billing.Amount
@@ -44,6 +45,7 @@ class ServiceViewModelTest {
             logger = FakeLogger(),
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
+            performanceMonitor = NoOpPerformanceMonitor,
             serviceRepository = fakeServiceRepository,
             settingsRepository = fakeSettingsRepository
         )

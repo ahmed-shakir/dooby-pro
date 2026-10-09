@@ -21,6 +21,8 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
+import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.manager.OrderQueryManager
 import se.supernovait.doobypro.domain.model.Service
@@ -41,13 +43,14 @@ class OrderViewModel(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
     private val analyticsTracker: AnalyticsTracker,
+    private val performanceMonitor: PerformanceMonitor,
     private val savedStateHandle: SavedStateHandle,
-    private val serviceRepository: ServiceRepository,
-    private val storageLocationRepository: StorageLocationRepository,
-    private val settingsRepository: SettingsRepository,
     private val customerRepository: CustomerRepository,
     private val orderManager: OrderManager,
-    private val orderQueryManager: OrderQueryManager
+    private val orderQueryManager: OrderQueryManager,
+    serviceRepository: ServiceRepository,
+    storageLocationRepository: StorageLocationRepository,
+    settingsRepository: SettingsRepository
 ) : ViewModel() {
     private val _activeTab = MutableStateFlow(OrderTab.NEW)
     private val _isArchive = MutableStateFlow(false)
@@ -196,80 +199,92 @@ class OrderViewModel(
 
     private fun reissueOrder(order: Order) {
         viewModelScope.launch {
-            logger.info("Reissuing order template from order with ID: ${order.id}", tag = LogTags.ORDER_VM)
-            analyticsTracker.trackEvent("order_reissued", mapOf("order_id" to (order.id ?: "")))
-            val template = orderManager.reissueOrder(order)
-            _editingOrder.value = template
+            performanceMonitor.traceAsync("OrderViewModel.reissueOrder") {
+                logger.info("Reissuing order template from order with ID: ${order.id}", tag = LogTags.ORDER_VM)
+                analyticsTracker.trackEvent("order_reissued", mapOf("order_id" to (order.id ?: "")))
+                val template = orderManager.reissueOrder(order)
+                _editingOrder.value = template
+            }
         }
     }
 
     private fun selectCustomer(customer: User) {
         viewModelScope.launch {
-            logger.info("Selected customer '${customer.username}' for order creation", tag = LogTags.ORDER_VM)
-            val template = orderManager.createOrderTemplate(customer = customer)
-            _editingOrder.value = template
+            performanceMonitor.traceAsync("OrderViewModel.selectCustomer") {
+                logger.info("Selected customer '${customer.username}' for order creation", tag = LogTags.ORDER_VM)
+                val template = orderManager.createOrderTemplate(customer = customer)
+                _editingOrder.value = template
+            }
         }
     }
 
     private fun saveNewCustomer(customer: User) {
         viewModelScope.launch {
-            logger.info("Saving new customer: ${customer.username}", tag = LogTags.ORDER_VM)
-            _isSaving.value = true
-            val result = customerRepository.saveCustomer(customer)
-            if (result is Result.Success) {
-                logger.info("Customer '${customer.username}' saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
-                analyticsTracker.trackEvent("customer_created", mapOf("username" to customer.username))
-                val newUser = customer.copy(id = result.data)
-                _isAddingCustomer.value = false
-                selectCustomer(newUser)
-            } else {
-                logger.error("Failed to save customer '${customer.username}'", tag = LogTags.ORDER_VM)
-                crashReporter.log("Failed to save customer '${customer.username}' in OrderViewModel")
-                _error.value = Res.string.screen_Order_error_customer_save_failed
+            performanceMonitor.traceAsync("OrderViewModel.saveNewCustomer") {
+                logger.info("Saving new customer: ${customer.username}", tag = LogTags.ORDER_VM)
+                _isSaving.value = true
+                val result = customerRepository.saveCustomer(customer)
+                if (result is Result.Success) {
+                    logger.info("Customer '${customer.username}' saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
+                    analyticsTracker.trackEvent("customer_created", mapOf("username" to customer.username))
+                    val newUser = customer.copy(id = result.data)
+                    _isAddingCustomer.value = false
+                    selectCustomer(newUser)
+                } else {
+                    logger.error("Failed to save customer '${customer.username}'", tag = LogTags.ORDER_VM)
+                    crashReporter.log("Failed to save customer '${customer.username}' in OrderViewModel")
+                    _error.value = Res.string.screen_Order_error_customer_save_failed
+                }
+                _isSaving.value = false
             }
-            _isSaving.value = false
         }
     }
 
     private fun saveOrder(order: Order) {
         viewModelScope.launch {
-            logger.info("Saving order for customer '${order.customer.username}'", tag = LogTags.ORDER_VM)
-            _isSaving.value = true
-            val result = orderManager.createOrder(order)
-            if (result is Result.Success) {
-                logger.info("Order saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
-                analyticsTracker.trackEvent("order_saved", mapOf("customer" to order.customer.username, "status" to order.status.name))
-                _editingOrder.value = null
-            } else {
-                logger.error("Failed to save order", tag = LogTags.ORDER_VM)
-                crashReporter.log("Failed to save order for customer '${order.customer.username}' in OrderViewModel")
-                _error.value = Res.string.screen_Order_error_save_failed
+            performanceMonitor.traceAsync("OrderViewModel.saveOrder") {
+                logger.info("Saving order for customer '${order.customer.username}'", tag = LogTags.ORDER_VM)
+                _isSaving.value = true
+                val result = orderManager.createOrder(order)
+                if (result is Result.Success) {
+                    logger.info("Order saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
+                    analyticsTracker.trackEvent("order_saved", mapOf("customer" to order.customer.username, "status" to order.status.name))
+                    _editingOrder.value = null
+                } else {
+                    logger.error("Failed to save order", tag = LogTags.ORDER_VM)
+                    crashReporter.log("Failed to save order for customer '${order.customer.username}' in OrderViewModel")
+                    _error.value = Res.string.screen_Order_error_save_failed
+                }
+                _isSaving.value = false
             }
-            _isSaving.value = false
         }
     }
 
     private fun deleteOrder(order: Order) {
         viewModelScope.launch {
-            logger.info("Deleting order with ID: ${order.id}", tag = LogTags.ORDER_VM)
-            _isSaving.value = true
-            val result = orderManager.deleteOrder(order)
-            if (result is Result.Success) {
-                analyticsTracker.trackEvent("order_deleted", mapOf("order_id" to (order.id ?: "")))
-            } else {
-                logger.error("Failed to delete order with ID: ${order.id}", tag = LogTags.ORDER_VM)
-                crashReporter.log("Failed to delete order with ID: ${order.id} in OrderViewModel")
-                _error.value = Res.string.screen_Order_error_delete_failed
+            performanceMonitor.traceAsync("OrderViewModel.deleteOrder") {
+                logger.info("Deleting order with ID: ${order.id}", tag = LogTags.ORDER_VM)
+                _isSaving.value = true
+                val result = orderManager.deleteOrder(order)
+                if (result is Result.Success) {
+                    analyticsTracker.trackEvent("order_deleted", mapOf("order_id" to (order.id ?: "")))
+                } else {
+                    logger.error("Failed to delete order with ID: ${order.id}", tag = LogTags.ORDER_VM)
+                    crashReporter.log("Failed to delete order with ID: ${order.id} in OrderViewModel")
+                    _error.value = Res.string.screen_Order_error_delete_failed
+                }
+                _isSaving.value = false
             }
-            _isSaving.value = false
         }
     }
 
     private fun updateStatus(orderId: String, newStatus: OrderStatus) {
         viewModelScope.launch {
-            logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_VM)
-            analyticsTracker.trackEvent("order_status_updated", mapOf("order_id" to orderId, "new_status" to newStatus.name))
-            orderManager.updateOrderStatus(orderId, newStatus)
+            performanceMonitor.traceAsync("OrderViewModel.updateStatus") {
+                logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_VM)
+                analyticsTracker.trackEvent("order_status_updated", mapOf("order_id" to orderId, "new_status" to newStatus.name))
+                orderManager.updateOrderStatus(orderId, newStatus)
+            }
         }
     }
 }

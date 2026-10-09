@@ -9,6 +9,8 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
+import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.doobypro.data.local.dao.StorageLocationDao
 import se.supernovait.doobypro.data.local.mapper.toDomain
 import se.supernovait.doobypro.data.local.mapper.toEntity
@@ -20,6 +22,7 @@ import kotlin.coroutines.CoroutineContext
 class StorageLocationRepositoryImpl(
     private val logger: Logger,
     private val crashReporter: CrashReporter,
+    private val performanceMonitor: PerformanceMonitor,
     private val storageLocationDao: StorageLocationDao
 ) : StorageLocationRepository {
     private val ioContext: CoroutineContext = Dispatchers.IO
@@ -33,65 +36,81 @@ class StorageLocationRepositoryImpl(
 
     override suspend fun getLocationById(id: String): Result<StorageLocation, DataError> {
         return withContext(ioContext) {
-            logger.debug("Fetching storage location with ID: $id", tag = LogTags.STORAGE_LOCATION_REPO)
-            storageLocationDao.getById(id)?.toDomain()?.let {
-                Result.Success(it)
-            } ?: run {
-                logger.warn("Storage location not found with ID: $id", tag = LogTags.STORAGE_LOCATION_REPO)
-                Result.Failure(DataError.NOT_FOUND)
+            performanceMonitor.traceAsync("StorageLocationRepository.getLocationById") {
+                logger.debug("Fetching storage location with ID: $id", tag = LogTags.STORAGE_LOCATION_REPO)
+                storageLocationDao.getById(id)?.toDomain()?.let {
+                    Result.Success(it)
+                } ?: run {
+                    logger.warn("Storage location not found with ID: $id", tag = LogTags.STORAGE_LOCATION_REPO)
+                    Result.Failure(DataError.NOT_FOUND)
+                }
             }
         }
     }
 
     override suspend fun getDefaultLocation(): Result<StorageLocation, DataError> {
         return withContext(ioContext) {
-            logger.debug("Fetching default storage location", tag = LogTags.STORAGE_LOCATION_REPO)
-            val location = storageLocationDao.getDefault()
-            if (location != null) {
-                Result.Success(location.toDomain())
-            } else {
-                logger.warn("Default storage location not found", tag = LogTags.STORAGE_LOCATION_REPO)
-                Result.Failure(DataError.NOT_FOUND)
+            performanceMonitor.traceAsync("StorageLocationRepository.getDefaultLocation") {
+                logger.debug("Fetching default storage location", tag = LogTags.STORAGE_LOCATION_REPO)
+                val location = storageLocationDao.getDefault()
+                if (location != null) {
+                    Result.Success(location.toDomain())
+                } else {
+                    logger.warn("Default storage location not found", tag = LogTags.STORAGE_LOCATION_REPO)
+                    Result.Failure(DataError.NOT_FOUND)
+                }
             }
         }
     }
 
     override suspend fun saveLocation(location: StorageLocation): Result<String, DataError> {
         return withContext(ioContext) {
-            try {
-                logger.info("Saving storage location '${location.label}'", tag = LogTags.STORAGE_LOCATION_REPO)
-                val entityToSave = location.toEntity()
-                storageLocationDao.upsert(entityToSave)
-                Result.Success(entityToSave.id)
-            } catch (e: Exception) {
-                logger.error("Error saving storage location '${location.label}'", e, tag = LogTags.STORAGE_LOCATION_REPO)
-                crashReporter.recordException(e, mapOf("action" to "saveLocation", "label" to location.label))
-                Result.Failure(DataError.DATABASE_ERROR)
+            performanceMonitor.traceAsync("StorageLocationRepository.saveLocation") {
+                try {
+                    logger.info("Saving storage location '${location.label}'", tag = LogTags.STORAGE_LOCATION_REPO)
+                    val entityToSave = location.toEntity()
+                    storageLocationDao.upsert(entityToSave)
+                    Result.Success(entityToSave.id)
+                } catch (e: Exception) {
+                    logger.error("Error saving storage location '${location.label}'", e, tag = LogTags.STORAGE_LOCATION_REPO)
+                    crashReporter.recordException(e, mapOf("action" to "saveLocation", "label" to location.label))
+                    Result.Failure(DataError.DATABASE_ERROR)
+                }
             }
         }
     }
 
     override suspend fun deleteLocation(location: StorageLocation): Result<Unit, DataError> {
         return withContext(ioContext) {
-            try {
-                logger.info("Deleting storage location with ID: ${location.id}", tag = LogTags.STORAGE_LOCATION_REPO)
-                storageLocationDao.delete(location.toEntity())
-                Result.Success(Unit)
-            } catch (e: Exception) {
-                logger.error("Error deleting storage location with ID: ${location.id}", e, tag = LogTags.STORAGE_LOCATION_REPO)
-                crashReporter.recordException(e, mapOf("action" to "deleteLocation", "locationId" to (location.id ?: "unknown")))
-                Result.Failure(DataError.UNKNOWN)
+            performanceMonitor.traceAsync("StorageLocationRepository.deleteLocation") {
+                try {
+                    logger.info("Deleting storage location with ID: ${location.id}", tag = LogTags.STORAGE_LOCATION_REPO)
+                    storageLocationDao.delete(location.toEntity())
+                    Result.Success(Unit)
+                } catch (e: Exception) {
+                    logger.error("Error deleting storage location with ID: ${location.id}", e, tag = LogTags.STORAGE_LOCATION_REPO)
+                    crashReporter.recordException(e, mapOf("action" to "deleteLocation", "locationId" to (location.id ?: "unknown")))
+                    Result.Failure(DataError.UNKNOWN)
+                }
             }
         }
     }
 
     override suspend fun incrementOccupiedSlots(id: String) {
-        logger.debug("Incrementing occupied slots for storage location with ID: $id", tag = LogTags.STORAGE_LOCATION_REPO)
-        storageLocationDao.incrementOccupiedSlots(id)
+        withContext(ioContext) {
+            performanceMonitor.traceAsync("StorageLocationRepository.incrementOccupiedSlots") {
+                logger.debug("Incrementing occupied slots for storage location with ID: $id", tag = LogTags.STORAGE_LOCATION_REPO)
+                storageLocationDao.incrementOccupiedSlots(id)
+            }
+        }
     }
 
     override suspend fun decrementOccupiedSlots(id: String) {
-        logger.debug("Decrementing occupied slots for storage location with ID: $id", tag = LogTags.STORAGE_LOCATION_REPO)
-        storageLocationDao.decrementOccupiedSlots(id)
+        withContext(ioContext) {
+            performanceMonitor.traceAsync("StorageLocationRepository.decrementOccupiedSlots") {
+                logger.debug("Decrementing occupied slots for storage location with ID: $id", tag = LogTags.STORAGE_LOCATION_REPO)
+                storageLocationDao.decrementOccupiedSlots(id)
+            }
+        }
     }
 }
