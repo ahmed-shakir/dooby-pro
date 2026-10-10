@@ -10,6 +10,7 @@ import se.supernovait.app.core.data.persistence.dao.LicenseDao
 import se.supernovait.app.core.data.persistence.dao.NotificationDao
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.di.coreModule
+import se.supernovait.app.core.di.sharingModule
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.initialization.InitializableDatabase
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
@@ -62,6 +63,13 @@ expect val platformModule: Module
 val sharedModule = module {
     includes(coreModule)
 
+    includes(
+        sharingModule(
+            config = ShareConfiguration.https("doobypro.supernovait.se"),
+            extraConfigurations = listOf(ShareConfiguration.custom("doobypro"))
+        )
+    )
+
     singleOf(::AuthRepositoryImpl).bind<AuthRepository>()
     singleOf(::AccountRepositoryImpl).bind<AccountRepository>()
     singleOf(::CompanyRepositoryImpl).bind<CompanyRepository>()
@@ -90,13 +98,6 @@ val sharedModule = module {
     viewModelOf(::StorageViewModel)
 
     single<FileStorage> { FileStorage() }
-
-    single<List<ShareConfiguration>> {
-        listOf(
-            ShareConfiguration.custom("doobypro"),
-            ShareConfiguration.https(host = "doobypro.supernovait.se")
-        )
-    }
 
     single<AppDatabase> {
         DatabaseFactory.create(get())

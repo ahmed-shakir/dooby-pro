@@ -151,7 +151,7 @@ class AccountSetupWizardViewModel(
                     logger.info("Account creation in wizard succeeded", tag = LogTags.ACCOUNT_SETUP_VM)
                     crashReporter.log("Account creation in wizard succeeded")
                     analyticsTracker.setUserId(state.username)
-                    analyticsTracker.trackEvent("account_created", mapOf("username" to state.username, "company" to state.companyLegalName))
+                    analyticsTracker.trackEvent("account_created", mapOf("account_username" to state.username, "company" to state.companyLegalName))
                     _events.send(AppEvent.SignIn)
                 } else {
                     logger.error("Account creation in wizard failed", tag = LogTags.ACCOUNT_SETUP_VM)

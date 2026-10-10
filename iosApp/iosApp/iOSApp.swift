@@ -4,6 +4,7 @@ import BackgroundTasks
 import FirebaseCore
 import FirebaseCrashlytics
 import FirebaseAnalytics
+import FirebasePerformance
 import Shared
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -14,6 +15,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         FirebaseApp.configure()
         setupCrashlyticsBridge()
         setupAnalyticsBridge()
+        setupPerformanceBridge()
 
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
@@ -117,6 +119,53 @@ private func setupAnalyticsBridge() {
     // 4. User ID Attribution
     IosAnalyticsBridge.shared.onSetUserId = { userId in
         Analytics.setUserID(userId)
+    }
+}
+
+private func setupPerformanceBridge() {
+    var activeTraces: [String: Trace] = [:]
+
+    // 1. Start Trace
+    IosPerformanceBridge.shared.onStartTrace = { traceName in
+        if let trace = Performance.sharedInstance().trace(name: traceName) {
+            trace.start()
+            activeTraces[traceName] = trace
+        }
+    }
+
+    // 2. Stop Trace
+    IosPerformanceBridge.shared.onStopTrace = { traceName in
+        if let trace = activeTraces.removeValue(forKey: traceName) {
+            trace.stop()
+        }
+    }
+
+    // 3. Put Attribute
+    IosPerformanceBridge.shared.onPutAttribute = { traceName, key, value in
+        if let trace = activeTraces[traceName] {
+            trace.setValue(value, forAttribute: key)
+        }
+    }
+
+    // 4. Remove Attribute
+    IosPerformanceBridge.shared.onRemoveAttribute = { traceName, key in
+        if let trace = activeTraces[traceName] {
+            trace.removeAttribute(key)
+        }
+    }
+
+    // 5. Increment Metric
+    IosPerformanceBridge.shared.onIncrementMetric = { traceName, metricName, value in
+        if let trace = activeTraces[traceName] {
+            trace.incrementMetric(metricName, by: Int64(truncating: value))
+        }
+    }
+
+    // 6. Set Metric
+    IosPerformanceBridge.shared.onSetMetric = { traceName, metricName, value in
+        if let trace = activeTraces[traceName] {
+            trace.setValue(Int64(truncating: value), forMetric: metricName)
+        }
     }
 }
 

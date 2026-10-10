@@ -71,14 +71,14 @@ class WelcomeViewModel(
                         logger.info("Sign in succeeded for username: $username", tag = LogTags.WELCOME_VM)
                         crashReporter.log("Sign in succeeded for username $username in WelcomeViewModel")
                         analyticsTracker.setUserId(result.data.id ?: username)
-                        analyticsTracker.trackEvent("sign_in_success", mapOf("username" to username))
+                        analyticsTracker.trackEvent("sign_in_success", mapOf("login_username" to username))
                         _uiState.update { it.copy(isSigningIn = false, showSignInForm = false) }
                         _events.send(AppEvent.SignIn)
                     }
                     is Result.Failure -> {
                         logger.warn("Sign in failed for username: $username with error: ${result.error}", tag = LogTags.WELCOME_VM)
                         crashReporter.log("Sign in failed for username $username in WelcomeViewModel")
-                        analyticsTracker.trackEvent("sign_in_failed", mapOf("username" to username, "error" to result.error.toString()))
+                        analyticsTracker.trackEvent("sign_in_failed", mapOf("login_username" to username, "error" to result.error.toString()))
                         _uiState.update { it.copy(
                             isSigningIn = false,
                             signInError = result.error

@@ -169,7 +169,7 @@ class OrderViewModel(
             is OrderEvent.DeleteOrder -> deleteOrder(event.order)
             is OrderEvent.UpdateStatus -> updateStatus(event.orderId, event.newStatus)
             is OrderEvent.SelectTab -> {
-                analyticsTracker.trackEvent("order_tab_selected", mapOf("tab" to event.tab.name))
+                analyticsTracker.trackEvent("order_tab_selected", mapOf("order_tab" to event.tab.name))
                 _activeTab.value = event.tab
             }
             is OrderEvent.SearchOrders -> {
@@ -228,7 +228,7 @@ class OrderViewModel(
                 val result = customerRepository.saveCustomer(customer)
                 if (result is Result.Success) {
                     logger.info("Customer '${customer.username}' saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
-                    analyticsTracker.trackEvent("customer_created", mapOf("username" to customer.username))
+                    analyticsTracker.trackEvent("customer_created", mapOf("customer_username" to customer.username))
                     val newUser = customer.copy(id = result.data)
                     _isAddingCustomer.value = false
                     selectCustomer(newUser)

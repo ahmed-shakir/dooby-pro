@@ -68,7 +68,7 @@ class AccountViewModel(
         when (event) {
             AccountEvent.LoadAccount -> loadAccount()
             is AccountEvent.SwitchTab -> {
-                analyticsTracker.trackEvent("account_tab_switched", mapOf("tab" to event.tab.name))
+                analyticsTracker.trackEvent("account_tab_switched", mapOf("account_tab" to event.tab.name))
                 _uiState.update { it.copy(currentTab = event.tab) }
             }
             is AccountEvent.EnterEditMode -> _uiState.update { it.copy(editingCardId = event.cardId) }
