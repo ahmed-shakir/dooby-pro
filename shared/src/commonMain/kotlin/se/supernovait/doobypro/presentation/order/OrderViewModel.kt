@@ -1,6 +1,5 @@
 package se.supernovait.doobypro.presentation.order
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import doobypro.shared.generated.resources.Res
@@ -44,7 +43,6 @@ class OrderViewModel(
     private val crashReporter: CrashReporter,
     private val analyticsTracker: AnalyticsTracker,
     private val performanceMonitor: PerformanceMonitor,
-    private val savedStateHandle: SavedStateHandle,
     private val customerRepository: CustomerRepository,
     private val orderManager: OrderManager,
     private val orderQueryManager: OrderQueryManager,
@@ -63,13 +61,13 @@ class OrderViewModel(
 
     init {
         logger.info("OrderViewModel initialized", tag = LogTags.ORDER_VM)
-        // Observe reissue requests from navigation results
+        // Observe pending reissue requests from OrderManager
         viewModelScope.launch {
-            savedStateHandle.getStateFlow<Order?>("reissue_order", null).collect { order ->
+            orderManager.pendingReissue.collect { order ->
                 if (order != null) {
-                    logger.info("Received reissue request from navigation result for order with ID: ${order.id}", tag = LogTags.ORDER_VM)
+                    logger.info("Received pending reissue request from OrderManager for order with ID: ${order.id}", tag = LogTags.ORDER_VM)
                     reissueOrder(order)
-                    savedStateHandle["reissue_order"] = null // Clear result
+                    orderManager.clearReissue()
                 }
             }
         }

@@ -13,6 +13,9 @@ import doobypro.shared.generated.resources.screen_Order_label_new_order
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -78,6 +81,17 @@ class OrderManager(
     private val businessHoursRepository: BusinessHoursRepository
 ) : KoinComponent {
     private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    private val _pendingReissue = MutableStateFlow<Order?>(null)
+    val pendingReissue: StateFlow<Order?> = _pendingReissue.asStateFlow()
+
+    fun requestReissue(order: Order) {
+        _pendingReissue.value = order
+    }
+
+    fun clearReissue() {
+        _pendingReissue.value = null
+    }
 
     init {
         logger.info("OrderManager initialized", tag = LogTags.ORDER_MANAGER)

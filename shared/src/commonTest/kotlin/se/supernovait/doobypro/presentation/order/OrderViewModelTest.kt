@@ -1,6 +1,4 @@
 package se.supernovait.doobypro.presentation.order
-
-import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -147,7 +145,6 @@ class OrderViewModelTest : PlatformTestConfig() {
             crashReporter = NoOpCrashReporter,
             analyticsTracker = NoOpAnalyticsTracker,
             performanceMonitor = NoOpPerformanceMonitor,
-            savedStateHandle = SavedStateHandle(),
             serviceRepository = fakeServiceRepo,
             storageLocationRepository = fakeStorageRepo,
             settingsRepository = fakeSettingsRepo,
@@ -211,26 +208,13 @@ class OrderViewModelTest : PlatformTestConfig() {
     }
 
     @Test
-    fun `SavedStateHandle reissue_order should trigger editing state`() = runTest(testDispatcher) {
-        val savedStateHandle = SavedStateHandle(mapOf("reissue_order" to testOrder))
-        val vm = OrderViewModel(
-            logger = FakeLogger(),
-            crashReporter = NoOpCrashReporter,
-            analyticsTracker = NoOpAnalyticsTracker,
-            performanceMonitor = NoOpPerformanceMonitor,
-            savedStateHandle = savedStateHandle,
-            serviceRepository = fakeServiceRepo,
-            storageLocationRepository = fakeStorageRepo,
-            settingsRepository = fakeSettingsRepo,
-            customerRepository = fakeCustomerRepo,
-            orderManager = orderManager,
-            orderQueryManager = orderQueryManager
-        )
+    fun `OrderManager pendingReissue should trigger editing state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
         
-        val collectJob = launch { vm.uiState.collect {} }
+        orderManager.requestReissue(testOrder)
         
-        assertNotNull(vm.uiState.value.editingOrder)
-        assertEquals(testOrder.customer.id, vm.uiState.value.editingOrder?.customer?.id)
+        assertNotNull(viewModel.uiState.value.editingOrder)
+        assertEquals(testOrder.customer.id, viewModel.uiState.value.editingOrder?.customer?.id)
         
         collectJob.cancel()
     }

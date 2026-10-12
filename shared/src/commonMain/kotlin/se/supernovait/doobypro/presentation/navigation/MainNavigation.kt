@@ -12,10 +12,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import se.supernovait.app.core.ui.component.action.SupernovaButton
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.presentation.order.CancelledOrdersScreen
 import se.supernovait.doobypro.presentation.order.OrderEvent
 import se.supernovait.doobypro.presentation.order.OrderManagementScreen
@@ -63,6 +65,7 @@ fun NavGraphBuilder.mainGraph(
     composable<Route.CancelledOrders> {
         val viewModel = koinViewModel<OrderViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val orderManager = koinInject<OrderManager>()
 
         CancelledOrdersScreen(
             uiState = uiState,
@@ -70,8 +73,8 @@ fun NavGraphBuilder.mainGraph(
                 when (event) {
                     is OrderEvent.ViewOrderDetails -> navController.navigateWithRules(Route.OrderDetails(event.id))
                     is OrderEvent.ReissueOrder -> {
-                        viewModel.onEvent(event)
-                        navController.popBackStack() // Go back to Hub to show the form
+                        orderManager.requestReissue(event.order)
+                        navController.popBackStack()
                     }
                     else -> viewModel.onEvent(event)
                 }
@@ -82,6 +85,7 @@ fun NavGraphBuilder.mainGraph(
     composable<Route.OrderDetails> {
         val viewModel = koinViewModel<OrderDetailsViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val orderManager = koinInject<OrderManager>()
 
         OrderDetailsScreen(
             uiState = uiState, 
@@ -89,10 +93,8 @@ fun NavGraphBuilder.mainGraph(
                 when (event) {
                     OrderDetailsEvent.ReissueOrder -> {
                         val order = uiState.order ?: return@OrderDetailsScreen
-                        // We can't directly trigger the hub VM here easily without a shared VM or Result pattern.
-                        // But we can use the savedStateHandle of the PREVIOUS entry.
-                        navController.previousBackStackEntry?.savedStateHandle?.set("reissue_order", order)
-                        navController.popBackStack()
+                        orderManager.requestReissue(order)
+                        navController.popBackStack<Route.Orders>(inclusive = false)
                     }
                     else -> viewModel.onEvent(event)
                 }
