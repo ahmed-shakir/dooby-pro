@@ -10,6 +10,7 @@
 		557F3F9030740D3B0093235C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 557F3F8F30740D3B0093235C /* FirebaseAnalytics */; };
 		557F3F9230740D3B0093235C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 557F3F9130740D3B0093235C /* FirebaseCrashlytics */; };
 		557F3F9630740D3B0093235F /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = 557F3F9530740D3B0093235E /* FirebasePerformance */; };
+		557F3F9830740D3B0093235C /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 557F3F9730740D3B0093235C /* FirebaseRemoteConfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 				557F3F9030740D3B0093235C /* FirebaseAnalytics in Frameworks */,
 				557F3F9230740D3B0093235C /* FirebaseCrashlytics in Frameworks */,
 				557F3F9630740D3B0093235F /* FirebasePerformance in Frameworks */,
+				557F3F9830740D3B0093235C /* FirebaseRemoteConfig in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 				557F3F8F30740D3B0093235C /* FirebaseAnalytics */,
 				557F3F9130740D3B0093235C /* FirebaseCrashlytics */,
 				557F3F9530740D3B0093235E /* FirebasePerformance */,
+				557F3F9730740D3B0093235C /* FirebaseRemoteConfig */,
 			);
 			productName = iosApp;
 			productReference = BB73DAE56013887BA82A7CC7 /* Dooby Pro.app */;
@@ -418,6 +421,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 557F3F8E30740D3B0093235C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebasePerformance;
+		};
+		557F3F9730740D3B0093235C /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 557F3F8E30740D3B0093235C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -14,6 +15,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.app_name
+import doobypro.shared.generated.resources.app_update_available_action
+import doobypro.shared.generated.resources.app_update_available_message
+import doobypro.shared.generated.resources.app_update_available_title
+import doobypro.shared.generated.resources.app_update_required_action
+import doobypro.shared.generated.resources.app_update_required_message
+import doobypro.shared.generated.resources.app_update_required_title
 import doobypro.shared.generated.resources.ic_app_icon
 import doobypro.shared.generated.resources.ic_dashboard
 import doobypro.shared.generated.resources.ic_dashboard_selected
@@ -36,6 +43,7 @@ import doobypro.shared.generated.resources.ic_support
 import doobypro.shared.generated.resources.ic_support_selected
 import doobypro.shared.generated.resources.ic_user_account
 import doobypro.shared.generated.resources.ic_user_account_selected
+import doobypro.shared.generated.resources.ic_warning
 import doobypro.shared.generated.resources.label_sign_out
 import doobypro.shared.generated.resources.navigation_item_menu_label
 import doobypro.shared.generated.resources.navigation_item_notifications_label
@@ -48,15 +56,19 @@ import se.supernovait.app.core.domain.connectivity.ConnectivityManager
 import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.observability.analytics.AnalyticsTracker
 import se.supernovait.app.core.domain.sharing.DeepLinkHandler
+import se.supernovait.app.core.ui.component.banner.LocalBannerState
 import se.supernovait.app.core.ui.component.drawer.LocalNavigationDrawerState
 import se.supernovait.app.core.ui.component.drawer.NavigationDrawerSection
 import se.supernovait.app.core.ui.component.fab.LocalFabState
+import se.supernovait.app.core.ui.component.modal.infolayer.LocalInfoLayerState
 import se.supernovait.app.core.ui.component.navigation.LocalNavigationBarState
 import se.supernovait.app.core.ui.component.navigation.NavigationItem
 import se.supernovait.app.core.ui.component.scaffold.SupernovaScaffold
 import se.supernovait.app.core.ui.component.topbar.LocalTopBarState
 import se.supernovait.app.core.ui.component.topbar.TopBarAction
 import se.supernovait.doobypro.AppConfig
+import se.supernovait.doobypro.domain.manager.AppUpdateManager
+import se.supernovait.doobypro.domain.manager.UpdateStatus
 import se.supernovait.doobypro.presentation.common.preview.ScreenPreviewContainer
 import se.supernovait.doobypro.presentation.navigation.Route
 import se.supernovait.doobypro.presentation.navigation.accountGraph
@@ -79,18 +91,29 @@ fun AppRoot() {
         val unreadCount by notificationManager.unreadCount.collectAsStateWithLifecycle(0)
         val deepLinkHandler = koinInject<DeepLinkHandler>()
         val analyticsTracker = koinInject<AnalyticsTracker>()
+        val versionCheck = koinInject<AppUpdateManager>()
+        val updateStatus by versionCheck.updateStatus.collectAsStateWithLifecycle()
 
         val topBarState = LocalTopBarState.current
         val navigationBarState = LocalNavigationBarState.current
         val navigationDrawerState = LocalNavigationDrawerState.current
         val fabState = LocalFabState.current
-
-        val notificationsLabel = stringResource(Res.string.navigation_item_notifications_label)
+        val infoLayerState = LocalInfoLayerState.current
+        val bannerState = LocalBannerState.current
+        val uriHandler = LocalUriHandler.current
 
         val navController: NavHostController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
         val startScreen = Route.startScreen(isAuthenticated)
         val currentScreen = Route.parse(route = backStackEntry?.destination?.route, defaultRoute = startScreen)
+
+        val notificationsLabel = stringResource(Res.string.navigation_item_notifications_label)
+        val updateRequiredTitle = stringResource(Res.string.app_update_required_title)
+        val updateRequiredMessage = stringResource(Res.string.app_update_required_message)
+        val updateRequiredAction = stringResource(Res.string.app_update_required_action)
+        val updateAvailableTitle = stringResource(Res.string.app_update_available_title)
+        val updateAvailableMessage = stringResource(Res.string.app_update_available_message)
+        val updateAvailableAction = stringResource(Res.string.app_update_available_action)
 
         LaunchedEffect(currentScreen) {
             analyticsTracker.trackScreenView(screenName = currentScreen.name, screenClass = currentScreen.name)
@@ -112,6 +135,31 @@ fun AppRoot() {
                 val route = Route.parse(sharedData.route, sharedData.data)
                 navController.navigateWithRules(route)
                 notificationManager.markAsRead(sharedData.data)
+            }
+        }
+
+        LaunchedEffect(updateStatus) {
+            when (val status = updateStatus) {
+                is UpdateStatus.Required -> {
+                    infoLayerState.show(
+                        icon = Res.drawable.ic_warning,
+                        title = updateRequiredTitle,
+                        description = updateRequiredMessage,
+                        primaryActionLabel = updateRequiredAction,
+                        onPrimaryAction = { uriHandler.openUri(status.updateUrl) }
+                    )
+                }
+                is UpdateStatus.Recommended -> {
+                    bannerState.show(
+                        icon = Res.drawable.ic_info,
+                        title = updateAvailableTitle,
+                        message = updateAvailableMessage,
+                        primaryActionLabel = updateAvailableAction,
+                        onPrimaryAction = { uriHandler.openUri(status.updateUrl) },
+                        onDismiss = { bannerState.hide() }
+                    )
+                }
+                is UpdateStatus.UpToDate -> { /* Do nothing */ }
             }
         }
 

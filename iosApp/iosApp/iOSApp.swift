@@ -5,6 +5,7 @@ import FirebaseCore
 import FirebaseCrashlytics
 import FirebaseAnalytics
 import FirebasePerformance
+import FirebaseRemoteConfig
 import Shared
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -16,6 +17,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         setupCrashlyticsBridge()
         setupAnalyticsBridge()
         setupPerformanceBridge()
+        setupRemoteConfigBridge()
 
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
@@ -165,6 +167,63 @@ private func setupPerformanceBridge() {
     IosPerformanceBridge.shared.onSetMetric = { traceName, metricName, value in
         if let trace = activeTraces[traceName] {
             trace.setValue(Int64(truncating: value), forMetric: metricName)
+        }
+    }
+}
+
+private func setupRemoteConfigBridge() {
+    // 1. Fetch and Activate
+    IosRemoteConfigBridge.shared.onFetchAndActivate = SwiftSuspendFunction0 { completion in
+        RemoteConfig.remoteConfig().fetchAndActivate { _, error in
+            let success = (error == nil)
+            completion(KotlinBoolean(bool: success), error as? Shared.Error)
+        }
+    }
+
+    // 2. Get String
+    IosRemoteConfigBridge.shared.onGetString = { key in
+        return RemoteConfig.remoteConfig().configValue(forKey: key).stringValue
+    }
+
+    // 3. Get Boolean
+    IosRemoteConfigBridge.shared.onGetBoolean = { key in
+        let value = RemoteConfig.remoteConfig().configValue(forKey: key).boolValue
+        return KotlinBoolean(bool: value)
+    }
+
+    // 4. Get Long
+    IosRemoteConfigBridge.shared.onGetLong = { key in
+        let value = RemoteConfig.remoteConfig().configValue(forKey: key).numberValue.int64Value
+        return KotlinLong(value: value)
+    }
+
+    // 5. Get Double
+    IosRemoteConfigBridge.shared.onGetDouble = { key in
+        let value = RemoteConfig.remoteConfig().configValue(forKey: key).numberValue.doubleValue
+        return KotlinDouble(value: value)
+    }
+}
+
+class SwiftSuspendFunction0: KotlinSuspendFunction0 {
+    let handler: (@escaping (Any?, (any Shared.Error)?) -> Void) -> Void
+
+    init(handler: @escaping (@escaping (Any?, (any Shared.Error)?) -> Void) -> Void) {
+        self.handler = handler
+    }
+
+    func invoke(completionHandler: @escaping (Any?, (any Shared.Error)?) -> Void) {
+        handler(completionHandler)
+    }
+
+    func invoke() async throws -> Any? {
+        return try await withCheckedThrowingContinuation { continuation in
+            handler { result, error in
+                if let error = error {
+                    continuation.resume(throwing: error as? Swift.Error ?? NSError(domain: "RemoteConfig", code: -1))
+                } else {
+                    continuation.resume(returning: result)
+                }
+            }
         }
     }
 }

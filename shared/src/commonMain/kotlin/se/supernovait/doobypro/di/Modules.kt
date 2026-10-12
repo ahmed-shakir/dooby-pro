@@ -10,10 +10,14 @@ import se.supernovait.app.core.data.persistence.dao.LicenseDao
 import se.supernovait.app.core.data.persistence.dao.NotificationDao
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.di.coreModule
+import se.supernovait.app.core.di.remoteConfigModule
 import se.supernovait.app.core.di.sharingModule
 import se.supernovait.app.core.domain.auth.AuthRepository
+import se.supernovait.app.core.domain.initialization.AppInitializationHook
 import se.supernovait.app.core.domain.initialization.InitializableDatabase
+import se.supernovait.app.core.domain.remoteconfig.RemoteConfigConfig
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
+import se.supernovait.doobypro.AppConfig
 import se.supernovait.doobypro.data.local.AppDatabase
 import se.supernovait.doobypro.data.local.dao.AccountDao
 import se.supernovait.doobypro.data.local.dao.AgreementDao
@@ -33,6 +37,7 @@ import se.supernovait.doobypro.data.repository.OrderRepositoryImpl
 import se.supernovait.doobypro.data.repository.ServiceRepositoryImpl
 import se.supernovait.doobypro.data.repository.SettingsRepositoryImpl
 import se.supernovait.doobypro.data.repository.StorageLocationRepositoryImpl
+import se.supernovait.doobypro.domain.manager.AppUpdateManager
 import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.manager.OrderQueryManager
 import se.supernovait.doobypro.domain.manager.StorageLocationManager
@@ -69,6 +74,26 @@ val sharedModule = module {
             extraConfigurations = listOf(ShareConfiguration.custom("doobypro"))
         )
     )
+
+    includes(
+        remoteConfigModule(
+            RemoteConfigConfig(
+                defaults = mapOf(
+                    "min_supported_version_code" to AppConfig.VERSION_CODE.toLong(),
+                    "recommended_version_code" to AppConfig.VERSION_CODE.toLong(),
+                    "update_url" to AppConfig.WEBSITE_URL // TODO: update with the app store not available page
+                )
+            )
+        )
+    )
+
+    singleOf(::AppUpdateManager)
+
+    single<AppInitializationHook> {
+        AppInitializationHook { _ ->
+            get<AppUpdateManager>().checkForUpdates()
+        }
+    }
 
     singleOf(::AuthRepositoryImpl).bind<AuthRepository>()
     singleOf(::AccountRepositoryImpl).bind<AccountRepository>()
