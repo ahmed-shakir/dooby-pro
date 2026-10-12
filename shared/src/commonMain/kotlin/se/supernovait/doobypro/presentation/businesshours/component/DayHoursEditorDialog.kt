@@ -149,6 +149,7 @@ fun DayHoursEditorDialog(
                 ) {
                     SupernovaOutlinedButton(
                         label = stringResource(Res.string.label_cancel),
+                        shape = MaterialTheme.shapes.extraSmall,
                         onClick = onDismiss,
                         enabled = !isSaving,
                         modifier = Modifier.weight(1f)
@@ -156,6 +157,7 @@ fun DayHoursEditorDialog(
 
                     SupernovaButton(
                         label = stringResource(Res.string.label_save),
+                        shape = MaterialTheme.shapes.extraSmall,
                         onClick = {
                             val newHours = when {
                                 !isOpen -> DayHours.Closed
