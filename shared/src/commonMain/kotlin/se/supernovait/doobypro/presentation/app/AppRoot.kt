@@ -15,12 +15,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.app_name
-import doobypro.shared.generated.resources.app_update_available_action
-import doobypro.shared.generated.resources.app_update_available_message
-import doobypro.shared.generated.resources.app_update_available_title
-import doobypro.shared.generated.resources.app_update_required_action
-import doobypro.shared.generated.resources.app_update_required_message
-import doobypro.shared.generated.resources.app_update_required_title
 import doobypro.shared.generated.resources.ic_app_icon
 import doobypro.shared.generated.resources.ic_dashboard
 import doobypro.shared.generated.resources.ic_dashboard_selected
@@ -43,11 +37,11 @@ import doobypro.shared.generated.resources.ic_support
 import doobypro.shared.generated.resources.ic_support_selected
 import doobypro.shared.generated.resources.ic_user_account
 import doobypro.shared.generated.resources.ic_user_account_selected
-import doobypro.shared.generated.resources.ic_warning
 import doobypro.shared.generated.resources.label_sign_out
 import doobypro.shared.generated.resources.navigation_item_menu_label
 import doobypro.shared.generated.resources.navigation_item_notifications_label
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import se.supernovait.app.core.domain.auth.AuthenticationManager
@@ -108,12 +102,6 @@ fun AppRoot() {
         val currentScreen = Route.parse(route = backStackEntry?.destination?.route, defaultRoute = startScreen)
 
         val notificationsLabel = stringResource(Res.string.navigation_item_notifications_label)
-        val updateRequiredTitle = stringResource(Res.string.app_update_required_title)
-        val updateRequiredMessage = stringResource(Res.string.app_update_required_message)
-        val updateRequiredAction = stringResource(Res.string.app_update_required_action)
-        val updateAvailableTitle = stringResource(Res.string.app_update_available_title)
-        val updateAvailableMessage = stringResource(Res.string.app_update_available_message)
-        val updateAvailableAction = stringResource(Res.string.app_update_available_action)
 
         LaunchedEffect(currentScreen) {
             analyticsTracker.trackScreenView(screenName = currentScreen.name, screenClass = currentScreen.name)
@@ -141,22 +129,15 @@ fun AppRoot() {
         LaunchedEffect(updateStatus) {
             when (val status = updateStatus) {
                 is UpdateStatus.Required -> {
-                    infoLayerState.show(
-                        icon = Res.drawable.ic_warning,
-                        title = updateRequiredTitle,
-                        description = updateRequiredMessage,
-                        primaryActionLabel = updateRequiredAction,
-                        onPrimaryAction = { uriHandler.openUri(status.updateUrl) }
+                    infoLayerState.showAppUpdateRequired(
+                        descriptionResourceArgs = arrayOf(getString(Res.string.app_name)),
+                        onUpdate = { uriHandler.openUri(status.updateUrl) }
                     )
                 }
                 is UpdateStatus.Recommended -> {
-                    bannerState.show(
-                        icon = Res.drawable.ic_info,
-                        title = updateAvailableTitle,
-                        message = updateAvailableMessage,
-                        primaryActionLabel = updateAvailableAction,
-                        onPrimaryAction = { uriHandler.openUri(status.updateUrl) },
-                        onDismiss = { bannerState.hide() }
+                    bannerState.showAppUpdateAvailable(
+                        messageResourceArgs = arrayOf(getString(Res.string.app_name)),
+                        onUpdate = { uriHandler.openUri(status.updateUrl) }
                     )
                 }
                 is UpdateStatus.UpToDate -> { /* Do nothing */ }
