@@ -81,7 +81,7 @@ val sharedModule = module {
                 defaults = mapOf(
                     "min_supported_version_code" to AppConfig.VERSION_CODE.toLong(),
                     "recommended_version_code" to AppConfig.VERSION_CODE.toLong(),
-                    "update_url" to AppConfig.WEBSITE_URL // TODO: update with the app store not available page
+                    "update_url" to AppConfig.APP_STORE_UNAVAILABLE_URL
                 )
             )
         )
