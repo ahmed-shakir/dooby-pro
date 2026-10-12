@@ -403,6 +403,7 @@
     <string name="screen_Order_dialog_cancel_message">Are you sure you want to cancel this order?</string>
     <string name="screen_Order_action_add_order">New Order</string>
     <string name="screen_Order_action_cancel_order">Cancel Order</string>
+    <string name="screen_Order_action_keep_order">Keep Order</string>
     <string name="screen_Order_action_reissue_order">Reissue Order</string>
     <string name="screen_Order_action_next_status_new">Start Processing</string>
     <string name="screen_Order_action_next_status_in_progress">Mark as Ready</string>

@@ -22,6 +22,8 @@ import doobypro.shared.generated.resources.label_delete
 import doobypro.shared.generated.resources.label_late
 import doobypro.shared.generated.resources.label_payment_status_paid
 import doobypro.shared.generated.resources.label_payment_status_pending
+import doobypro.shared.generated.resources.screen_Order_action_cancel_order
+import doobypro.shared.generated.resources.screen_Order_action_keep_order
 import doobypro.shared.generated.resources.screen_Order_dialog_cancel_message
 import doobypro.shared.generated.resources.screen_Order_dialog_cancel_title
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_message
@@ -145,8 +147,8 @@ fun OrderDetailsScreen(
                 dialogState.showConfirmation(
                     message = cancelMessage,
                     title = cancelTitle,
-                    confirmLabel = Res.string.label_delete, 
-                    dismissLabel = Res.string.label_cancel,
+                    confirmLabel = Res.string.screen_Order_action_cancel_order, 
+                    dismissLabel = Res.string.screen_Order_action_keep_order,
                     primaryActionColor = deleteColor,
                     onConfirm = { 
                         onEvent(OrderDetailsEvent.CancelOrder)
