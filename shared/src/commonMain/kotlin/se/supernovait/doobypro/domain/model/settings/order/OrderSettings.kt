@@ -23,5 +23,5 @@ data class OrderSettings(
     val defaultDeliveryDaysOffset: Int = 2,
     val autoPrintReceipts: Boolean = false,
     val autoPrintOrderTag: Boolean = true,
-    val orderTagPrintMode: OrderTagPrintMode = OrderTagPrintMode.PER_ORDER,
+    val orderTagPrintMode: OrderTagPrintMode = OrderTagPrintMode.PER_ORDER
 )

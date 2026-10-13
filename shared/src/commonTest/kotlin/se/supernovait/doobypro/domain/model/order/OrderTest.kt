@@ -1,8 +1,14 @@
 package se.supernovait.doobypro.domain.model.order
 
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
@@ -147,34 +153,64 @@ class OrderTest {
     }
 
     @Test
-    fun `isNotPickedUp - only IN_STORE_PICKUP orders in READY status past delivery date`() {
-        val pastDateTime = LocalDateTime(2000, 1, 1, 0, 0, 0)
-        val futureDateTime = LocalDateTime(2099, 1, 1, 0, 0, 0)
+    fun `isLate - returns false when delivery date is less than 24h ago and true when more than 24h ago`() {
+        val nowInstant = LocalDateTime.now().toInstant(TimeZone.currentSystemDefault())
+        val systemTimeZone = TimeZone.currentSystemDefault()
 
-        val readyPickupPast = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = pastDateTime)
-        val readyPickupFuture = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = futureDateTime)
-        val readyDeliveryPast = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = pastDateTime)
-        val newPickupPast = createOrder(status = OrderStatus.NEW, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = pastDateTime)
+        val delivery12HoursAgo = nowInstant.minus(12, DateTimeUnit.HOUR).toLocalDateTime(systemTimeZone)
+        val delivery23HoursAgo = nowInstant.minus(23, DateTimeUnit.HOUR).toLocalDateTime(systemTimeZone)
+        val delivery25HoursAgo = nowInstant.minus(25, DateTimeUnit.HOUR).toLocalDateTime(systemTimeZone)
 
-        assertTrue(readyPickupPast.isNotPickedUp())
-        assertFalse(readyPickupFuture.isNotPickedUp())
-        assertFalse(readyDeliveryPast.isNotPickedUp())
-        assertFalse(newPickupPast.isNotPickedUp())
+        val recentOrder12h = createOrder(status = OrderStatus.NEW).copy(deliveryDatetime = delivery12HoursAgo)
+        val recentOrder23h = createOrder(status = OrderStatus.NEW).copy(deliveryDatetime = delivery23HoursAgo)
+        val lateOrder25h = createOrder(status = OrderStatus.NEW).copy(deliveryDatetime = delivery25HoursAgo)
+
+        assertFalse(recentOrder12h.isLate())
+        assertFalse(recentOrder23h.isLate())
+        assertTrue(lateOrder25h.isLate())
     }
 
     @Test
-    fun `isNotDelivered - only HOME_DELIVERY orders in READY status past delivery date`() {
-        val pastDateTime = LocalDateTime(2000, 1, 1, 0, 0, 0)
+    fun `isNotPickedUp - only IN_STORE_PICKUP orders in READY status past delivery date and threshold`() {
+        val nowInstant = LocalDateTime.now().toInstant(TimeZone.currentSystemDefault())
+        val systemTimeZone = TimeZone.currentSystemDefault()
+
+        val delivery12HoursAgo = nowInstant.minus(12, DateTimeUnit.HOUR).toLocalDateTime(systemTimeZone)
+        val delivery25HoursAgo = nowInstant.minus(25, DateTimeUnit.HOUR).toLocalDateTime(systemTimeZone)
         val futureDateTime = LocalDateTime(2099, 1, 1, 0, 0, 0)
 
-        val readyHomePast = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = pastDateTime)
-        val readyHomeFuture = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = futureDateTime)
-        val readyPickupPast = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = pastDateTime)
-        val deliveredHomePast = createOrder(status = OrderStatus.DELIVERED, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = pastDateTime)
+        val readyPickup12h = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = delivery12HoursAgo)
+        val readyPickup25h = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = delivery25HoursAgo)
+        val readyPickupFuture = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = futureDateTime)
+        val readyDelivery25h = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = delivery25HoursAgo)
+        val newPickup25h = createOrder(status = OrderStatus.NEW, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = delivery25HoursAgo)
 
-        assertTrue(readyHomePast.isNotDelivered())
+        assertFalse(readyPickup12h.isNotPickedUp())
+        assertTrue(readyPickup25h.isNotPickedUp())
+        assertFalse(readyPickupFuture.isNotPickedUp())
+        assertFalse(readyDelivery25h.isNotPickedUp())
+        assertFalse(newPickup25h.isNotPickedUp())
+    }
+
+    @Test
+    fun `isNotDelivered - only HOME_DELIVERY orders in READY status past delivery date and threshold`() {
+        val nowInstant = LocalDateTime.now().toInstant(TimeZone.currentSystemDefault())
+        val systemTimeZone = TimeZone.currentSystemDefault()
+
+        val delivery12HoursAgo = nowInstant.minus(12, DateTimeUnit.HOUR).toLocalDateTime(systemTimeZone)
+        val delivery25HoursAgo = nowInstant.minus(25, DateTimeUnit.HOUR).toLocalDateTime(systemTimeZone)
+        val futureDateTime = LocalDateTime(2099, 1, 1, 0, 0, 0)
+
+        val readyHome12h = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = delivery12HoursAgo)
+        val readyHome25h = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = delivery25HoursAgo)
+        val readyHomeFuture = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = futureDateTime)
+        val readyPickup25h = createOrder(status = OrderStatus.READY, deliveryMethod = DeliveryMethod.IN_STORE_PICKUP).copy(deliveryDatetime = delivery25HoursAgo)
+        val deliveredHome25h = createOrder(status = OrderStatus.DELIVERED, deliveryMethod = DeliveryMethod.HOME_DELIVERY).copy(deliveryDatetime = delivery25HoursAgo)
+
+        assertFalse(readyHome12h.isNotDelivered())
+        assertTrue(readyHome25h.isNotDelivered())
         assertFalse(readyHomeFuture.isNotDelivered())
-        assertFalse(readyPickupPast.isNotDelivered())
-        assertFalse(deliveredHomePast.isNotDelivered())
+        assertFalse(readyPickup25h.isNotDelivered())
+        assertFalse(deliveredHome25h.isNotDelivered())
     }
 }

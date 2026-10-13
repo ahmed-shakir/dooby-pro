@@ -1,6 +1,11 @@
 package se.supernovait.doobypro.domain.model.order
 
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.extension.now
 import se.supernovait.doobypro.domain.model.Service
@@ -63,33 +68,50 @@ data class Order(
     /**
      * Checks if the order is considered late based on the current time.
      * Late orders are orders in status NEW or IN_PROGRESS, or HOME_DELIVERY orders in READY or OUT_FOR_DELIVERY status,
-     * that are later than the delivery date.
+     * that are at least 24 hours past the delivery date.
      */
     fun isLate(): Boolean {
-        val isLate = deliveryDatetime < LocalDateTime.now() && !status.isTerminal()
+        val systemTimeZone = TimeZone.currentSystemDefault()
+        val lateThreshold = deliveryDatetime.toInstant(systemTimeZone)
+            .plus(LATE_THRESHOLD_HOURS, DateTimeUnit.HOUR)
+            .toLocalDateTime(systemTimeZone)
+        val isLateThresholdPassed = lateThreshold < LocalDateTime.now() && !status.isTerminal()
         val isNotReady = status == OrderStatus.NEW || status == OrderStatus.IN_PROGRESS
         val isHomeDelivery = deliveryMethod == DeliveryMethod.HOME_DELIVERY
         val isNotDelivered = isHomeDelivery && (status == OrderStatus.READY || status == OrderStatus.OUT_FOR_DELIVERY)
 
-        return isLate && (isNotReady || isNotDelivered)
+        return isLateThresholdPassed && (isNotReady || isNotDelivered)
     }
 
     /**
      * Checks if the order is not picked up based on the current time.
-     * Not picked up is for orders with delivery method IN_STORE_PICKUP, status READY, and current datetime is after delivery datetime.
+     * Not picked up is for orders with delivery method IN_STORE_PICKUP, status READY, and past delivery datetime by at least 24 hours.
      */
     fun isNotPickedUp(): Boolean {
+        val systemTimeZone = TimeZone.currentSystemDefault()
+        val overdueThreshold = deliveryDatetime.toInstant(systemTimeZone)
+            .plus(LATE_THRESHOLD_HOURS, DateTimeUnit.HOUR)
+            .toLocalDateTime(systemTimeZone)
         return deliveryMethod == DeliveryMethod.IN_STORE_PICKUP &&
             status == OrderStatus.READY &&
-            deliveryDatetime < LocalDateTime.now()
+            overdueThreshold < LocalDateTime.now()
     }
 
     /**
      * Checks if the order is not delivered based on the current time.
+     * Not delivered is for orders with delivery method HOME_DELIVERY, status READY, and past delivery datetime by at least 24 hours.
      */
     fun isNotDelivered(): Boolean {
+        val systemTimeZone = TimeZone.currentSystemDefault()
+        val overdueThreshold = deliveryDatetime.toInstant(systemTimeZone)
+            .plus(LATE_THRESHOLD_HOURS, DateTimeUnit.HOUR)
+            .toLocalDateTime(systemTimeZone)
         return deliveryMethod == DeliveryMethod.HOME_DELIVERY &&
             status == OrderStatus.READY &&
-            deliveryDatetime < LocalDateTime.now()
+            overdueThreshold < LocalDateTime.now()
+    }
+
+    companion object {
+        const val LATE_THRESHOLD_HOURS = 24
     }
 }
