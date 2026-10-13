@@ -72,7 +72,7 @@ class AccountSetupWizardViewModel(
     private fun onNextStep() {
         if (_uiState.value.currentStep < 4) {
             logger.debug("Advancing to next wizard step from step ${_uiState.value.currentStep}", tag = LogTags.ACCOUNT_SETUP_VM)
-            analyticsTracker.trackEvent("wizard_step_advanced", mapOf("step" to _uiState.value.currentStep))
+            analyticsTracker.trackEvent("wizard_step_advanced", mapOf("wizard_step" to _uiState.value.currentStep))
             _uiState.update { currentState ->
                 currentState.copy(
                     phoneNumber = if (currentState.phoneNumber.isNotBlank()) formatPhoneNumber(currentState.phoneNumber) else "",
@@ -151,7 +151,7 @@ class AccountSetupWizardViewModel(
                     logger.info("Account creation in wizard succeeded", tag = LogTags.ACCOUNT_SETUP_VM)
                     crashReporter.log("Account creation in wizard succeeded")
                     analyticsTracker.setUserId(state.username)
-                    analyticsTracker.trackEvent("account_created", mapOf("account_username" to state.username, "company" to state.companyLegalName))
+                    analyticsTracker.trackEvent("account_created", mapOf("account_username" to state.username, "account_company_name" to state.companyLegalName))
                     _events.send(AppEvent.SignIn)
                 } else {
                     logger.error("Account creation in wizard failed", tag = LogTags.ACCOUNT_SETUP_VM)

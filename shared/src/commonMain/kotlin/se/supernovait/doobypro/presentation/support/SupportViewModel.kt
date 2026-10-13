@@ -55,7 +55,7 @@ class SupportViewModel(
             is SupportEvent.SubmitRequest -> {
                 logger.info("Submitting support request of type: ${_uiState.value.requestType}", tag = LogTags.SUPPORT_VM)
                 crashReporter.log("Submitting support request of type: ${_uiState.value.requestType}")
-                analyticsTracker.trackEvent("support_request_submitted", mapOf("request_type" to _uiState.value.requestType.name))
+                analyticsTracker.trackEvent("support_request_submitted", mapOf("support_request_type" to _uiState.value.requestType.name))
                 viewModelScope.launch {
                     performanceMonitor.traceAsync("SupportViewModel.submitRequest") {
                         val state = _uiState.value

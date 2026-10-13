@@ -83,7 +83,7 @@ class StorageViewModel(
                 val result = storageLocationRepository.saveLocation(locationToSave)
                 if (result is Result.Success) {
                     logger.info("Storage location '${event.label}' saved successfully", tag = LogTags.STORAGE_VM)
-                    analyticsTracker.trackEvent("storage_location_saved", mapOf("label" to event.label))
+                    analyticsTracker.trackEvent("storage_location_saved", mapOf("storage_location_label" to event.label))
                     _uiState.update { it.copy(isSaving = false, editingLocation = null) }
                 } else {
                     logger.error("Failed to save storage location '${event.label}'", tag = LogTags.STORAGE_VM)

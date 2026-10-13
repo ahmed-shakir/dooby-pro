@@ -287,7 +287,7 @@ class AccountViewModel(
                 val result = businessHoursRepository.updateDayHours(companyId, day, hours)
                 if (result is Result.Success) {
                     logger.info("Business hours for $day updated successfully", tag = LogTags.ACCOUNT_VM)
-                    analyticsTracker.trackEvent("business_hours_updated", mapOf("day" to day.name))
+                    analyticsTracker.trackEvent("business_hours_updated", mapOf("business_hours_day" to day.name))
                     val updatedHoursResult = businessHoursRepository.getBusinessHours(companyId)
                     val updatedHours = (updatedHoursResult as? Result.Success)?.data
                     _uiState.update { state ->

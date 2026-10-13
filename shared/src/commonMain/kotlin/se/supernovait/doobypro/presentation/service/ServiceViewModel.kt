@@ -94,7 +94,7 @@ class ServiceViewModel(
                 val result = serviceRepository.saveService(serviceToSave)
                 if (result is Result.Success) {
                     logger.info("Service '${event.title}' saved successfully", tag = LogTags.SERVICE_VM)
-                    analyticsTracker.trackEvent("service_saved", mapOf("title" to event.title))
+                    analyticsTracker.trackEvent("service_saved", mapOf("service_title" to event.title))
                     _uiState.update { it.copy(isSaving = false, editingService = null) }
                 } else {
                     logger.error("Failed to save service '${event.title}'", tag = LogTags.SERVICE_VM)

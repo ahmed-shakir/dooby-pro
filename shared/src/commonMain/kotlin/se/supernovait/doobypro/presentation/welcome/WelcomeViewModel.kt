@@ -78,7 +78,7 @@ class WelcomeViewModel(
                     is Result.Failure -> {
                         logger.warn("Sign in failed for username: $username with error: ${result.error}", tag = LogTags.WELCOME_VM)
                         crashReporter.log("Sign in failed for username $username in WelcomeViewModel")
-                        analyticsTracker.trackEvent("sign_in_failed", mapOf("login_username" to username, "error" to result.error.toString()))
+                        analyticsTracker.trackEvent("sign_in_failed", mapOf("login_username" to username, "sign_in_error" to result.error.toString()))
                         _uiState.update { it.copy(
                             isSigningIn = false,
                             signInError = result.error

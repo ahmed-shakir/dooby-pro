@@ -172,7 +172,7 @@ class OrderViewModel(
             }
             is OrderEvent.SearchOrders -> {
                 if (event.query.isNotBlank()) {
-                    analyticsTracker.trackEvent("order_searched", mapOf("query" to event.query))
+                    analyticsTracker.trackEvent("order_searched", mapOf("order_search_query" to event.query))
                 }
                 _orderSearchQuery.value = event.query
             }
@@ -248,7 +248,7 @@ class OrderViewModel(
                 val result = orderManager.createOrder(order)
                 if (result is Result.Success) {
                     logger.info("Order saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
-                    analyticsTracker.trackEvent("order_saved", mapOf("customer" to order.customer.username, "status" to order.status.name))
+                    analyticsTracker.trackEvent("order_saved", mapOf("order_customer_username" to order.customer.username, "order_status" to order.status.name))
                     _editingOrder.value = null
                 } else {
                     logger.error("Failed to save order", tag = LogTags.ORDER_VM)
@@ -282,7 +282,7 @@ class OrderViewModel(
         viewModelScope.launch {
             performanceMonitor.traceAsync("OrderViewModel.updateStatus") {
                 logger.info("Updating status for order with ID: $orderId to $newStatus", tag = LogTags.ORDER_VM)
-                analyticsTracker.trackEvent("order_status_updated", mapOf("order_id" to orderId, "new_status" to newStatus.name))
+                analyticsTracker.trackEvent("order_status_updated", mapOf("order_id" to orderId, "order_new_status" to newStatus.name))
                 orderManager.updateOrderStatus(orderId, newStatus)
             }
         }
