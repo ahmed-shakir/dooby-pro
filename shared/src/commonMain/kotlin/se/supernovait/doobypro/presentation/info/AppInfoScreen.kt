@@ -2,8 +2,8 @@ package se.supernovait.doobypro.presentation.info
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,13 +23,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.app_action_back_label
+import doobypro.shared.generated.resources.app_action_close_label
 import doobypro.shared.generated.resources.app_developer_name
 import doobypro.shared.generated.resources.app_logo_content_description
 import doobypro.shared.generated.resources.app_name
 import doobypro.shared.generated.resources.app_version
 import doobypro.shared.generated.resources.ic_app_icon
-import doobypro.shared.generated.resources.ic_arrow_back
 import doobypro.shared.generated.resources.screen_AppInfo_check_updates_label
 import doobypro.shared.generated.resources.screen_AppInfo_copyright
 import doobypro.shared.generated.resources.screen_AppInfo_description
@@ -45,7 +44,6 @@ import doobypro.shared.generated.resources.screen_AppInfo_website_label
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.SupernovaIcon
 import se.supernovait.app.core.ui.component.action.SupernovaButton
-import se.supernovait.app.core.ui.component.action.SupernovaIconButton
 import se.supernovait.app.core.ui.component.action.SupernovaTextButton
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
@@ -61,48 +59,42 @@ fun AppInfoScreen(
 ) {
     val uriHandler = LocalUriHandler.current
 
-    Box(modifier = Modifier.fillMaxSize().then(modifier)) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(MaterialTheme.spacing.medium),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(MaterialTheme.spacing.medium)
+            .then(modifier)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
-
-            AppHeader()
-
-            AppDescription()
-
-            DeveloperInfo(
-                onVisitWebsite = { uriHandler.openUri(AppConfig.WEBSITE_URL) }
+            SupernovaTextButton(
+                label = stringResource(Res.string.app_action_close_label),
+                onClick = { onEvent(InfoScreenEvent.NavigateBack) }
             )
-
-            LegalSection(
-                onPrivacyPolicyClick = { uriHandler.openUri(AppConfig.PRIVACY_POLICY_URL) },
-                onTermsOfServiceClick = { uriHandler.openUri(AppConfig.TERMS_OF_SERVICE_URL) },
-                onLicensesClick = { uriHandler.openUri(AppConfig.LICENSE_URL) }
-            )
-
-            SupportNote(onFeedbackClick = { onEvent(InfoScreenEvent.NavigateToSupport) })
-
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-
-            Copyright()
         }
 
-        // Modern floating back button
-        SupernovaIconButton(
-            icon = Res.drawable.ic_arrow_back,
-            contentDescription = stringResource(Res.string.app_action_back_label),
-            onClick = { onEvent(InfoScreenEvent.NavigateBack) },
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .padding(top = MaterialTheme.spacing.small, start = MaterialTheme.spacing.small)
-                .align(Alignment.TopStart)
+        AppHeader()
+
+        AppDescription()
+
+        DeveloperInfo(onVisitWebsite = { uriHandler.openUri(AppConfig.WEBSITE_URL) })
+
+        LegalSection(
+            onPrivacyPolicyClick = { uriHandler.openUri(AppConfig.PRIVACY_POLICY_URL) },
+            onTermsOfServiceClick = { uriHandler.openUri(AppConfig.TERMS_OF_SERVICE_URL) },
+            onLicensesClick = { uriHandler.openUri(AppConfig.LICENSE_URL) }
         )
+
+        SupportNote(onFeedbackClick = { onEvent(InfoScreenEvent.NavigateToSupport) })
+
+        Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+
+        Copyright()
     }
 }
 

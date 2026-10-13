@@ -7,7 +7,7 @@
     <string name="app_logo_content_description">App logo</string>
     <string name="company_logo_content_description">Company Logo</string>
 
-    <string name="app_action_back_label">Back</string>
+    <string name="app_action_close_label">Close</string>
 
     <!-- Default texts -->
     <string name="default_license_title">Dooby Pro Free Tier License</string>
