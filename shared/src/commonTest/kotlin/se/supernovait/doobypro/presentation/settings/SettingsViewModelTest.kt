@@ -19,6 +19,7 @@ import se.supernovait.doobypro.data.repository.fake.FakeServiceRepository
 import se.supernovait.doobypro.data.repository.fake.FakeStorageLocationRepository
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.common.Currency
+import se.supernovait.doobypro.domain.model.settings.order.OrderTagPrintMode
 import se.supernovait.doobypro.domain.model.storage.StorageAllocationMode
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
 import se.supernovait.doobypro.util.FakeLogger
@@ -196,6 +197,26 @@ class SettingsViewModelTest {
         
         val state = viewModel.uiState.filter { it.settings.storage.defaultStorageLocationId == locationId }.first()
         assertEquals(locationId, state.settings.storage.defaultStorageLocationId)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `onEvent UpdateAutoPrintOrderTag should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        viewModel.onEvent(SettingsScreenEvent.UpdateAutoPrintOrderTag(false))
+
+        val state = viewModel.uiState.filter { !it.settings.order.autoPrintOrderTag }.first()
+        assertEquals(false, state.settings.order.autoPrintOrderTag)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `onEvent UpdateOrderTagPrintMode should update state`() = runTest(testDispatcher) {
+        val collectJob = launch { viewModel.uiState.collect {} }
+        viewModel.onEvent(SettingsScreenEvent.UpdateOrderTagPrintMode(OrderTagPrintMode.PER_ORDER_ITEM))
+
+        val state = viewModel.uiState.filter { it.settings.order.orderTagPrintMode == OrderTagPrintMode.PER_ORDER_ITEM }.first()
+        assertEquals(OrderTagPrintMode.PER_ORDER_ITEM, state.settings.order.orderTagPrintMode)
         collectJob.cancel()
     }
 }

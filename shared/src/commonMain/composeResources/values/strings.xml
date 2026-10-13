@@ -225,7 +225,10 @@
     <string name="screen_Settings_order_handling_time_label">Default Handling Time (days)</string>
     <string name="screen_Settings_order_behavior_label">Order Behavior</string>
     <string name="screen_Settings_order_auto_print_receipts_label">Auto-print receipts</string>
-    <string name="screen_Settings_order_auto_print_storage_tag_label">Auto-print storage tags</string>
+    <string name="screen_Settings_order_auto_print_order_tag_label">Auto-print order tag</string>
+    <string name="screen_Settings_order_tag_print_mode_label">Order tag print mode</string>
+    <string name="order_tag_print_mode_per_order">One per order</string>
+    <string name="order_tag_print_mode_per_order_item">One per order item</string>
 
     <!-- Order settings -->
     <string name="screen_Settings_storage_allocation_mode_label">Storage allocation mode</string>

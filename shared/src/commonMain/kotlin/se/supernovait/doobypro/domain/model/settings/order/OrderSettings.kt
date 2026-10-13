@@ -12,7 +12,8 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
  * @property defaultDeliveryMethod The delivery method (e.g., Pickup) used by default.
  * @property defaultDeliveryDaysOffset The expected time to complete an order in days.
  * @property autoPrintReceipts Whether the app should automatically trigger printing when an order is created.
- * @property autoPrintStorageLocationTag Whether to automatically print a tag for the storage location.
+ * @property autoPrintOrderTag Whether to automatically print a tag for the order.
+ * @property orderTagPrintMode The mode for printing order tags (per order or per order item).
  */
 @Serializable
 data class OrderSettings(
@@ -21,5 +22,6 @@ data class OrderSettings(
     val defaultDeliveryMethod: DeliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
     val defaultDeliveryDaysOffset: Int = 2,
     val autoPrintReceipts: Boolean = false,
-    val autoPrintStorageLocationTag: Boolean = true
+    val autoPrintOrderTag: Boolean = true,
+    val orderTagPrintMode: OrderTagPrintMode = OrderTagPrintMode.PER_ORDER,
 )
