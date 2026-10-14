@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_edit_square
 import doobypro.shared.generated.resources.ic_refresh
+import doobypro.shared.generated.resources.ic_thunderbolt
 import doobypro.shared.generated.resources.label_edit
 import doobypro.shared.generated.resources.label_late
 import doobypro.shared.generated.resources.screen_Order_action_reissue_order
@@ -23,9 +24,10 @@ import se.supernovait.app.core.ui.component.action.SupernovaIconButton
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.component.text.SupernovaTag
 import se.supernovait.app.core.ui.theme.spacing
-import se.supernovait.app.core.ui.theme.statusColor
+import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
+import se.supernovait.doobypro.presentation.app.theme.statusColor
 
 @Composable
 fun OrderItem(
@@ -63,7 +65,17 @@ fun OrderItem(
                     contentColor = statusColor,
                     style = MaterialTheme.typography.labelSmall
                 )
-                if (order.isLate()) {
+                if (order.deliveryOption == DeliveryOption.EXPRESS) {
+                    Spacer(Modifier.width(MaterialTheme.spacing.small))
+                    SupernovaTag(
+                        text = order.deliveryOption.label,
+                        icon = Res.drawable.ic_thunderbolt,
+                        containerColor = MaterialTheme.statusColor.express.copy(alpha = 0.15f),
+                        contentColor = MaterialTheme.statusColor.express,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+                if (order.isOverdue()) {
                     Spacer(Modifier.width(MaterialTheme.spacing.small))
                     SupernovaTag(
                         text = Res.string.label_late,
@@ -93,7 +105,7 @@ fun OrderItem(
                 SupernovaLabel(
                     text = order.deliveryDatetime.toString().replace("T", " "), // Basic formatting for now
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (order.isLate()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (order.isOverdue()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

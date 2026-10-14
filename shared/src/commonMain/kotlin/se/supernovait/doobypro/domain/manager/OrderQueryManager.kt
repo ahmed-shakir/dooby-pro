@@ -3,6 +3,7 @@ package se.supernovait.doobypro.domain.manager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import se.supernovait.app.core.domain.observability.logging.Logger
+import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.order.OrderTab
@@ -17,27 +18,29 @@ class OrderQueryManager(
     private val logger: Logger
 ) {
     /**
-     * Observes orders filtered by an operational tab.
+     * Observes orders filtered by an operational tab, sorted by operational priority:
+     * Overdue → Express → FIFO (oldest orders first).
      */
     fun getOrdersForTab(tab: OrderTab): Flow<List<Order>> {
         logger.debug("Querying orders for tab: $tab", tag = LogTags.ORDER_QUERY_MANAGER)
         return orderRepository.getOrders().map { orders ->
-            when (tab) {
+            val tabOrders = when (tab) {
                 OrderTab.NEW -> orders.filter { it.status == OrderStatus.NEW }
                 OrderTab.IN_PROGRESS -> orders.filter { it.status == OrderStatus.IN_PROGRESS }
                 OrderTab.READY -> orders.filter { it.status == OrderStatus.READY || it.status == OrderStatus.OUT_FOR_DELIVERY }
                 OrderTab.COMPLETED -> orders.filter { it.status == OrderStatus.PICKED_UP || it.status == OrderStatus.DELIVERED }
             }
+            sortOrders(tabOrders)
         }
     }
 
     /**
-     * Observes only cancelled orders.
+     * Observes only cancelled orders, sorted by operational priority.
      */
     fun getCancelledOrders(): Flow<List<Order>> {
         logger.debug("Querying cancelled orders", tag = LogTags.ORDER_QUERY_MANAGER)
         return orderRepository.getOrders().map { orders ->
-            orders.filter { it.status == OrderStatus.CANCELLED }
+            sortOrders(orders.filter { it.status == OrderStatus.CANCELLED })
         }
     }
 
@@ -49,7 +52,7 @@ class OrderQueryManager(
         logger.debug("Calculating late order counts per tab", tag = LogTags.ORDER_QUERY_MANAGER)
         return orderRepository.getOrders().map { orders ->
             OrderTab.entries.associateWith { tab ->
-                orders.filter { it.isLate() || it.isNotPickedUp() || it.isNotDelivered() }.count { order ->
+                orders.filter { it.isOverdue() }.count { order ->
                     when (tab) {
                         OrderTab.NEW -> order.status == OrderStatus.NEW
                         OrderTab.IN_PROGRESS -> order.status == OrderStatus.IN_PROGRESS
@@ -59,5 +62,19 @@ class OrderQueryManager(
                 }
             }
         }
+    }
+
+    /**
+     * Sorts orders according to operational priority:
+     * 1. Overdue orders first (`isOverdue()`)
+     * 2. Express orders next (`deliveryOption == DeliveryOption.EXPRESS`)
+     * 3. First-In, First-Out (FIFO) by creation/order time (`orderDatetime` ascending)
+     */
+    private fun sortOrders(orders: List<Order>): List<Order> {
+        return orders.sortedWith(
+            compareByDescending<Order> { it.isOverdue() }
+                .thenByDescending { it.deliveryOption == DeliveryOption.EXPRESS }
+                .thenBy { it.orderDatetime }
+        )
     }
 }

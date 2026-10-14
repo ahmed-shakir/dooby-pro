@@ -111,6 +111,11 @@ data class Order(
             overdueThreshold < LocalDateTime.now()
     }
 
+    /**
+     * Checks if the order is overdue (either late, not picked up, or not delivered).
+     */
+    fun isOverdue(): Boolean = isLate() || isNotPickedUp() || isNotDelivered()
+
     companion object {
         const val LATE_THRESHOLD_HOURS = 24
     }

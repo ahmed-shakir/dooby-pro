@@ -11,7 +11,8 @@ data class StatusColor(
     val success: Color,
     val warning: Color,
     val error: Color,
-    val active: Color
+    val active: Color,
+    val express: Color
 )
 
 val lightStatusColors = StatusColor(
@@ -19,7 +20,8 @@ val lightStatusColors = StatusColor(
     success = Color(0xFF2E7D32),
     warning = Color(0xFFF57C00),
     error = Color(0xFFB3261E),
-    active = Color(0xFF4CAF50)
+    active = Color(0xFF4CAF50),
+    express = Color(0xFF673AB7) // Electric Purple / Deep Indigo
 )
 
 val darkStatusColors = StatusColor(
@@ -27,7 +29,8 @@ val darkStatusColors = StatusColor(
     success = Color(0xFF81C784),
     warning = Color(0xFFFFB74D),
     error = Color(0xFFFFB4AA), // Matches errorDark in Color.kt
-    active = Color(0xFF66BB6A)
+    active = Color(0xFF66BB6A),
+    express = Color(0xFFB388FF) // Bright Electric Violet / Lavender
 )
 
 val LocalStatus = staticCompositionLocalOf { lightStatusColors }

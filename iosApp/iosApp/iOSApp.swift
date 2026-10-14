@@ -69,15 +69,21 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 private func setupCrashlyticsBridge() {
     // 1. Record Non-Fatal Exceptions
     IosCrashReporterBridge.shared.onRecordException = { message, stackTrace, attributes in
+        var userInfo: [String: Any] = [
+            NSLocalizedDescriptionKey: message,
+            "KotlinStackTrace": stackTrace ?? ""
+        ]
+        for (key, value) in attributes {
+            userInfo[key] = value
+            Crashlytics.crashlytics().setCustomValue(value, forKey: key)
+        }
+
         let error = NSError(
-            domain: "se.supernovait.doobypro",
+            domain: "se.supernovait.doobypro.DoobyPro",
             code: -1,
-            userInfo: [
-                NSLocalizedDescriptionKey: message,
-                "KotlinStackTrace": stackTrace ?? ""
-            ]
+            userInfo: userInfo
         )
-        Crashlytics.crashlytics().record(error: error, userInfo: attributes)
+        Crashlytics.crashlytics().record(error: error)
     }
 
     // 2. Log Breadcrumbs
