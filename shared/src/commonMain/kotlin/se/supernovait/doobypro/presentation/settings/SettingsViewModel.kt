@@ -84,6 +84,9 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateAutoPrintReceipts -> updateSettings { it.copy(order = it.order.copy(autoPrintReceipts = event.enabled)) }
             is SettingsScreenEvent.UpdateAutoPrintOrderTag -> updateSettings { it.copy(order = it.order.copy(autoPrintOrderTag = event.enabled)) }
             is SettingsScreenEvent.UpdateOrderTagPrintMode -> updateSettings { it.copy(order = it.order.copy(orderTagPrintMode = event.mode)) }
+            is SettingsScreenEvent.UpdateExpressFeeMode -> updateSettings { it.copy(order = it.order.copy(expressFeeMode = event.mode)) }
+            is SettingsScreenEvent.UpdateExpressFeeType -> updateSettings { it.copy(order = it.order.copy(expressFeeType = event.type)) }
+            is SettingsScreenEvent.UpdateExpressFeeValue -> updateSettings { it.copy(order = it.order.copy(expressFeeValue = event.value)) }
             // Storage settings
             is SettingsScreenEvent.UpdateStorageAllocationMode -> updateSettings { it.copy(storage = it.storage.copy(storageAllocationMode = event.mode)) }
             is SettingsScreenEvent.UpdateDefaultStorageLocationId -> updateSettings { it.copy(storage = it.storage.copy(defaultStorageLocationId = event.id)) }

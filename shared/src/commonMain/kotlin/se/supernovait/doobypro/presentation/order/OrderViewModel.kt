@@ -143,6 +143,7 @@ class OrderViewModel(
             services = services,
             storageLocations = locations,
             isManualStorageMode = settings.storage.storageAllocationMode == StorageAllocationMode.MANUAL,
+            settings = settings,
             customers = filteredCustomers,
             editingOrder = editing,
             error = error,

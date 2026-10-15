@@ -12,9 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours_closes
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours_opens
 import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.business_hours_closes
-import doobypro.shared.generated.resources.business_hours_opens
 import kotlinx.datetime.LocalTime
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
@@ -39,14 +39,14 @@ fun TimeRangePicker(
             modifier = Modifier.fillMaxWidth()
         ) {
             SupernovaLabel(
-                text = stringResource(Res.string.business_hours_opens),
+                text = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours_opens),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.weight(0.2f))
             SupernovaLabel(
-                text = stringResource(Res.string.business_hours_closes),
+                text = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours_closes),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f)

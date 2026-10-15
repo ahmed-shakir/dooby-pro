@@ -25,6 +25,7 @@ import kotlin.time.Instant
  * @property deliveryOption The chosen delivery priority (e.g., [DeliveryOption.EXPRESS], [DeliveryOption.STANDARD]).
  * @property deliveryMethod The chosen delivery method (e.g., [DeliveryMethod.HOME_DELIVERY], [DeliveryMethod.IN_STORE_PICKUP]).
  * @property isPaymentDone Whether the order has been paid for.
+ * @property expressFee The express fee associated with the order.
  * @property notes Optional notes provided by the customer.
  * @property createdAt The timestamp when the order was first created.
  * @property updatedAt The timestamp when the order was last modified.
@@ -50,7 +51,8 @@ data class OrderEntity(
     val deliveryOption: DeliveryOption,
     val deliveryMethod: DeliveryMethod,
     val isPaymentDone: Boolean,
-    val notes: String?,
+    val expressFee: Long? = null,
+    val notes: String? = null,
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now()
 )

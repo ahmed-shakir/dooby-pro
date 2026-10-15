@@ -29,6 +29,7 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
  * @property deliveryOption The chosen delivery priority (e.g., Express, Standard).
  * @property deliveryMethod The chosen delivery method (e.g., Home Delivery, Pickup).
  * @property isPaymentDone Whether the order has been paid for.
+ * @property expressFee The express fee (percentage value or flat fee amount) applied when [deliveryOption] is [DeliveryOption.EXPRESS].
  * @property notes Optional internal or customer-provided notes.
  * @property createdAt The timestamp when the order was first created.
  * @property updatedAt The timestamp when the order was last modified.
@@ -44,6 +45,7 @@ data class Order(
     val deliveryOption: DeliveryOption = DeliveryOption.STANDARD,
     val deliveryMethod: DeliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
     val isPaymentDone: Boolean = false,
+    val expressFee: Long? = null,
     val notes: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()

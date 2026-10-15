@@ -37,6 +37,7 @@ import doobypro.shared.generated.resources.Account_CompanyProfileTab_picker_titl
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_address
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_branding
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours_subtitle
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_contact
 import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_info
 import doobypro.shared.generated.resources.Address_field_city
@@ -48,7 +49,6 @@ import doobypro.shared.generated.resources.Address_field_street
 import doobypro.shared.generated.resources.Contact_details_field_email
 import doobypro.shared.generated.resources.Contact_details_field_phone
 import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.business_hours_subtitle
 import doobypro.shared.generated.resources.ic_files
 import doobypro.shared.generated.resources.ic_info
 import doobypro.shared.generated.resources.ic_photo_library
@@ -391,7 +391,7 @@ fun CompanyProfileTab(
             onEditClick = null
         ) {
             SupernovaLabel(
-                text = stringResource(Res.string.business_hours_subtitle),
+                text = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

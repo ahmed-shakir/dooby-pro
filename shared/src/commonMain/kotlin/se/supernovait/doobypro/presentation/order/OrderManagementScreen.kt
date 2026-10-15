@@ -131,6 +131,10 @@ fun OrderManagementScreen(
                     services = state.services,
                     storageLocations = state.storageLocations,
                     isManualStorageMode = state.isManualStorageMode,
+                    expressFeeMode = state.settings.order.expressFeeMode,
+                    expressFeeType = state.settings.order.expressFeeType,
+                    globalExpressFee = state.settings.order.expressFeeValue,
+                    currency = state.settings.common.currency.symbol,
                     onSave = { 
                         onEvent(OrderEvent.SaveOrder(it))
                         bottomSheetState.hide()
@@ -198,6 +202,10 @@ fun OrderManagementScreen(
                         services = state.services,
                         storageLocations = state.storageLocations,
                         isManualStorageMode = state.isManualStorageMode,
+                        expressFeeMode = state.settings.order.expressFeeMode,
+                        expressFeeType = state.settings.order.expressFeeType,
+                        globalExpressFee = state.settings.order.expressFeeValue,
+                        currency = state.settings.common.currency.symbol,
                         onSave = { 
                             onEvent(OrderEvent.SaveOrder(it))
                             bottomSheetState.hide()

@@ -32,6 +32,30 @@
     <string name="navigation_item_services_label">Services</string>
     <string name="navigation_item_storage_label">Storage</string>
 
+    <!-- Notification schedule -->
+    <string name="notification_schedule_label">Notification schedule</string>
+    <string name="notification_schedule_business_hours">During business hours</string>
+    <string name="notification_schedule_daytime">Daytime (08:00 - 20:00)</string>
+    <string name="notification_schedule_anytime">Anytime</string>
+
+    <!-- FAQ category -->
+    <string name="faq_category_getting_started">Getting Started</string>
+    <string name="faq_category_orders">Orders</string>
+    <string name="faq_category_storage">Storage</string>
+    <string name="faq_category_services">Services</string>
+    <string name="faq_category_printing">Printing</string>
+    <string name="faq_category_delivery">Delivery</string>
+    <string name="faq_category_account">Account</string>
+    <string name="faq_category_technical">Technical</string>
+    <string name="faq_category_billing">Billing</string>
+    <string name="faq_category_other">Other</string>
+
+    <!-- Support request type -->
+    <string name="support_request_type_question">Question</string>
+    <string name="support_request_type_suggestion">Suggestion</string>
+    <string name="support_request_type_bug_report">Report Error</string>
+    <string name="support_request_type_other">Other</string>
+
     <!-- Delivery -->
     <string name="delivery_option_express">Express</string>
     <string name="delivery_option_standard">Standard</string>
@@ -48,6 +72,16 @@
     <string name="theme_mode_light">Light mode</string>
     <string name="theme_mode_dark">Dark mode</string>
     <string name="theme_mode_system">System settings</string>
+
+    <!-- Express fee settings -->
+    <string name="express_fee_mode_global">Global</string>
+    <string name="express_fee_mode_individual">Individual</string>
+    <string name="express_fee_type_percentage">Percentage Markup (%)</string>
+    <string name="express_fee_type_flat_fee">Flat Fee (%1$s)</string>
+
+    <!-- Order tag print mode -->
+    <string name="order_tag_print_mode_per_order">One per order</string>
+    <string name="order_tag_print_mode_per_order_item">One per order item</string>
 
     <!-- Connection method -->
     <string name="connection_method_network">Network (WiFi/Ethernet)</string>
@@ -91,6 +125,7 @@
     <string name="label_payment_status_pending">Pending</string>
     <string name="label_role_admin">Administrator</string>
     <string name="label_role_user">Staff Member</string>
+    <string name="label_customize">Customize</string>
 
     <!-- Sign In Bottom Sheet -->
     <string name="sheet_SignIn_title">Sign in</string>
@@ -163,27 +198,7 @@
     <string name="screen_support_faq_search_placeholder">Search FAQs...</string>
     <string name="screen_support_faq_no_match">No matching FAQs found</string>
 
-    <string name="faq_category_getting_started">Getting Started</string>
-    <string name="faq_category_orders">Orders</string>
-    <string name="faq_category_storage">Storage</string>
-    <string name="faq_category_services">Services</string>
-    <string name="faq_category_printing">Printing</string>
-    <string name="faq_category_delivery">Delivery</string>
-    <string name="faq_category_account">Account</string>
-    <string name="faq_category_technical">Technical</string>
-    <string name="faq_category_billing">Billing</string>
-    <string name="faq_category_other">Other</string>
-
-    <string name="support_request_type_question">Question</string>
-    <string name="support_request_type_suggestion">Suggestion</string>
-    <string name="support_request_type_bug_report">Report Error</string>
-    <string name="support_request_type_other">Other</string>
-
     <!-- Notification Screen -->
-    <string name="notification_schedule_label">Notification schedule</string>
-    <string name="notification_schedule_business_hours">During business hours</string>
-    <string name="notification_schedule_daytime">Daytime (08:00 - 20:00)</string>
-    <string name="notification_schedule_anytime">Anytime</string>
     <string name="screen_Notification_action_mark_all_read">Mark all as read</string>
     <string name="screen_Notification_action_mark_read">Mark as read</string>
     <string name="screen_Notification_empty_state">No notifications</string>
@@ -227,8 +242,8 @@
     <string name="screen_Settings_order_auto_print_receipts_label">Auto-print receipts</string>
     <string name="screen_Settings_order_auto_print_order_tag_label">Auto-print order tag</string>
     <string name="screen_Settings_order_tag_print_mode_label">Order tag print mode</string>
-    <string name="order_tag_print_mode_per_order">One per order</string>
-    <string name="order_tag_print_mode_per_order_item">One per order item</string>
+    <string name="screen_Settings_order_express_fee_type_label">Express Fee Type</string>
+    <string name="screen_Settings_order_express_fee_value_label">Global Express Fee Value (%1$s)</string>
 
     <!-- Order settings -->
     <string name="screen_Settings_storage_allocation_mode_label">Storage allocation mode</string>
@@ -301,6 +316,8 @@
     <!-- Account Success Messages -->
     <string name="screen_Account_agreements_download_success">Agreements PDF downloaded successfully</string>
     <string name="screen_Account_license_download_success">License PDF downloaded successfully</string>
+    <string name="screen_Account_business_hours_success_update">Business hours updated successfully</string>
+    <string name="screen_Account_business_hours_error_update">Failed to update business hours</string>
 
     <!-- Account User Profile -->
     <string name="Account_UserProfileTab_section_account">Account Information</string>
@@ -335,22 +352,20 @@
     <string name="Account_CompanyProfileTab_section_contact">Contact Information</string>
     <string name="Account_CompanyProfileTab_section_address">Address</string>
     <string name="Account_CompanyProfileTab_section_business_hours">Business Hours</string>
-    <string name="screen_Account_business_hours_success_update">Business hours updated successfully</string>
-    <string name="screen_Account_business_hours_error_update">Failed to update business hours</string>
-    <string name="business_hours_closed">Closed</string>
-    <string name="business_hours_open_24_hours">Open 24 hours</string>
-    <string name="business_hours_today">Today: %1$s</string>
-    <string name="business_hours_not_available">Hours not available</string>
-    <string name="business_hours_title">Business Hours</string>
-    <string name="business_hours_subtitle">Set your operating hours. Used for notifications and receipt display.</string>
-    <string name="business_hours_status_label">Status</string>
-    <string name="business_hours_open">Open</string>
-    <string name="business_hours_hours_label">Hours</string>
-    <string name="business_hours_24_hours">24 Hours</string>
-    <string name="business_hours_custom">Custom</string>
-    <string name="business_hours_opens">Opens</string>
-    <string name="business_hours_closes">Closes</string>
-    <string name="business_hours_edit_day">Edit %1$s</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_closed">Closed</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_open_24_hours">Open 24 hours</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_today">Today: %1$s</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_not_available">Hours not available</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_title">Business Hours</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_subtitle">Set your operating hours. Used for notifications and receipt display.</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_status_label">Status</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_open">Open</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_hours_label">Hours</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_24_hours">24 Hours</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_custom">Custom</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_opens">Opens</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_closes">Closes</string>
+    <string name="Account_CompanyProfileTab_section_business_hours_edit_day">Edit %1$s</string>
 
     <!-- Account License -->
     <string name="Account_LicenseTab_error_not_found">No active license found for this account.</string>
@@ -398,6 +413,8 @@
     <string name="screen_Order_field_delivery_method">Delivery Method</string>
     <string name="screen_Order_field_delivery_date">Delivery Date</string>
     <string name="screen_Order_field_storage">Storage Location</string>
+    <string name="screen_Order_field_express_fee">Express Fee (%1$s)</string>
+    <string name="screen_Order_field_express_fee_percentage">Express Fee Percentage (%)</string>
     <string name="screen_Order_field_payment_status">Payment Done</string>
     <string name="screen_Order_field_notes">Notes</string>
     <string name="screen_Order_dialog_delete_title">Delete Order</string>
@@ -426,6 +443,7 @@
     <string name="screen_Order_tab_processing">Processing</string>
     <string name="screen_Order_tab_ready">Ready</string>
     <string name="screen_Order_tab_completed">Completed</string>
+    <string name="screen_Settings_order_express_fee_mode_label">Express Fee Mode</string>
 
     <!-- Order Status -->
     <string name="order_status_new">New</string>
@@ -444,6 +462,7 @@
     <string name="screen_Service_field_price">Price (%1$s)</string>
     <string name="screen_Service_dialog_delete_title">Delete Service</string>
     <string name="screen_Service_dialog_delete_message">Are you sure you want to delete this service? This action cannot be undone.</string>
+
     <string name="screen_Service_error_save_failed">Failed to save service</string>
     <string name="screen_Service_error_delete_failed">Failed to delete service</string>
     <string name="screen_Service_empty_state">No services configured. Add your first service like "Wash &amp; Fold" or "Dry Cleaning" to get started.</string>

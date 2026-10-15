@@ -7,6 +7,8 @@ import se.supernovait.doobypro.domain.model.settings.common.DateFormat
 import se.supernovait.doobypro.domain.model.settings.common.Language
 import se.supernovait.doobypro.domain.model.settings.common.ThemeMode
 import se.supernovait.doobypro.domain.model.settings.notification.NotificationSchedule
+import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeMode
+import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import se.supernovait.doobypro.domain.model.settings.order.OrderTagPrintMode
 import se.supernovait.doobypro.domain.model.settings.printer.ConnectionMethod
 import se.supernovait.doobypro.domain.model.settings.receipt.PaperWidth
@@ -31,6 +33,9 @@ sealed interface SettingsScreenEvent {
     data class UpdateAutoPrintReceipts(val enabled: Boolean) : SettingsScreenEvent
     data class UpdateAutoPrintOrderTag(val enabled: Boolean) : SettingsScreenEvent
     data class UpdateOrderTagPrintMode(val mode: OrderTagPrintMode) : SettingsScreenEvent
+    data class UpdateExpressFeeMode(val mode: ExpressFeeMode) : SettingsScreenEvent
+    data class UpdateExpressFeeType(val type: ExpressFeeType) : SettingsScreenEvent
+    data class UpdateExpressFeeValue(val value: Long) : SettingsScreenEvent
     // Storage settings
     data class UpdateStorageAllocationMode(val mode: StorageAllocationMode) : SettingsScreenEvent
     data class UpdateDefaultStorageLocationId(val id: String) : SettingsScreenEvent

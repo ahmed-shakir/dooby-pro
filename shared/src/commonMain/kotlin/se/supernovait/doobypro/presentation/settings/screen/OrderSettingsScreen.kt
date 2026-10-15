@@ -20,6 +20,9 @@ import doobypro.shared.generated.resources.screen_Settings_order_behavior_label
 import doobypro.shared.generated.resources.screen_Settings_order_default_service_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_method_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_option_label
+import doobypro.shared.generated.resources.screen_Settings_order_express_fee_mode_label
+import doobypro.shared.generated.resources.screen_Settings_order_express_fee_type_label
+import doobypro.shared.generated.resources.screen_Settings_order_express_fee_value_label
 import doobypro.shared.generated.resources.screen_Settings_order_handling_time_label
 import doobypro.shared.generated.resources.screen_Settings_order_tag_print_mode_label
 import org.jetbrains.compose.resources.stringResource
@@ -32,6 +35,8 @@ import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeMode
+import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import se.supernovait.doobypro.domain.model.settings.order.OrderTagPrintMode
 import se.supernovait.doobypro.presentation.settings.SettingsState
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
@@ -45,9 +50,21 @@ fun OrderSettingsScreen(
     val deliveryOptionLabels = DeliveryOption.entries.associateWith { stringResource(it.label) }
     val deliveryMethodLabels = DeliveryMethod.entries.associateWith { stringResource(it.label) }
     val orderTagPrintModeLabels = OrderTagPrintMode.entries.associateWith { stringResource(it.label) }
+    val expressFeeModeLabels = ExpressFeeMode.entries.associateWith { stringResource(it.label) }
+    val currency = uiState.settings.common.currency.symbol
+    val expressFeeTypeLabels = ExpressFeeType.entries.associateWith { feeType ->
+        when (feeType) {
+            ExpressFeeType.FLAT_FEE -> stringResource(feeType.label, currency)
+            ExpressFeeType.PERCENTAGE -> stringResource(feeType.label)
+        }
+    }
 
     var deliveryDaysText by remember(uiState.settings.order.defaultDeliveryDaysOffset) {
         mutableStateOf(uiState.settings.order.defaultDeliveryDaysOffset.toString())
+    }
+
+    var expressFeeValueText by remember(uiState.settings.order.expressFeeValue) {
+        mutableStateOf(uiState.settings.order.expressFeeValue.toString())
     }
 
     SettingsScreen {
@@ -91,6 +108,42 @@ fun OrderSettingsScreen(
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        SupernovaSelectField(
+            label = Res.string.screen_Settings_order_express_fee_mode_label,
+            options = ExpressFeeMode.entries,
+            selectedOption = uiState.settings.order.expressFeeMode,
+            onOptionSelected = { onEvent(SettingsScreenEvent.UpdateExpressFeeMode(it)) },
+            optionLabel = { expressFeeModeLabels[it] ?: "" }
+        )
+
+        if (uiState.settings.order.expressFeeMode == ExpressFeeMode.GLOBAL) {
+            Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+            SupernovaSelectField(
+                label = Res.string.screen_Settings_order_express_fee_type_label,
+                options = ExpressFeeType.entries,
+                selectedOption = uiState.settings.order.expressFeeType,
+                onOptionSelected = { onEvent(SettingsScreenEvent.UpdateExpressFeeType(it)) },
+                optionLabel = { expressFeeTypeLabels[it] ?: "" }
+            )
+
+            Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+            SupernovaTextField(
+                label = stringResource(Res.string.screen_Settings_order_express_fee_value_label, if (uiState.settings.order.expressFeeType == ExpressFeeType.PERCENTAGE) "%" else currency),
+                value = expressFeeValueText,
+                onValueChange = { newValue, _ ->
+                    expressFeeValueText = newValue
+                    newValue.toLongOrNull()?.let {
+                        onEvent(SettingsScreenEvent.UpdateExpressFeeValue(it))
+                    }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        }
 
         SupernovaLabel(
             text = Res.string.screen_Settings_order_behavior_label,

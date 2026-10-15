@@ -24,14 +24,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours_24_hours
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours_closed
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours_custom
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours_edit_day
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours_hours_label
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours_open
+import doobypro.shared.generated.resources.Account_CompanyProfileTab_section_business_hours_status_label
 import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.business_hours_24_hours
-import doobypro.shared.generated.resources.business_hours_closed
-import doobypro.shared.generated.resources.business_hours_custom
-import doobypro.shared.generated.resources.business_hours_edit_day
-import doobypro.shared.generated.resources.business_hours_hours_label
-import doobypro.shared.generated.resources.business_hours_open
-import doobypro.shared.generated.resources.business_hours_status_label
 import doobypro.shared.generated.resources.label_cancel
 import doobypro.shared.generated.resources.label_save
 import kotlinx.datetime.DayOfWeek
@@ -92,7 +92,7 @@ fun DayHoursEditorDialog(
                     .padding(MaterialTheme.spacing.large),
             ) {
                 SupernovaLabel(
-                    text = stringResource(Res.string.business_hours_edit_day, dayName),
+                    text = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours_edit_day, dayName),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -102,9 +102,9 @@ fun DayHoursEditorDialog(
                 SupernovaStatusToggle(
                     isOpen = isOpen,
                     onOpenChange = { isOpen = it },
-                    title = stringResource(Res.string.business_hours_status_label),
-                    openLabel = stringResource(Res.string.business_hours_open),
-                    closedLabel = stringResource(Res.string.business_hours_closed)
+                    title = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours_status_label),
+                    openLabel = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours_open),
+                    closedLabel = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours_closed)
                 )
 
                 AnimatedVisibility(
@@ -118,9 +118,9 @@ fun DayHoursEditorDialog(
                         SupernovaStatusToggle(
                             isOpen = is24Hours,
                             onOpenChange = { is24Hours = it },
-                            title = stringResource(Res.string.business_hours_hours_label),
-                            openLabel = stringResource(Res.string.business_hours_24_hours),
-                            closedLabel = stringResource(Res.string.business_hours_custom)
+                            title = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours_hours_label),
+                            openLabel = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours_24_hours),
+                            closedLabel = stringResource(Res.string.Account_CompanyProfileTab_section_business_hours_custom)
                         )
 
                         AnimatedVisibility(

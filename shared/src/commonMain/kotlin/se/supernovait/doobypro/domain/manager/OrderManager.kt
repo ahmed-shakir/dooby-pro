@@ -50,6 +50,7 @@ import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.notification.NotificationSchedule
+import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeMode
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.AccountRepository
 import se.supernovait.doobypro.domain.repository.BusinessHoursRepository
@@ -138,6 +139,12 @@ class OrderManager(
                 ?: storageLocationRepository.getDefaultLocation().getOrNull()
                 ?: StorageLocation()
 
+            val expressFee = if (orderSettings.expressFeeMode == ExpressFeeMode.GLOBAL) {
+                orderSettings.expressFeeValue
+            } else {
+                null
+            }
+
             Order(
                 customer = customer,
                 service = defaultService,
@@ -148,6 +155,7 @@ class OrderManager(
                 deliveryOption = orderSettings.defaultDeliveryOption,
                 deliveryMethod = orderSettings.defaultDeliveryMethod,
                 isPaymentDone = false,
+                expressFee = expressFee,
                 notes = null
             )
         }
@@ -164,6 +172,7 @@ class OrderManager(
                 service = originalOrder.service,
                 deliveryOption = originalOrder.deliveryOption,
                 deliveryMethod = originalOrder.deliveryMethod,
+                expressFee = originalOrder.expressFee,
                 notes = originalOrder.notes
             )
         }
