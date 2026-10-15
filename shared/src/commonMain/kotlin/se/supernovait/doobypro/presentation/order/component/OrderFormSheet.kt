@@ -2,30 +2,23 @@ package se.supernovait.doobypro.presentation.order.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_edit_square
 import doobypro.shared.generated.resources.label_customize
@@ -35,6 +28,7 @@ import doobypro.shared.generated.resources.label_save
 import doobypro.shared.generated.resources.screen_Order_action_add_order
 import doobypro.shared.generated.resources.screen_Order_field_customer
 import doobypro.shared.generated.resources.screen_Order_field_delivery_date
+import doobypro.shared.generated.resources.screen_Order_field_delivery_fee
 import doobypro.shared.generated.resources.screen_Order_field_delivery_method
 import doobypro.shared.generated.resources.screen_Order_field_delivery_option
 import doobypro.shared.generated.resources.screen_Order_field_express_fee
@@ -43,17 +37,14 @@ import doobypro.shared.generated.resources.screen_Order_field_notes
 import doobypro.shared.generated.resources.screen_Order_field_payment_status
 import doobypro.shared.generated.resources.screen_Order_field_service
 import doobypro.shared.generated.resources.screen_Order_field_storage
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.component.action.SupernovaTextAction
-import se.supernovait.app.core.ui.component.action.SupernovaTextButton
 import se.supernovait.app.core.ui.component.input.SupernovaDatetimeField
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
-import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.Service
@@ -75,6 +66,7 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
  * @param expressFeeMode The current express fee mode from settings.
  * @param expressFeeType The current express fee calculation type from settings.
  * @param globalExpressFee The global express fee value from settings.
+ * @param globalDeliveryFee The global delivery fee value from settings.
  * @param currency The currency symbol.
  * @param onSave Callback invoked when the user saves the order.
  * @param onDelete Optional callback invoked when the user deletes the order.
@@ -89,6 +81,7 @@ fun OrderFormSheet(
     expressFeeMode: ExpressFeeMode,
     expressFeeType: ExpressFeeType,
     globalExpressFee: Long,
+    globalDeliveryFee: Long,
     currency: String,
     onSave: (Order) -> Unit,
     onDelete: (() -> Unit)? = null
@@ -238,6 +231,20 @@ fun OrderFormSheet(
             optionLabel = { deliveryMethodLabels[it] ?: it.name }
         )
 
+        // If delivery method is HOME_DELIVERY, show deactivated (read-only/disabled) delivery fee info field
+        if (deliveryMethod == DeliveryMethod.HOME_DELIVERY) {
+            Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+            SupernovaTextField(
+                label = stringResource(Res.string.screen_Order_field_delivery_fee, currency),
+                value = globalDeliveryFee.toString(),
+                onValueChange = { _, _ -> },
+                enabled = false,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
         // 7. isPaymentDone
@@ -290,6 +297,12 @@ fun OrderFormSheet(
                         else -> expressFeeText.toLongOrNull() ?: globalExpressFee
                     }
 
+                    val calculatedDeliveryFee = if (deliveryMethod == DeliveryMethod.HOME_DELIVERY) {
+                        globalDeliveryFee
+                    } else {
+                        null
+                    }
+
                     onSave(order.copy(
                         customer = selectedCustomer,
                         service = selectedService,
@@ -299,6 +312,7 @@ fun OrderFormSheet(
                         deliveryMethod = deliveryMethod,
                         isPaymentDone = isPaymentDone,
                         expressFee = calculatedExpressFee,
+                        deliveryFee = calculatedDeliveryFee,
                         notes = notes.ifBlank { null }
                     )) 
                 },

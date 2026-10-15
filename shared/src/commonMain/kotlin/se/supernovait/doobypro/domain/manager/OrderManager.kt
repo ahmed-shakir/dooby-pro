@@ -47,6 +47,7 @@ import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.company.Company
+import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.notification.NotificationSchedule
@@ -145,6 +146,12 @@ class OrderManager(
                 null
             }
 
+            val deliveryFee = if (orderSettings.defaultDeliveryMethod == DeliveryMethod.HOME_DELIVERY) {
+                orderSettings.deliveryFeeValue
+            } else {
+                null
+            }
+
             Order(
                 customer = customer,
                 service = defaultService,
@@ -156,6 +163,7 @@ class OrderManager(
                 deliveryMethod = orderSettings.defaultDeliveryMethod,
                 isPaymentDone = false,
                 expressFee = expressFee,
+                deliveryFee = deliveryFee,
                 notes = null
             )
         }
@@ -173,6 +181,7 @@ class OrderManager(
                 deliveryOption = originalOrder.deliveryOption,
                 deliveryMethod = originalOrder.deliveryMethod,
                 expressFee = originalOrder.expressFee,
+                deliveryFee = originalOrder.deliveryFee,
                 notes = originalOrder.notes
             )
         }

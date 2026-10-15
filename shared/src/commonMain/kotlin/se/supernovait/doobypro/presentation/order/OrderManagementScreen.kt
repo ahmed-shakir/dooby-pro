@@ -134,6 +134,7 @@ fun OrderManagementScreen(
                     expressFeeMode = state.settings.order.expressFeeMode,
                     expressFeeType = state.settings.order.expressFeeType,
                     globalExpressFee = state.settings.order.expressFeeValue,
+                    globalDeliveryFee = state.settings.order.deliveryFeeValue,
                     currency = state.settings.common.currency.symbol,
                     onSave = { 
                         onEvent(OrderEvent.SaveOrder(it))
@@ -205,6 +206,7 @@ fun OrderManagementScreen(
                         expressFeeMode = state.settings.order.expressFeeMode,
                         expressFeeType = state.settings.order.expressFeeType,
                         globalExpressFee = state.settings.order.expressFeeValue,
+                        globalDeliveryFee = state.settings.order.deliveryFeeValue,
                         currency = state.settings.common.currency.symbol,
                         onSave = { 
                             onEvent(OrderEvent.SaveOrder(it))

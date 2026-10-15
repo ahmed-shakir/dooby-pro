@@ -36,6 +36,7 @@ fun OrderEntity.toDomain(
     deliveryMethod = deliveryMethod,
     isPaymentDone = isPaymentDone,
     expressFee = expressFee,
+    deliveryFee = deliveryFee,
     notes = notes,
     createdAt = createdAt.toLocalDateTime(TimeZone.currentSystemDefault()),
     updatedAt = updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -58,6 +59,7 @@ fun Order.toEntity() = OrderEntity(
     deliveryMethod = deliveryMethod,
     isPaymentDone = isPaymentDone,
     expressFee = expressFee,
+    deliveryFee = deliveryFee,
     notes = notes,
     createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()),
     updatedAt = Clock.System.now()

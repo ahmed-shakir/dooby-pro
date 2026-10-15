@@ -45,7 +45,7 @@ import se.supernovait.doobypro.domain.model.storage.StorageType
         ServiceEntity::class,
         StorageLocationEntity::class,
         BusinessHoursDayEntity::class
-    ], version = 2
+    ], version = 3
 )
 @TypeConverters(RoomConverters::class, DbConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)

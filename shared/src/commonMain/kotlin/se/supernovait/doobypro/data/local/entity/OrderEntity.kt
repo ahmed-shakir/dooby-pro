@@ -52,6 +52,7 @@ data class OrderEntity(
     val deliveryMethod: DeliveryMethod,
     val isPaymentDone: Boolean,
     val expressFee: Long? = null,
+    val deliveryFee: Long? = null,
     val notes: String? = null,
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now()

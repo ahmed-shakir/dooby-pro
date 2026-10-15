@@ -18,6 +18,7 @@ import doobypro.shared.generated.resources.screen_Settings_order_auto_print_orde
 import doobypro.shared.generated.resources.screen_Settings_order_auto_print_receipts_label
 import doobypro.shared.generated.resources.screen_Settings_order_behavior_label
 import doobypro.shared.generated.resources.screen_Settings_order_default_service_label
+import doobypro.shared.generated.resources.screen_Settings_order_delivery_fee_value_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_method_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_option_label
 import doobypro.shared.generated.resources.screen_Settings_order_express_fee_mode_label
@@ -67,6 +68,10 @@ fun OrderSettingsScreen(
         mutableStateOf(uiState.settings.order.expressFeeValue.toString())
     }
 
+    var deliveryFeeValueText by remember(uiState.settings.order.deliveryFeeValue) {
+        mutableStateOf(uiState.settings.order.deliveryFeeValue.toString())
+    }
+
     SettingsScreen {
         Spacer(Modifier.height(MaterialTheme.spacing.small))
 
@@ -104,6 +109,20 @@ fun OrderSettingsScreen(
                 deliveryDaysText = newValue
                 newValue.toIntOrNull()?.let {
                     onEvent(SettingsScreenEvent.UpdateDefaultDeliveryDaysOffset(it))
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        SupernovaTextField(
+            label = stringResource(Res.string.screen_Settings_order_delivery_fee_value_label, currency),
+            value = deliveryFeeValueText,
+            onValueChange = { newValue, _ ->
+                deliveryFeeValueText = newValue
+                newValue.toLongOrNull()?.let {
+                    onEvent(SettingsScreenEvent.UpdateDeliveryFeeValue(it))
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)

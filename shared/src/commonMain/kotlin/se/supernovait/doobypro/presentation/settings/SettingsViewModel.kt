@@ -87,6 +87,7 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateExpressFeeMode -> updateSettings { it.copy(order = it.order.copy(expressFeeMode = event.mode)) }
             is SettingsScreenEvent.UpdateExpressFeeType -> updateSettings { it.copy(order = it.order.copy(expressFeeType = event.type)) }
             is SettingsScreenEvent.UpdateExpressFeeValue -> updateSettings { it.copy(order = it.order.copy(expressFeeValue = event.value)) }
+            is SettingsScreenEvent.UpdateDeliveryFeeValue -> updateSettings { it.copy(order = it.order.copy(deliveryFeeValue = event.value)) }
             // Storage settings
             is SettingsScreenEvent.UpdateStorageAllocationMode -> updateSettings { it.copy(storage = it.storage.copy(storageAllocationMode = event.mode)) }
             is SettingsScreenEvent.UpdateDefaultStorageLocationId -> updateSettings { it.copy(storage = it.storage.copy(defaultStorageLocationId = event.id)) }

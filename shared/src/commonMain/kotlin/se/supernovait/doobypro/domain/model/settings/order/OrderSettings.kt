@@ -17,6 +17,7 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
  * @property expressFeeMode The mode for determining express service fees (global or individual per order).
  * @property expressFeeType The type of express fee calculation (percentage markup or flat fee).
  * @property expressFeeValue The default express fee value (percentage or flat amount in minor units) when using global express fee settings.
+ * @property deliveryFeeValue The fixed global delivery fee applied for home delivery orders (in minor units).
  */
 @Serializable
 data class OrderSettings(
@@ -29,5 +30,6 @@ data class OrderSettings(
     val orderTagPrintMode: OrderTagPrintMode = OrderTagPrintMode.PER_ORDER,
     val expressFeeMode: ExpressFeeMode = ExpressFeeMode.GLOBAL,
     val expressFeeType: ExpressFeeType = ExpressFeeType.PERCENTAGE,
-    val expressFeeValue: Long = 50
+    val expressFeeValue: Long = 15,
+    val deliveryFeeValue: Long = 25
 )
