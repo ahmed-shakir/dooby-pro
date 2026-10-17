@@ -45,10 +45,10 @@ import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
 import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
-import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.order.OrderServiceItem
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.notification.NotificationSchedule
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeMode
@@ -134,7 +134,9 @@ class OrderManager(
 
             val defaultService = orderSettings.defaultServiceId?.let { id ->
                 serviceRepository.getServiceById(id).getOrNull()
-            } ?: Service()
+            }
+
+            val initialItems = defaultService?.let { listOf(OrderServiceItem(it, 1)) } ?: emptyList()
 
             val defaultStorage = storageLocationRepository.getLocationById(storageSettings.defaultStorageLocationId).getOrNull()
                 ?: storageLocationRepository.getDefaultLocation().getOrNull()
@@ -154,7 +156,7 @@ class OrderManager(
 
             Order(
                 customer = customer,
-                service = defaultService,
+                items = initialItems,
                 storageLocation = defaultStorage,
                 status = OrderStatus.NEW,
                 orderDatetime = orderDatetime,
@@ -177,7 +179,7 @@ class OrderManager(
             logger.info("Reissuing order with ID: ${originalOrder.id}", tag = LogTags.ORDER_MANAGER)
             val template = createOrderTemplate(originalOrder.customer)
             template.copy(
-                service = originalOrder.service,
+                items = originalOrder.items,
                 deliveryOption = originalOrder.deliveryOption,
                 deliveryMethod = originalOrder.deliveryMethod,
                 expressFee = originalOrder.expressFee,

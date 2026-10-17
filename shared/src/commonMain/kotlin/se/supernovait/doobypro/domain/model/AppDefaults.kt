@@ -16,6 +16,7 @@ import se.supernovait.app.core.domain.model.license.Tier
 object AppDefaults {
     const val COUNTRY = "UAE"
     const val COUNTRY_CODE = "+971"
+    const val CURRENCY = "AED"
     const val DEFAULT_STORAGE_LOCATION_ID = "default"
     const val DEFAULT_STORAGE_LOCATION_LABEL = "Uncategorized"
 

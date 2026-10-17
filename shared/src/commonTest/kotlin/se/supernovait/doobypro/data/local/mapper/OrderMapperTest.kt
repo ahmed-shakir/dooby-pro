@@ -13,6 +13,7 @@ import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.order.OrderServiceItem
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import kotlin.test.Test
@@ -53,7 +54,7 @@ class OrderMapperTest {
     private val testOrderEntity = OrderEntity(
         id = orderId,
         customerId = userId,
-        serviceId = serviceId,
+        serviceIds = "$serviceId:1",
         storageLocationId = "Shelf B",
         status = OrderStatus.NEW,
         orderDatetime = testDateTime,
@@ -69,7 +70,7 @@ class OrderMapperTest {
     private val testOrder = Order(
         id = orderId,
         customer = testUser,
-        service = testService,
+        items = listOf(OrderServiceItem(testService, 1)),
         storageLocation = testStorage,
         status = OrderStatus.NEW,
         orderDatetime = testDateTime,
@@ -84,11 +85,11 @@ class OrderMapperTest {
 
     @Test
     fun `toDomain should correctly transform OrderEntity to Order model`() {
-        val result = testOrderEntity.toDomain(testUser, testService, testStorage)
+        val result = testOrderEntity.toDomain(testUser, listOf(OrderServiceItem(testService, 1)), testStorage)
 
         assertEquals(testOrder.id, result.id)
         assertEquals(testOrder.customer.id, result.customer.id)
-        assertEquals(testOrder.service.id, result.service.id)
+        assertEquals(testOrder.items.first().service.id, result.items.first().service.id)
         assertEquals(testOrder.storageLocation?.id, result.storageLocation?.id)
         assertEquals(testOrder.status, result.status)
         assertEquals(testOrder.orderDatetime, result.orderDatetime)
@@ -104,7 +105,7 @@ class OrderMapperTest {
     @Test
     fun `toDomain with OUT_FOR_DELIVERY status`() {
         val entity = testOrderEntity.copy(status = OrderStatus.OUT_FOR_DELIVERY)
-        val result = entity.toDomain(testUser, testService, testStorage)
+        val result = entity.toDomain(testUser, listOf(OrderServiceItem(testService, 1)), testStorage)
         assertEquals(OrderStatus.OUT_FOR_DELIVERY, result.status)
     }
 

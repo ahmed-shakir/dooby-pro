@@ -41,7 +41,7 @@ import se.supernovait.app.core.ui.component.loading.SupernovaLoadingIndicator
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
-import se.supernovait.app.core.ui.theme.statusColor
+import se.supernovait.doobypro.presentation.app.theme.statusColor
 import se.supernovait.doobypro.presentation.order.component.DetailSection
 import se.supernovait.doobypro.presentation.order.component.OrderActions
 import se.supernovait.doobypro.presentation.order.component.OrderHeader
@@ -93,7 +93,7 @@ fun OrderDetailsScreen(
         )
         DetailSection(
             label = stringResource(Res.string.screen_Order_field_service),
-            value = order.service.title
+            value = order.items.joinToString(", ") { "${it.service.title} (x${it.quantity})" }
         )
         DetailSection(
             label = stringResource(Res.string.screen_Order_field_storage),

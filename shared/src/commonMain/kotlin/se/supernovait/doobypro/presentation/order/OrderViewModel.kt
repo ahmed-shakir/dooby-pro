@@ -112,8 +112,9 @@ class OrderViewModel(
         } else {
             orders.filter {
                 it.id?.contains(orderQuery, ignoreCase = true) == true ||
-                it.service.title.contains(orderQuery, ignoreCase = true) ||
-                it.service.price.formatted.contains(orderQuery, ignoreCase = true) ||
+                it.items.any { item ->
+                    item.service.title.contains(orderQuery, ignoreCase = true) || item.service.price.formatted.contains(orderQuery, ignoreCase = true)
+                } ||
                 it.notes?.contains(orderQuery, ignoreCase = true) == true ||
                 it.customer.firstname.contains(orderQuery, ignoreCase = true) ||
                 it.customer.lastname.contains(orderQuery, ignoreCase = true)

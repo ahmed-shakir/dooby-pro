@@ -86,7 +86,7 @@ fun OrderItem(
                 }
             }
             SupernovaLabel(
-                text = order.service.title,
+                text = order.items.joinToString(", ") { "${it.service.title} (${it.quantity})" },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,6 +25,7 @@ import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
+import se.supernovait.doobypro.presentation.app.theme.statusColor
 
 @Composable
 fun OrderActions(
@@ -53,8 +55,8 @@ fun OrderActions(
             SupernovaButton(
                 label = stringResource(nextStatusLabel),
                 onClick = onNextStatus,
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.extraSmall
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -62,8 +64,8 @@ fun OrderActions(
             SupernovaOutlinedButton(
                 label = stringResource(Res.string.screen_Order_action_delivery_failed),
                 onClick = onDeliveryFailed,
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.extraSmall
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -71,8 +73,8 @@ fun OrderActions(
             SupernovaButton(
                 label = stringResource(Res.string.screen_Order_action_reissue_order),
                 onClick = onReissue,
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.extraSmall
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -81,8 +83,8 @@ fun OrderActions(
                 SupernovaOutlinedButton(
                     label = stringResource(Res.string.screen_Order_action_cancel_order),
                     onClick = onCancel,
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.extraSmall
+                    shape = MaterialTheme.shapes.extraSmall,
+                    modifier = Modifier.weight(1f)
                 )
             }
 
@@ -90,8 +92,9 @@ fun OrderActions(
                 SupernovaOutlinedButton(
                     label = stringResource(Res.string.label_delete),
                     onClick = onDelete,
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.extraSmall
+                    shape = MaterialTheme.shapes.extraSmall,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.statusColor.error),
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

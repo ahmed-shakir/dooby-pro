@@ -1,5 +1,6 @@
 package se.supernovait.doobypro.presentation.order.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,24 +9,35 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.ic_add
+import doobypro.shared.generated.resources.ic_delete
 import doobypro.shared.generated.resources.ic_edit_square
 import doobypro.shared.generated.resources.label_customize
 import doobypro.shared.generated.resources.label_delete
 import doobypro.shared.generated.resources.label_edit
 import doobypro.shared.generated.resources.label_save
 import doobypro.shared.generated.resources.screen_Order_action_add_order
+import doobypro.shared.generated.resources.screen_Order_action_create_order
+import doobypro.shared.generated.resources.screen_Order_empty_services
 import doobypro.shared.generated.resources.screen_Order_field_customer
 import doobypro.shared.generated.resources.screen_Order_field_delivery_date
 import doobypro.shared.generated.resources.screen_Order_field_delivery_fee
@@ -37,15 +49,23 @@ import doobypro.shared.generated.resources.screen_Order_field_notes
 import doobypro.shared.generated.resources.screen_Order_field_payment_status
 import doobypro.shared.generated.resources.screen_Order_field_service
 import doobypro.shared.generated.resources.screen_Order_field_storage
+import doobypro.shared.generated.resources.screen_Order_header_item
+import doobypro.shared.generated.resources.screen_Order_header_price
+import doobypro.shared.generated.resources.screen_Order_header_subtotal
+import doobypro.shared.generated.resources.screen_Service_action_add_service
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.ui.component.action.SupernovaIconButton
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.component.action.SupernovaTextAction
 import se.supernovait.app.core.ui.component.input.SupernovaDatetimeField
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
+import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
+import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
+import se.supernovait.app.core.ui.theme.sizing
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
@@ -54,6 +74,7 @@ import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeMode
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
+import se.supernovait.doobypro.presentation.app.theme.statusColor
 
 /**
  * Bottom sheet form for creating or editing an order.
@@ -86,8 +107,10 @@ fun OrderFormSheet(
     onSave: (Order) -> Unit,
     onDelete: (() -> Unit)? = null
 ) {
+    val dialogState = LocalDialogState.current
+
     var selectedCustomer by remember { mutableStateOf(order.customer) }
-    var selectedService by remember { mutableStateOf(order.service) }
+    var orderItems by remember { mutableStateOf(order.items) }
     var selectedLocation by remember { mutableStateOf(order.storageLocation) }
     var deliveryDatetime by remember { mutableStateOf(order.deliveryDatetime) }
     var deliveryOption by remember { mutableStateOf(order.deliveryOption) }
@@ -103,6 +126,7 @@ fun OrderFormSheet(
     var notes by remember { mutableStateOf(order.notes ?: "") }
 
     val isNew = order.id == null
+    val showDelete = onDelete != null && !isNew
 
     val deliveryOptionLabels = DeliveryOption.entries.associateWith { stringResource(it.label) }
     val deliveryMethodLabels = DeliveryMethod.entries.associateWith { stringResource(it.label) }
@@ -132,14 +156,151 @@ fun OrderFormSheet(
         
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-        // 2. service
-        SupernovaSelectField(
-            label = Res.string.screen_Order_field_service,
-            options = services,
-            selectedOption = selectedService,
-            onOptionSelected = { selectedService = it },
-            optionLabel = { it.title }
-        )
+        // 2. Services section with "+ Add Service" action and added items list
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            SupernovaLabel(
+                text = Res.string.screen_Order_field_service,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+            SupernovaTextAction(
+                label = Res.string.screen_Service_action_add_service,
+                icon = Res.drawable.ic_add,
+                textStyle = MaterialTheme.typography.labelMedium,
+                onClick = {
+                    dialogState.showCustom(
+                        onDismiss = { dialogState.hide() },
+                        content = {
+                            AddServiceDialog(
+                                services = services,
+                                existingItems = orderItems,
+                                onDismiss = { dialogState.hide() },
+                                onAddServices = { newItems ->
+                                    orderItems = orderItems + newItems
+                                    dialogState.hide()
+                                }
+                            )
+                        }
+                    )
+                }
+            )
+        }
+
+        Spacer(Modifier.height(MaterialTheme.spacing.small))
+
+        if (orderItems.isEmpty()) {
+            SupernovaLabel(
+                text = stringResource(Res.string.screen_Order_empty_services),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = MaterialTheme.spacing.small)
+            )
+        } else {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), MaterialTheme.shapes.small)
+                    .padding(MaterialTheme.spacing.medium)
+            ) {
+                // Header row
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.spacing.extraSmall),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    SupernovaLabel(
+                        text = stringResource(Res.string.screen_Order_header_item),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1.7f)
+                    )
+                    SupernovaLabel(
+                        text = stringResource(Res.string.screen_Order_header_price),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1.1f)
+                    )
+                    SupernovaLabel(
+                        text = stringResource(Res.string.screen_Order_header_subtotal),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1.2f)
+                    )
+                    Spacer(Modifier.width(32.dp)) // space for delete icon
+                }
+
+                orderItems.forEachIndexed { index, item ->
+                    if (index > 0) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                            thickness = 1.dp,
+                            modifier = Modifier.padding(bottom = MaterialTheme.spacing.extraSmall)
+                        )
+                    }
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        SupernovaLabel(
+                            text = item.service.title,
+                            style = MaterialTheme.typography.bodyMediumEmphasized,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(Modifier.height(MaterialTheme.spacing.extraSmall))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            // Reusable Quantity Control component
+                            OrderQuantityControl(
+                                quantity = item.quantity,
+                                onQuantityChange = { newQty ->
+                                    orderItems = orderItems.toMutableList().also {
+                                        it[index] = item.copy(quantity = newQty)
+                                    }
+                                },
+                                modifier = Modifier.weight(1.5f)
+                            )
+
+                            // Price
+                            SupernovaLabel(
+                                text = item.service.price.formatted,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            // Subtotal
+                            SupernovaLabel(
+                                text = item.subtotal.formatted,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.weight(1.2f)
+                            )
+
+                            // Remove action
+                            SupernovaIconButton(
+                                icon = Res.drawable.ic_delete,
+                                contentDescription = Res.string.label_delete,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(MaterialTheme.sizing.icon.small),
+                                onClick = {
+                                    orderItems = orderItems.filterIndexed { i, _ -> i != index }
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
@@ -247,16 +408,7 @@ fun OrderFormSheet(
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-        // 7. isPaymentDone
-        SupernovaToggle(
-            label = Res.string.screen_Order_field_payment_status,
-            checked = isPaymentDone,
-            onCheckedChange = { isPaymentDone = it }
-        )
-
-        Spacer(Modifier.height(MaterialTheme.spacing.medium))
-
-        // 8. notes
+        // 7. notes
         SupernovaTextField(
             label = stringResource(Res.string.screen_Order_field_notes),
             value = notes,
@@ -265,31 +417,39 @@ fun OrderFormSheet(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        // 8. isPaymentDone
+        SupernovaToggle(
+            label = Res.string.screen_Order_field_payment_status,
+            checked = isPaymentDone,
+            onCheckedChange = { isPaymentDone = it }
+        )
+
         Spacer(Modifier.height(MaterialTheme.spacing.large))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
-            if (onDelete != null && !isNew) {
+            if (showDelete) {
                 SupernovaOutlinedButton(
                     label = Res.string.label_delete,
                     onClick = onDelete,
                     shape = MaterialTheme.shapes.extraSmall,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.statusColor.error),
                     modifier = Modifier.weight(1f)
                 )
-            } else {
-                Spacer(Modifier.weight(1f))
             }
 
             val isExpressValid = deliveryOption != DeliveryOption.EXPRESS ||
                 (expressFeeMode == ExpressFeeMode.GLOBAL && !isCustomized) ||
                 (expressFeeText.isNotBlank() && expressFeeText.toLongOrNull() != null)
 
-            val isValid = selectedCustomer.id != null && selectedService.id != null && isExpressValid
+            val isValid = selectedCustomer.id != null && orderItems.isNotEmpty() && isExpressValid
 
             SupernovaOutlinedButton(
-                label = Res.string.label_save,
+                label = if (isNew) Res.string.screen_Order_action_create_order else Res.string.label_save,
                 onClick = { 
                     val calculatedExpressFee = when {
                         deliveryOption != DeliveryOption.EXPRESS -> null
@@ -305,7 +465,7 @@ fun OrderFormSheet(
 
                     onSave(order.copy(
                         customer = selectedCustomer,
-                        service = selectedService,
+                        items = orderItems,
                         storageLocation = selectedLocation,
                         deliveryDatetime = deliveryDatetime,
                         deliveryOption = deliveryOption,
@@ -318,7 +478,7 @@ fun OrderFormSheet(
                 },
                 enabled = isValid,
                 shape = MaterialTheme.shapes.extraSmall,
-                modifier = Modifier.weight(1f)
+                modifier = if (showDelete) Modifier.weight(1f) else Modifier.fillMaxWidth()
             )
         }
 

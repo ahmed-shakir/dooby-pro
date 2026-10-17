@@ -8,7 +8,8 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.extension.now
-import se.supernovait.doobypro.domain.model.Service
+import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
@@ -16,12 +17,12 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
 /**
  * Domain model representing a customer order for laundry services.
  *
- * This model contains the full details of the customer, the service requested,
+ * This model contains the full details of the customer, the service items requested,
  * scheduling, and internal operational details like storage placement.
  *
  * @property id The unique identifier for the order. Null for unsaved orders.
  * @property customer The [User] who placed the order.
- * @property service The [Service] being ordered.
+ * @property items The list of [OrderServiceItem] line items being ordered.
  * @property storageLocation The assigned [StorageLocation] area.
  * @property status The current lifecycle stage of the order.
  * @property orderDatetime The date and time the order was placed.
@@ -29,7 +30,7 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
  * @property deliveryOption The chosen delivery priority (e.g., Express, Standard).
  * @property deliveryMethod The chosen delivery method (e.g., Home Delivery, Pickup).
  * @property isPaymentDone Whether the order has been paid for.
- * @property expressFee The express fee (percentage value or flat fee amount) applied when [deliveryOption] is [DeliveryOption.EXPRESS].
+ * @property expressFee The express fee applied when [deliveryOption] is [DeliveryOption.EXPRESS].
  * @property deliveryFee The fixed delivery fee applied when [deliveryMethod] is [DeliveryMethod.HOME_DELIVERY].
  * @property notes Optional internal or customer-provided notes.
  * @property createdAt The timestamp when the order was first created.
@@ -38,7 +39,7 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
 data class Order(
     val id: String? = null,
     val customer: User,
-    val service: Service,
+    val items: List<OrderServiceItem> = emptyList(),
     val storageLocation: StorageLocation,
     val status: OrderStatus = OrderStatus.NEW,
     val orderDatetime: LocalDateTime = LocalDateTime.now(),
@@ -52,6 +53,16 @@ data class Order(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
+    /**
+     * Calculates the total price of all order items.
+     */
+    val totalPrice: Amount
+        get() {
+            val currency = items.firstOrNull()?.service?.price?.currency ?: AppDefaults.CURRENCY
+            val totalRaw = items.sumOf { it.subtotal.raw } + (expressFee ?: 0L) + (deliveryFee ?: 0L)
+            return Amount(totalRaw, currency)
+        }
+
     /**
      * Determines the next logical status in the workflow based on the current state.
      *

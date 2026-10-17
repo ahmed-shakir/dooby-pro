@@ -43,6 +43,7 @@ import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.order.OrderServiceItem
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
@@ -78,7 +79,7 @@ class OrderViewModelTest : PlatformTestConfig() {
     private val testOrder = Order(
         id = "o1",
         customer = testUser,
-        service = testService,
+        items = listOf(OrderServiceItem(testService, 1)),
         storageLocation = testStorage,
         status = OrderStatus.NEW,
         orderDatetime = LocalDateTime(2026, 1, 1, 0, 0),
@@ -202,7 +203,7 @@ class OrderViewModelTest : PlatformTestConfig() {
         
         assertNotNull(viewModel.uiState.value.editingOrder)
         assertEquals(testOrder.customer.id, viewModel.uiState.value.editingOrder?.customer?.id)
-        assertEquals(testOrder.service.id, viewModel.uiState.value.editingOrder?.service?.id)
+        assertEquals(testOrder.items.first().service.id, viewModel.uiState.value.editingOrder?.items?.first()?.service?.id)
         
         collectJob.cancel()
     }

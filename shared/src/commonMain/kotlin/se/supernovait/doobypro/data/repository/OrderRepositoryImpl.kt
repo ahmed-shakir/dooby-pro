@@ -25,6 +25,7 @@ import se.supernovait.doobypro.data.local.mapper.toDomain
 import se.supernovait.doobypro.data.local.mapper.toEntity
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.order.OrderServiceItem
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.OrderRepository
@@ -53,7 +54,9 @@ class OrderRepositoryImpl(
             if (entities.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
             val userIds = entities.map { it.customerId }.distinct()
-            val serviceIds = entities.map { it.serviceId }.distinct()
+            val serviceIds = entities.flatMap { entity ->
+                parseServiceIds(entity.serviceIds)
+            }.distinct()
             val storageLocationIds = entities.map { it.storageLocationId }.distinct()
 
             combine(
@@ -63,9 +66,10 @@ class OrderRepositoryImpl(
             ) { usersMap, servicesMap, storageMap ->
                 entities.mapNotNull { entity ->
                     val user = usersMap[entity.customerId] ?: return@mapNotNull null
-                    val service = servicesMap[entity.serviceId] ?: return@mapNotNull null
                     val storageLocation = storageMap[entity.storageLocationId] ?: return@mapNotNull null
-                    entity.toDomain(user, service, storageLocation)
+                    val items = parseOrderItems(entity.serviceIds, servicesMap)
+                    if (items.isEmpty()) return@mapNotNull null
+                    entity.toDomain(user, items, storageLocation)
                 }
             }
         }
@@ -76,7 +80,9 @@ class OrderRepositoryImpl(
         return orderDao.getByCustomerId(customerId).flatMapLatest { entities ->
             if (entities.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
-            val serviceIds = entities.map { it.serviceId }.distinct()
+            val serviceIds = entities.flatMap { entity ->
+                parseServiceIds(entity.serviceIds)
+            }.distinct()
             val storageLocationIds = entities.map { it.storageLocationId }.distinct()
 
             combine(
@@ -86,9 +92,10 @@ class OrderRepositoryImpl(
             ) { usersMap, servicesMap, storageMap ->
                 val user = usersMap[customerId] ?: return@combine emptyList()
                 entities.mapNotNull { entity ->
-                    val service = servicesMap[entity.serviceId] ?: return@mapNotNull null
                     val storageLocation = storageMap[entity.storageLocationId] ?: return@mapNotNull null
-                    entity.toDomain(user, service, storageLocation)
+                    val items = parseOrderItems(entity.serviceIds, servicesMap)
+                    if (items.isEmpty()) return@mapNotNull null
+                    entity.toDomain(user, items, storageLocation)
                 }
             }
         }
@@ -102,13 +109,21 @@ class OrderRepositoryImpl(
 
                 if (order != null) {
                     val user = userDao.getById(order.customerId)?.toDomain()
-                    val service = serviceDao.getById(order.serviceId)?.toDomain()
+                    val serviceIdsList = parseServiceIds(order.serviceIds)
+                    val servicesList = serviceDao.getAllByIds(serviceIdsList)
+                    val servicesMap = servicesList.associateBy({ it.id }, { it.toDomain() })
                     val storageLocation = storageLocationDao.getById(order.storageLocationId)?.toDomain()
 
-                    if (user != null && service != null && storageLocation != null) {
-                        Result.Success(order.toDomain(user, service, storageLocation))
+                    if (user != null && storageLocation != null) {
+                        val items = parseOrderItems(order.serviceIds, servicesMap)
+                        if (items.isNotEmpty()) {
+                            Result.Success(order.toDomain(user, items, storageLocation))
+                        } else {
+                            logger.warn("Order with ID: $id has no valid items", tag = LogTags.ORDER_REPO)
+                            Result.Failure(DataError.NOT_FOUND)
+                        }
                     } else {
-                        logger.warn("Order with ID: $id is missing dependent components (user=$user, service=$service, storage=$storageLocation)", tag = LogTags.ORDER_REPO)
+                        logger.warn("Order with ID: $id is missing dependent components (user=$user, storage=$storageLocation)", tag = LogTags.ORDER_REPO)
                         Result.Failure(DataError.NOT_FOUND)
                     }
                 } else {
@@ -177,6 +192,23 @@ class OrderRepositoryImpl(
                     Result.Failure(DataError.DATABASE_ERROR)
                 }
             }
+        }
+    }
+
+    private fun parseServiceIds(serviceIdsStr: String): List<String> {
+        return serviceIdsStr.split(",").mapNotNull { token ->
+            val parts = token.split(":")
+            parts.getOrNull(0)?.trim()?.takeIf { it.isNotEmpty() }
+        }
+    }
+
+    private fun parseOrderItems(serviceIdsStr: String, servicesMap: Map<String, Service>): List<OrderServiceItem> {
+        return serviceIdsStr.split(",").mapNotNull { token ->
+            val parts = token.split(":")
+            val serviceId = parts.getOrNull(0)?.trim() ?: return@mapNotNull null
+            val quantity = parts.getOrNull(1)?.toIntOrNull() ?: 1
+            val service = servicesMap[serviceId] ?: return@mapNotNull null
+            OrderServiceItem(service, quantity)
         }
     }
 

@@ -51,7 +51,7 @@ class OrderTest {
     ) = Order(
         id = "order_123",
         customer = testUser,
-        service = testService,
+        items = listOf(OrderServiceItem(testService, 1)),
         storageLocation = testStorage,
         status = status,
         orderDatetime = testDateTime,

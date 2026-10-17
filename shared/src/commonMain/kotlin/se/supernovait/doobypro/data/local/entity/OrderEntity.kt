@@ -17,7 +17,7 @@ import kotlin.time.Instant
  *
  * @property id The unique identifier for the order, generated using [SupernovaIdGenerator].
  * @property customerId The ID of the customer who placed the order.
- * @property serviceId The ID of the service being ordered.
+ * @property serviceIds Comma-separated list of service IDs being ordered.
  * @property storageLocationId The ID of the assigned storage area.
  * @property status The current lifecycle stage of the order.
  * @property orderDatetime The date and time when the order was placed.
@@ -26,6 +26,7 @@ import kotlin.time.Instant
  * @property deliveryMethod The chosen delivery method (e.g., [DeliveryMethod.HOME_DELIVERY], [DeliveryMethod.IN_STORE_PICKUP]).
  * @property isPaymentDone Whether the order has been paid for.
  * @property expressFee The express fee associated with the order.
+ * @property deliveryFee The delivery fee associated with the order.
  * @property notes Optional notes provided by the customer.
  * @property createdAt The timestamp when the order was first created.
  * @property updatedAt The timestamp when the order was last modified.
@@ -43,7 +44,7 @@ data class OrderEntity(
     @PrimaryKey
     val id: String = SupernovaIdGenerator.generateId(IdType.ORDER.prefix),
     val customerId: String,
-    val serviceId: String,
+    val serviceIds: String,
     val storageLocationId: String = "default",
     val status: OrderStatus,
     val orderDatetime: LocalDateTime,

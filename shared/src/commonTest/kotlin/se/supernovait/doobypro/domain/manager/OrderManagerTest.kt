@@ -39,6 +39,7 @@ import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.order.OrderServiceItem
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.notification.NotificationSettings
@@ -145,7 +146,7 @@ class OrderManagerTest : PlatformTestConfig() {
     ) = Order(
         id = id,
         customer = testUser,
-        service = testService,
+        items = listOf(OrderServiceItem(testService, 1)),
         storageLocation = testStorage,
         status = status,
         orderDatetime = pastDateTime,

@@ -27,6 +27,7 @@ import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
+import se.supernovait.doobypro.domain.model.order.OrderServiceItem
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
@@ -101,7 +102,7 @@ class OrderRepositoryImplTest {
     private val testOrder = Order(
         id = orderId,
         customer = testUser,
-        service = testService,
+        items = listOf(OrderServiceItem(testService, 1)),
         storageLocation = testStorage,
         status = OrderStatus.NEW,
         orderDatetime = testDateTime,
@@ -150,7 +151,7 @@ class OrderRepositoryImplTest {
         val order = orders[0]
         assertEquals(testOrder.id, order.id)
         assertEquals(testUser.id, order.customer.id)
-        assertEquals(testService.id, order.service.id)
+        assertEquals(testService.id, order.items.first().service.id)
         assertEquals(testStorage.id, order.storageLocation?.id)
         assertEquals(OrderStatus.NEW, order.status)
     }
@@ -186,7 +187,7 @@ class OrderRepositoryImplTest {
         // Upsert order but don't seed service
         val orderWithMissingService = testOrder.copy(
             id = SupernovaIdGenerator.generateId(IdType.ORDER.prefix), 
-            service = testService.copy(id = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix))
+            items = listOf(OrderServiceItem(testService.copy(id = SupernovaIdGenerator.generateId(IdType.SERVICE.prefix)), 1))
         )
         repository.saveOrder(orderWithMissingService)
 
