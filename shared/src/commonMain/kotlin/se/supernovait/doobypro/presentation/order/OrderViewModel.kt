@@ -7,11 +7,13 @@ import doobypro.shared.generated.resources.screen_Order_error_customer_save_fail
 import doobypro.shared.generated.resources.screen_Order_error_delete_failed
 import doobypro.shared.generated.resources.screen_Order_error_save_failed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
@@ -36,6 +38,7 @@ import se.supernovait.doobypro.domain.repository.ServiceRepository
 import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 import se.supernovait.doobypro.domain.util.LogTags
+import se.supernovait.doobypro.presentation.navigation.Route
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OrderViewModel(
@@ -58,6 +61,9 @@ class OrderViewModel(
     private val _editingOrder = MutableStateFlow<Order?>(null)
     private val _isAddingCustomer = MutableStateFlow(false)
     private val _error = MutableStateFlow<StringResource?>(null)
+
+    private val _navigationEvents = Channel<Route>()
+    val navigationEvents = _navigationEvents.receiveAsFlow()
 
     init {
         logger.info("OrderViewModel initialized", tag = LogTags.ORDER_VM)
@@ -243,6 +249,8 @@ class OrderViewModel(
     }
 
     private fun saveOrder(order: Order) {
+        val isNew = order.id == null
+
         viewModelScope.launch {
             performanceMonitor.traceAsync("OrderViewModel.saveOrder") {
                 logger.info("Saving order for customer '${order.customer.username}'", tag = LogTags.ORDER_VM)
@@ -252,6 +260,9 @@ class OrderViewModel(
                     logger.info("Order saved successfully with ID: ${result.data}", tag = LogTags.ORDER_VM)
                     analyticsTracker.trackEvent("order_saved", mapOf("order_customer_username" to order.customer.username, "order_status" to order.status.name))
                     _editingOrder.value = null
+                    if (isNew) {
+                        _navigationEvents.send(Route.OrderDetails(result.data))
+                    }
                 } else {
                     logger.error("Failed to save order", tag = LogTags.ORDER_VM)
                     crashReporter.log("Failed to save order for customer '${order.customer.username}' in OrderViewModel")
