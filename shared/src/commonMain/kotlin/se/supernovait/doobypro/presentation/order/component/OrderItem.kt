@@ -1,17 +1,18 @@
 package se.supernovait.doobypro.presentation.order.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_edit_square
 import doobypro.shared.generated.resources.ic_refresh
@@ -19,7 +20,6 @@ import doobypro.shared.generated.resources.ic_thunderbolt
 import doobypro.shared.generated.resources.label_edit
 import doobypro.shared.generated.resources.label_late
 import doobypro.shared.generated.resources.screen_Order_action_reissue_order
-import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.action.SupernovaIconButton
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.component.text.SupernovaTag
@@ -29,12 +29,26 @@ import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.presentation.app.theme.statusColor
 
+/**
+ * List item component for displaying order details in the Order Hub list.
+ *
+ * Designed to handle long customer names, multi-badge arrangements (e.g., status, express, overdue),
+ * and concise service summaries without layout overflow or clutter.
+ *
+ * @param order The [Order] domain model to render.
+ * @param onClick Callback invoked when the order item is clicked.
+ * @param onEdit Callback invoked when the edit button is clicked.
+ * @param onReissue Optional callback invoked when the reissue button is clicked.
+ * @param modifier Optional [Modifier] for root container layout customization.
+ */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun OrderItem(
     order: Order,
     onClick: () -> Unit,
     onEdit: () -> Unit,
-    onReissue: (() -> Unit)? = null
+    onReissue: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
 ) {
     val statusColor = when (order.status) {
         OrderStatus.NEW -> MaterialTheme.statusColor.info
@@ -46,19 +60,19 @@ fun OrderItem(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
             .padding(vertical = MaterialTheme.spacing.medium)
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                SupernovaLabel(
-                    text = "${order.customer.firstname} ${order.customer.lastname}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(Modifier.width(MaterialTheme.spacing.small))
+            // Badges Row
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+                modifier = Modifier.padding(bottom = MaterialTheme.spacing.small)
+            ) {
                 SupernovaTag(
                     text = order.status.label,
                     containerColor = statusColor.copy(alpha = 0.1f),
@@ -66,7 +80,6 @@ fun OrderItem(
                     style = MaterialTheme.typography.labelSmall
                 )
                 if (order.deliveryOption == DeliveryOption.EXPRESS) {
-                    Spacer(Modifier.width(MaterialTheme.spacing.small))
                     SupernovaTag(
                         text = order.deliveryOption.label,
                         icon = Res.drawable.ic_thunderbolt,
@@ -76,7 +89,6 @@ fun OrderItem(
                     )
                 }
                 if (order.isOverdue()) {
-                    Spacer(Modifier.width(MaterialTheme.spacing.small))
                     SupernovaTag(
                         text = Res.string.label_late,
                         containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
@@ -85,14 +97,28 @@ fun OrderItem(
                     )
                 }
             }
+
+            // Order ID Row
             SupernovaLabel(
-                text = order.items.joinToString(", ") { "${it.service.title} (${it.quantity})" },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = "#${order.id}",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
             )
-            
+
+            // Header Row: Customer Name
+            SupernovaLabel(
+                text = order.customer.name.trim(),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+
+            // Storage Location and Delivery Date/Time Row
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium, Alignment.CenterHorizontally),
                 modifier = Modifier.padding(top = MaterialTheme.spacing.extraSmall)
             ) {
                 SupernovaLabel(
@@ -101,19 +127,19 @@ fun OrderItem(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
                 )
-                Spacer(Modifier.width(MaterialTheme.spacing.medium))
                 SupernovaLabel(
-                    text = order.deliveryDatetime.toString().replace("T", " "), // Basic formatting for now
+                    text = order.deliveryDatetime.toString().replace("T", " "),
                     style = MaterialTheme.typography.labelSmall,
                     color = if (order.isOverdue()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
+        // Action Buttons
         if (onReissue != null) {
             SupernovaIconButton(
                 icon = Res.drawable.ic_refresh,
-                contentDescription = stringResource(Res.string.screen_Order_action_reissue_order),
+                contentDescription = Res.string.screen_Order_action_reissue_order,
                 onClick = onReissue
             )
         }
