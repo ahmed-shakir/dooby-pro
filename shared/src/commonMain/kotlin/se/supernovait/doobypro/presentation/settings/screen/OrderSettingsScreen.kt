@@ -27,6 +27,7 @@ import doobypro.shared.generated.resources.screen_Settings_order_express_fee_val
 import doobypro.shared.generated.resources.screen_Settings_order_handling_time_label
 import doobypro.shared.generated.resources.screen_Settings_order_tag_print_mode_label
 import org.jetbrains.compose.resources.stringResource
+import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.ui.component.container.SupernovaListGroup
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
@@ -64,12 +65,19 @@ fun OrderSettingsScreen(
         mutableStateOf(uiState.settings.order.defaultDeliveryDaysOffset.toString())
     }
 
-    var expressFeeValueText by remember(uiState.settings.order.expressFeeValue) {
-        mutableStateOf(uiState.settings.order.expressFeeValue.toString())
+    val isExpressPercentage = uiState.settings.order.expressFeeType == ExpressFeeType.PERCENTAGE
+
+    var expressFeeValueText by remember(uiState.settings.order.expressFeeValue, isExpressPercentage) {
+        val text = if (isExpressPercentage) {
+            uiState.settings.order.expressFeeValue.toString()
+        } else {
+            Amount(uiState.settings.order.expressFeeValue, currency).value
+        }
+        mutableStateOf(text)
     }
 
     var deliveryFeeValueText by remember(uiState.settings.order.deliveryFeeValue) {
-        mutableStateOf(uiState.settings.order.deliveryFeeValue.toString())
+        mutableStateOf(Amount(uiState.settings.order.deliveryFeeValue, currency).value)
     }
 
     SettingsScreen {
@@ -120,12 +128,13 @@ fun OrderSettingsScreen(
             label = stringResource(Res.string.screen_Settings_order_delivery_fee_value_label, currency),
             value = deliveryFeeValueText,
             onValueChange = { newValue, _ ->
-                deliveryFeeValueText = newValue
-                newValue.toLongOrNull()?.let {
-                    onEvent(SettingsScreenEvent.UpdateDeliveryFeeValue(it))
+                if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
+                    deliveryFeeValueText = newValue
+                    val rawValue = ((newValue.toDoubleOrNull() ?: 0.0) * 100).toLong()
+                    onEvent(SettingsScreenEvent.UpdateDeliveryFeeValue(rawValue))
                 }
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
         )
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
@@ -135,7 +144,7 @@ fun OrderSettingsScreen(
             options = ExpressFeeMode.entries,
             selectedOption = uiState.settings.order.expressFeeMode,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateExpressFeeMode(it)) },
-            optionLabel = { expressFeeModeLabels[it] ?: "" }
+            optionLabel = { expressFeeModeLabels[it] ?: "" },
         )
 
         if (uiState.settings.order.expressFeeMode == ExpressFeeMode.GLOBAL) {
@@ -146,21 +155,32 @@ fun OrderSettingsScreen(
                 options = ExpressFeeType.entries,
                 selectedOption = uiState.settings.order.expressFeeType,
                 onOptionSelected = { onEvent(SettingsScreenEvent.UpdateExpressFeeType(it)) },
-                optionLabel = { expressFeeTypeLabels[it] ?: "" }
+                optionLabel = { expressFeeTypeLabels[it] ?: "" },
             )
 
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
             SupernovaTextField(
-                label = stringResource(Res.string.screen_Settings_order_express_fee_value_label, if (uiState.settings.order.expressFeeType == ExpressFeeType.PERCENTAGE) "%" else currency),
+                label = stringResource(
+                    Res.string.screen_Settings_order_express_fee_value_label,
+                    if (isExpressPercentage) "%" else currency,
+                ),
                 value = expressFeeValueText,
                 onValueChange = { newValue, _ ->
-                    expressFeeValueText = newValue
-                    newValue.toLongOrNull()?.let {
-                        onEvent(SettingsScreenEvent.UpdateExpressFeeValue(it))
+                    val regex = if (isExpressPercentage) Regex("^\\d*$") else Regex("^\\d*\\.?\\d{0,2}$")
+                    if (newValue.isEmpty() || newValue.matches(regex)) {
+                        expressFeeValueText = newValue
+                        val rawValue = if (isExpressPercentage) {
+                            newValue.toLongOrNull() ?: 0L
+                        } else {
+                            ((newValue.toDoubleOrNull() ?: 0.0) * 100).toLong()
+                        }
+                        onEvent(SettingsScreenEvent.UpdateExpressFeeValue(rawValue))
                     }
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = if (isExpressPercentage) KeyboardType.Number else KeyboardType.Decimal,
+                ),
             )
         }
 

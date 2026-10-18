@@ -47,11 +47,13 @@ import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
+import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderServiceItem
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.notification.NotificationSchedule
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeMode
+import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.AccountRepository
 import se.supernovait.doobypro.domain.repository.BusinessHoursRepository
@@ -142,8 +144,21 @@ class OrderManager(
                 ?: storageLocationRepository.getDefaultLocation().getOrNull()
                 ?: StorageLocation()
 
-            val expressFee = if (orderSettings.expressFeeMode == ExpressFeeMode.GLOBAL) {
+            val isExpress = orderSettings.defaultDeliveryOption == DeliveryOption.EXPRESS
+            val isGlobalExpress = orderSettings.expressFeeMode == ExpressFeeMode.GLOBAL
+            val itemsSubtotalRaw = initialItems.sumOf { it.subtotal.raw }
+
+            val expressFeeType = if (isExpress) orderSettings.expressFeeType else null
+            val expressFeePercentage = if (isExpress && isGlobalExpress && expressFeeType == ExpressFeeType.PERCENTAGE) {
                 orderSettings.expressFeeValue
+            } else null
+
+            val expressFee = if (isExpress && isGlobalExpress) {
+                if (expressFeeType == ExpressFeeType.PERCENTAGE) {
+                    (itemsSubtotalRaw * orderSettings.expressFeeValue / 100)
+                } else {
+                    orderSettings.expressFeeValue
+                }
             } else {
                 null
             }
@@ -159,11 +174,13 @@ class OrderManager(
                 items = initialItems,
                 storageLocation = defaultStorage,
                 status = OrderStatus.NEW,
+                isPaymentDone = false,
                 orderDatetime = orderDatetime,
                 deliveryDatetime = deliveryDatetime,
                 deliveryOption = orderSettings.defaultDeliveryOption,
                 deliveryMethod = orderSettings.defaultDeliveryMethod,
-                isPaymentDone = false,
+                expressFeeType = expressFeeType,
+                expressFeePercentage = expressFeePercentage,
                 expressFee = expressFee,
                 deliveryFee = deliveryFee,
                 notes = null
@@ -182,6 +199,8 @@ class OrderManager(
                 items = originalOrder.items,
                 deliveryOption = originalOrder.deliveryOption,
                 deliveryMethod = originalOrder.deliveryMethod,
+                expressFeeType = originalOrder.expressFeeType,
+                expressFeePercentage = originalOrder.expressFeePercentage,
                 expressFee = originalOrder.expressFee,
                 deliveryFee = originalOrder.deliveryFee,
                 notes = originalOrder.notes

@@ -455,6 +455,12 @@
     <string name="screen_Order_header_item">Item</string>
     <string name="screen_Order_header_price">Price</string>
     <string name="screen_Order_header_subtotal">Subtotal</string>
+    <string name="screen_Order_header_quantity">Qty</string>
+    <string name="screen_Order_label_subtotal">Subtotal</string>
+    <string name="screen_Order_label_express_fee">Express Fee</string>
+    <string name="screen_Order_label_express_fee_with_percentage">Express Fee (%1$s)</string>
+    <string name="screen_Order_label_delivery_fee">Delivery Fee</string>
+    <string name="screen_Order_label_total_price">Total</string>
 
     <!-- Order Quantity Control -->
     <string name="order_quantity_control_a11y_decrease_quantity">Decrease quantity</string>

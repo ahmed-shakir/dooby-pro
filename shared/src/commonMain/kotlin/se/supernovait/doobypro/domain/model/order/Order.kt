@@ -12,6 +12,7 @@ import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 
 /**
@@ -25,11 +26,13 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
  * @property items The list of [OrderServiceItem] line items being ordered.
  * @property storageLocation The assigned [StorageLocation] area.
  * @property status The current lifecycle stage of the order.
+ * @property isPaymentDone Whether the order has been paid for.
  * @property orderDatetime The date and time the order was placed.
  * @property deliveryDatetime The scheduled completion or delivery date and time.
  * @property deliveryOption The chosen delivery priority (e.g., Express, Standard).
  * @property deliveryMethod The chosen delivery method (e.g., Home Delivery, Pickup).
- * @property isPaymentDone Whether the order has been paid for.
+ * @property expressFeeType The [ExpressFeeType] calculation mode (percentage or flat fee) used when the express fee was set.
+ * @property expressFeePercentage The percentage markup value if express fee was percentage-based.
  * @property expressFee The express fee applied when [deliveryOption] is [DeliveryOption.EXPRESS].
  * @property deliveryFee The fixed delivery fee applied when [deliveryMethod] is [DeliveryMethod.HOME_DELIVERY].
  * @property notes Optional internal or customer-provided notes.
@@ -42,11 +45,13 @@ data class Order(
     val items: List<OrderServiceItem> = emptyList(),
     val storageLocation: StorageLocation,
     val status: OrderStatus = OrderStatus.NEW,
+    val isPaymentDone: Boolean = false,
     val orderDatetime: LocalDateTime = LocalDateTime.now(),
     val deliveryDatetime: LocalDateTime = LocalDateTime.now(),
     val deliveryOption: DeliveryOption = DeliveryOption.STANDARD,
     val deliveryMethod: DeliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
-    val isPaymentDone: Boolean = false,
+    val expressFeeType: ExpressFeeType? = null,
+    val expressFeePercentage: Long? = null,
     val expressFee: Long? = null,
     val deliveryFee: Long? = null,
     val notes: String? = null,

@@ -19,11 +19,12 @@ fun DetailSection(
     label: String,
     value: String,
     status: String? = null,
-    valueColor: Color = Color.Unspecified
+    valueColor: Color = Color.Unspecified,
+    modifier: Modifier = Modifier
 ) {
     val finalValueColor = if (valueColor == Color.Unspecified) MaterialTheme.colorScheme.onSurface else valueColor
 
-    Column(modifier = Modifier.padding(vertical = MaterialTheme.spacing.small)) {
+    Column(modifier = modifier.padding(vertical = MaterialTheme.spacing.small)) {
         SupernovaLabel(
             text = label,
             style = MaterialTheme.typography.labelMedium,

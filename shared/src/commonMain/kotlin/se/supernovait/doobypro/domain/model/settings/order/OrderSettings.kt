@@ -30,6 +30,6 @@ data class OrderSettings(
     val orderTagPrintMode: OrderTagPrintMode = OrderTagPrintMode.PER_ORDER,
     val expressFeeMode: ExpressFeeMode = ExpressFeeMode.GLOBAL,
     val expressFeeType: ExpressFeeType = ExpressFeeType.PERCENTAGE,
-    val expressFeeValue: Long = 15,
-    val deliveryFeeValue: Long = 25
+    val expressFeeValue: Long = 1500L,
+    val deliveryFeeValue: Long = 2500L,
 )

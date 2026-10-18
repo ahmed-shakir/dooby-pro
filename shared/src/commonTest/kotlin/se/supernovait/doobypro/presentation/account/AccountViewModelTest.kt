@@ -39,6 +39,7 @@ import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.util.FakeFileStorage
 import se.supernovait.doobypro.util.FakePdfGenerator
+import se.supernovait.doobypro.util.PlatformTestConfig
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -46,7 +47,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AccountViewModelTest {
+class AccountViewModelTest : PlatformTestConfig() {
     private val testDispatcher = StandardTestDispatcher()
     
     private lateinit var authRepository: FakeAuthRepository

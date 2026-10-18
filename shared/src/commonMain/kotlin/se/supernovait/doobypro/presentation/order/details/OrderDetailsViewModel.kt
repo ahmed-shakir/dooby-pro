@@ -10,6 +10,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,6 +25,7 @@ import se.supernovait.doobypro.domain.manager.OrderManager
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.repository.OrderRepository
+import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.util.LogTags
 import se.supernovait.doobypro.presentation.navigation.Route
 
@@ -34,7 +36,8 @@ class OrderDetailsViewModel(
     private val performanceMonitor: PerformanceMonitor,
     private val orderRepository: OrderRepository,
     private val orderManager: OrderManager,
-    savedStateHandle: SavedStateHandle
+    private val settingsRepository: SettingsRepository,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val args = savedStateHandle.toRoute<Route.OrderDetails>()
     private val orderId = args.id
@@ -70,8 +73,17 @@ class OrderDetailsViewModel(
                 logger.info("Loading order details for order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
                 _uiState.update { it.copy(isLoading = true) }
                 val result = orderRepository.getOrderById(orderId)
+                val settings = settingsRepository.settings.first()
                 if (result is Result.Success) {
-                    _uiState.update { it.copy(order = result.data, isLoading = false, error = null) }
+                    _uiState.update { 
+                        it.copy(
+                            order = result.data, 
+                            expressFeeType = settings.order.expressFeeType,
+                            expressFeeValue = settings.order.expressFeeValue,
+                            isLoading = false, 
+                            error = null,
+                        ) 
+                    }
                 } else {
                     logger.warn("Order details not found for order with ID: $orderId", tag = LogTags.ORDER_DETAILS_VM)
                     _uiState.update { it.copy(isLoading = false, error = Res.string.screen_Order_error_not_found) }

@@ -34,18 +34,28 @@ import doobypro.shared.generated.resources.screen_Order_field_delivery_method
 import doobypro.shared.generated.resources.screen_Order_field_delivery_option
 import doobypro.shared.generated.resources.screen_Order_field_notes
 import doobypro.shared.generated.resources.screen_Order_field_payment_status
-import doobypro.shared.generated.resources.screen_Order_field_service
 import doobypro.shared.generated.resources.screen_Order_field_storage
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.loading.SupernovaLoadingIndicator
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.presentation.app.theme.statusColor
 import se.supernovait.doobypro.presentation.order.component.DetailSection
 import se.supernovait.doobypro.presentation.order.component.OrderActions
 import se.supernovait.doobypro.presentation.order.component.OrderHeader
+import se.supernovait.doobypro.presentation.order.component.OrderServicesSection
 
+/**
+ * Screen displaying the detailed view of an [Order].
+ *
+ * Provides customer information, storage location, payment status, an itemized services breakdown with fees
+ * and totals in a receipt layout, delivery configuration, and actions.
+ *
+ * @param uiState The current [OrderDetailsState] containing order details, loading, or error states.
+ * @param onEvent Callback for handling [OrderDetailsEvent] actions.
+ */
 @Composable
 fun OrderDetailsScreen(
     uiState: OrderDetailsState,
@@ -91,30 +101,45 @@ fun OrderDetailsScreen(
             label = stringResource(Res.string.screen_Order_field_customer),
             value = "${order.customer.firstname} ${order.customer.lastname}"
         )
-        DetailSection(
-            label = stringResource(Res.string.screen_Order_field_service),
-            value = order.items.joinToString(", ") { "${it.service.title} (x${it.quantity})" }
-        )
-        DetailSection(
-            label = stringResource(Res.string.screen_Order_field_storage),
-            value = order.storageLocation.label
+
+        Row(modifier = Modifier.fillMaxWidth()) {
+            DetailSection(
+                label = stringResource(Res.string.screen_Order_field_storage),
+                value = order.storageLocation.label,
+                modifier = Modifier.weight(1f)
+            )
+            DetailSection(
+                label = stringResource(Res.string.screen_Order_field_payment_status),
+                value = paymentStatusText,
+                valueColor = paymentStatusColor,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        OrderServicesSection(
+            order = order,
+            expressFeeType = uiState.expressFeeType,
+            expressFeeValue = uiState.expressFeeValue,
         )
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = MaterialTheme.spacing.medium), color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = MaterialTheme.spacing.medium),
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
         
         Row(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.weight(1f)) {
-                DetailSection(
-                    label = stringResource(Res.string.screen_Order_field_delivery_option),
-                    value = stringResource(order.deliveryOption.label)
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                DetailSection(
-                    label = stringResource(Res.string.screen_Order_field_delivery_method),
-                    value = stringResource(order.deliveryMethod.label)
-                )
-            }
+            DetailSection(
+                label = stringResource(Res.string.screen_Order_field_delivery_option),
+                value = stringResource(order.deliveryOption.label),
+                modifier = Modifier.weight(1f)
+            )
+            DetailSection(
+                label = stringResource(Res.string.screen_Order_field_delivery_method),
+                value = stringResource(order.deliveryMethod.label),
+                modifier = Modifier.weight(1f)
+            )
         }
 
         DetailSection(
@@ -122,12 +147,6 @@ fun OrderDetailsScreen(
             value = order.deliveryDatetime.toString().replace("T", " "),
             status = if (order.isLate()) stringResource(Res.string.label_late) else null,
             valueColor = if (order.isLate()) MaterialTheme.colorScheme.error else Color.Unspecified
-        )
-
-        DetailSection(
-            label = stringResource(Res.string.screen_Order_field_payment_status),
-            value = paymentStatusText,
-            valueColor = paymentStatusColor
         )
         
         if (!order.notes.isNullOrBlank()) {

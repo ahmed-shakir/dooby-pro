@@ -9,6 +9,7 @@ import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.OrderStatus
+import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -20,11 +21,13 @@ import kotlin.time.Instant
  * @property serviceIds Comma-separated list of service IDs being ordered.
  * @property storageLocationId The ID of the assigned storage area.
  * @property status The current lifecycle stage of the order.
+ * @property isPaymentDone Whether the order has been paid for.
  * @property orderDatetime The date and time when the order was placed.
  * @property deliveryDatetime The scheduled date and time for delivery.
  * @property deliveryOption The chosen delivery priority (e.g., [DeliveryOption.EXPRESS], [DeliveryOption.STANDARD]).
  * @property deliveryMethod The chosen delivery method (e.g., [DeliveryMethod.HOME_DELIVERY], [DeliveryMethod.IN_STORE_PICKUP]).
- * @property isPaymentDone Whether the order has been paid for.
+ * @property expressFeeType The calculation type (percentage or flat fee) used when express fee was created.
+ * @property expressFeePercentage The percentage value if express fee was percentage-based.
  * @property expressFee The express fee associated with the order.
  * @property deliveryFee The delivery fee associated with the order.
  * @property notes Optional notes provided by the customer.
@@ -47,11 +50,13 @@ data class OrderEntity(
     val serviceIds: String,
     val storageLocationId: String = "default",
     val status: OrderStatus,
+    val isPaymentDone: Boolean,
     val orderDatetime: LocalDateTime,
     val deliveryDatetime: LocalDateTime,
     val deliveryOption: DeliveryOption,
     val deliveryMethod: DeliveryMethod,
-    val isPaymentDone: Boolean,
+    val expressFeeType: ExpressFeeType? = null,
+    val expressFeePercentage: Long? = null,
     val expressFee: Long? = null,
     val deliveryFee: Long? = null,
     val notes: String? = null,

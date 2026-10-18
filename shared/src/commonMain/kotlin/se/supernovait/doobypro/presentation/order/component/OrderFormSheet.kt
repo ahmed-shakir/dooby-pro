@@ -55,6 +55,8 @@ import doobypro.shared.generated.resources.screen_Order_header_subtotal
 import doobypro.shared.generated.resources.screen_Service_action_add_service
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.auth.User
+import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.ui.component.action.QuantityControl
 import se.supernovait.app.core.ui.component.action.SupernovaIconButton
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.component.action.SupernovaTextAction
@@ -118,10 +120,16 @@ fun OrderFormSheet(
     var isPaymentDone by remember { mutableStateOf(order.isPaymentDone) }
     
     var isCustomized by remember {
-        mutableStateOf(order.expressFee != null && order.expressFee != globalExpressFee)
+        mutableStateOf((order.expressFee != null) && (order.expressFee != globalExpressFee))
     }
     var expressFeeText by remember { 
-        mutableStateOf(order.expressFee?.toString() ?: if (expressFeeMode == ExpressFeeMode.GLOBAL) globalExpressFee.toString() else "") 
+        val initialText = when {
+            order.expressFee != null -> Amount(order.expressFee, currency).value
+            expressFeeMode == ExpressFeeMode.GLOBAL && expressFeeType == ExpressFeeType.PERCENTAGE -> globalExpressFee.toString()
+            expressFeeMode == ExpressFeeMode.GLOBAL -> Amount(globalExpressFee, currency).value
+            else -> ""
+        }
+        mutableStateOf(initialText)
     }
     var notes by remember { mutableStateOf(order.notes ?: "") }
 
@@ -240,7 +248,7 @@ fun OrderFormSheet(
                     if (index > 0) {
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                            thickness = 1.dp,
+                            thickness = MaterialTheme.spacing.divider,
                             modifier = Modifier.padding(bottom = MaterialTheme.spacing.extraSmall)
                         )
                     }
@@ -259,13 +267,14 @@ fun OrderFormSheet(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             // Reusable Quantity Control component
-                            OrderQuantityControl(
+                            QuantityControl(
                                 quantity = item.quantity,
                                 onQuantityChange = { newQty ->
                                     orderItems = orderItems.toMutableList().also {
                                         it[index] = item.copy(quantity = newQty)
                                     }
                                 },
+                                style = MaterialTheme.typography.labelSmallEmphasized,
                                 modifier = Modifier.weight(1.5f)
                             )
 
@@ -344,24 +353,37 @@ fun OrderFormSheet(
 
             val isGlobalMode = expressFeeMode == ExpressFeeMode.GLOBAL
             val isFieldEnabled = !isGlobalMode || isCustomized
-            val displayValue = if (isGlobalMode && !isCustomized) globalExpressFee.toString() else expressFeeText
+            val displayValue = if (isGlobalMode && !isCustomized) {
+                if (expressFeeType == ExpressFeeType.PERCENTAGE) {
+                    globalExpressFee.toString()
+                } else {
+                    Amount(globalExpressFee, currency).value
+                }
+            } else {
+                expressFeeText
+            }
 
-            val expressFeeLabel = if (expressFeeType == ExpressFeeType.PERCENTAGE) {
+            val expressFeeLabel = if (expressFeeType == ExpressFeeType.PERCENTAGE && isGlobalMode && !isCustomized) {
                 stringResource(Res.string.screen_Order_field_express_fee_percentage)
             } else {
                 stringResource(Res.string.screen_Order_field_express_fee, currency)
             }
 
+            val isPercentageInput = expressFeeType == ExpressFeeType.PERCENTAGE && isGlobalMode && !isCustomized
+
             SupernovaTextField(
                 label = expressFeeLabel,
                 value = displayValue,
                 onValueChange = { v, _ ->
-                    if (v.isEmpty() || v.matches(Regex("^\\d*$"))) {
+                    val regex = if (isPercentageInput) Regex("^\\d*$") else Regex("^\\d*\\.?\\d{0,2}$")
+                    if (v.isEmpty() || v.matches(regex)) {
                         expressFeeText = v
                     }
                 },
                 enabled = isFieldEnabled,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = if (isPercentageInput) KeyboardType.Number else KeyboardType.Decimal
+                ),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -374,7 +396,11 @@ fun OrderFormSheet(
                     textStyle = MaterialTheme.typography.labelMedium,
                     onClick = {
                         isCustomized = true
-                        expressFeeText = globalExpressFee.toString()
+                        expressFeeText = if (expressFeeType == ExpressFeeType.PERCENTAGE) {
+                            globalExpressFee.toString()
+                        } else {
+                            Amount(globalExpressFee, currency).value
+                        }
                     },
                     modifier = Modifier.padding(start = MaterialTheme.spacing.small)
                 )
@@ -398,10 +424,10 @@ fun OrderFormSheet(
 
             SupernovaTextField(
                 label = stringResource(Res.string.screen_Order_field_delivery_fee, currency),
-                value = globalDeliveryFee.toString(),
+                value = Amount(globalDeliveryFee, currency).value,
                 onValueChange = { _, _ -> },
                 enabled = false,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -444,17 +470,39 @@ fun OrderFormSheet(
 
             val isExpressValid = deliveryOption != DeliveryOption.EXPRESS ||
                 (expressFeeMode == ExpressFeeMode.GLOBAL && !isCustomized) ||
-                (expressFeeText.isNotBlank() && expressFeeText.toLongOrNull() != null)
+                (expressFeeText.isNotBlank() && expressFeeText.toDoubleOrNull() != null)
 
             val isValid = selectedCustomer.id != null && orderItems.isNotEmpty() && isExpressValid
 
             SupernovaOutlinedButton(
                 label = if (isNew) Res.string.screen_Order_action_create_order else Res.string.label_save,
                 onClick = { 
-                    val calculatedExpressFee = when {
-                        deliveryOption != DeliveryOption.EXPRESS -> null
-                        expressFeeMode == ExpressFeeMode.GLOBAL && !isCustomized -> globalExpressFee
-                        else -> expressFeeText.toLongOrNull() ?: globalExpressFee
+                    val itemsSubtotalRaw = orderItems.sumOf { it.subtotal.raw }
+                    val (calculatedExpressFee, savedExpressFeeType, savedExpressFeePercentage) = if (deliveryOption == DeliveryOption.EXPRESS) {
+                        if (expressFeeMode == ExpressFeeMode.GLOBAL && !isCustomized) {
+                            if (expressFeeType == ExpressFeeType.PERCENTAGE) {
+                                val feeAmount = (itemsSubtotalRaw * globalExpressFee / 100)
+                                Triple(feeAmount, ExpressFeeType.PERCENTAGE, globalExpressFee)
+                            } else {
+                                Triple(globalExpressFee, ExpressFeeType.FLAT_FEE, null)
+                            }
+                        } else {
+                            val expressFeeInput = expressFeeText.toDoubleOrNull()
+                            if (expressFeeType == ExpressFeeType.PERCENTAGE) {
+                                val percentage = expressFeeInput?.toLong() ?: globalExpressFee
+                                val feeAmount = (itemsSubtotalRaw * percentage / 100)
+                                Triple(feeAmount, ExpressFeeType.PERCENTAGE, percentage)
+                            } else {
+                                val feeAmount = if (expressFeeInput != null) {
+                                    (expressFeeInput * 100).toLong()
+                                } else {
+                                    globalExpressFee
+                                }
+                                Triple(feeAmount, ExpressFeeType.FLAT_FEE, null)
+                            }
+                        }
+                    } else {
+                        Triple(null, null, null)
                     }
 
                     val calculatedDeliveryFee = if (deliveryMethod == DeliveryMethod.HOME_DELIVERY) {
@@ -466,11 +514,13 @@ fun OrderFormSheet(
                     onSave(order.copy(
                         customer = selectedCustomer,
                         items = orderItems,
+                        isPaymentDone = isPaymentDone,
                         storageLocation = selectedLocation,
                         deliveryDatetime = deliveryDatetime,
                         deliveryOption = deliveryOption,
                         deliveryMethod = deliveryMethod,
-                        isPaymentDone = isPaymentDone,
+                        expressFeeType = savedExpressFeeType,
+                        expressFeePercentage = savedExpressFeePercentage,
                         expressFee = calculatedExpressFee,
                         deliveryFee = calculatedDeliveryFee,
                         notes = notes.ifBlank { null }
