@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.app_action_close_label
 import doobypro.shared.generated.resources.ic_add
 import doobypro.shared.generated.resources.ic_delete
 import doobypro.shared.generated.resources.ic_edit_square
@@ -62,6 +63,7 @@ import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.component.action.SupernovaTextAction
 import se.supernovait.app.core.ui.component.input.SupernovaDatetimeField
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
+import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
@@ -111,6 +113,7 @@ fun OrderFormSheet(
     onDelete: (() -> Unit)? = null
 ) {
     val dialogState = LocalDialogState.current
+    val bottomSheetState = LocalBottomSheetState.current
 
     var selectedCustomer by remember { mutableStateOf(order.customer) }
     var orderItems by remember { mutableStateOf(order.items) }
@@ -159,11 +162,22 @@ fun OrderFormSheet(
             .verticalScroll(rememberScrollState())
             .padding(MaterialTheme.spacing.medium)
     ) {
-        SupernovaTitle(
-            text = if (isNew) stringResource(Res.string.screen_Order_action_add_order) else stringResource(Res.string.label_edit),
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleLarge
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SupernovaTitle(
+                text = if (isNew) stringResource(Res.string.screen_Order_action_add_order) else stringResource(Res.string.label_edit),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleLarge
+            )
+            SupernovaTextAction(
+                label = Res.string.app_action_close_label,
+                textStyle = MaterialTheme.typography.labelMedium,
+                onClick = { bottomSheetState.hide() }
+            )
+        }
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
         // 1. customer
