@@ -157,12 +157,13 @@ fun OrderServicesSection(
                     if (expressFeeAmount != null) {
                         val activeExpressFeeType = order.expressFeeType ?: expressFeeType
                         val expressFeeLabel = if (activeExpressFeeType == ExpressFeeType.PERCENTAGE) {
-                            val pct = order.expressFeePercentage ?: expressFeeValue
-                            val pctText = if (pct in 1..99) {
-                                "$pct%"
+                            val pctRaw = order.expressFeePercentage ?: expressFeeValue
+                            val pctDouble = pctRaw / 100.0
+                            val pctText = if (pctDouble > 0.0) {
+                                if (pctDouble % 1.0 == 0.0) "${pctDouble.toInt()}%" else "$pctDouble%"
                             } else if (itemsSubtotal.raw > 0) {
                                 val calcPct = (expressFeeAmount.raw.toDouble() * 100.0) / itemsSubtotal.raw.toDouble()
-                                if (calcPct % 1.0 == 0.0) "${calcPct.toInt()}%" else "${(calcPct * 10).roundToLong() / 10.0}%"
+                                if (calcPct % 1.0 == 0.0) "${calcPct.toInt()}%" else "${(calcPct * 100).roundToLong() / 100.0}%"
                             } else {
                                 null
                             }

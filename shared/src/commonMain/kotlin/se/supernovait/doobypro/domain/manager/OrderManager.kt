@@ -63,6 +63,7 @@ import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 import se.supernovait.doobypro.domain.util.LogTags
 import se.supernovait.doobypro.presentation.navigation.Route
+import kotlin.math.roundToLong
 import kotlin.time.Clock
 
 /**
@@ -155,7 +156,8 @@ class OrderManager(
 
             val expressFee = if (isExpress && isGlobalExpress) {
                 if (expressFeeType == ExpressFeeType.PERCENTAGE) {
-                    (itemsSubtotalRaw * orderSettings.expressFeeValue / 100)
+                    val pctDouble = orderSettings.expressFeeValue / 100.0
+                    (itemsSubtotalRaw * pctDouble / 100.0).roundToLong()
                 } else {
                     orderSettings.expressFeeValue
                 }

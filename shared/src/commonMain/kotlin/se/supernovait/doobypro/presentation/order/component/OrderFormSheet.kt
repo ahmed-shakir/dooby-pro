@@ -77,6 +77,7 @@ import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeMode
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.presentation.app.theme.statusColor
+import kotlin.math.roundToLong
 
 /**
  * Bottom sheet form for creating or editing an order.
@@ -124,8 +125,20 @@ fun OrderFormSheet(
     }
     var expressFeeText by remember { 
         val initialText = when {
-            order.expressFee != null -> Amount(order.expressFee, currency).value
-            expressFeeMode == ExpressFeeMode.GLOBAL && expressFeeType == ExpressFeeType.PERCENTAGE -> globalExpressFee.toString()
+            order.expressFee != null && (expressFeeMode == ExpressFeeMode.INDIVIDUAL || isCustomized) -> {
+                if (expressFeeType == ExpressFeeType.PERCENTAGE) {
+                    order.expressFeePercentage?.let {
+                        val pctDouble = it / 100.0
+                        if (pctDouble % 1.0 == 0.0) pctDouble.toInt().toString() else pctDouble.toString()
+                    } ?: Amount(order.expressFee, currency).value
+                } else {
+                    Amount(order.expressFee, currency).value
+                }
+            }
+            expressFeeMode == ExpressFeeMode.GLOBAL && expressFeeType == ExpressFeeType.PERCENTAGE -> {
+                val pctDouble = globalExpressFee / 100.0
+                if (pctDouble % 1.0 == 0.0) pctDouble.toInt().toString() else pctDouble.toString()
+            }
             expressFeeMode == ExpressFeeMode.GLOBAL -> Amount(globalExpressFee, currency).value
             else -> ""
         }
@@ -355,7 +368,8 @@ fun OrderFormSheet(
             val isFieldEnabled = !isGlobalMode || isCustomized
             val displayValue = if (isGlobalMode && !isCustomized) {
                 if (expressFeeType == ExpressFeeType.PERCENTAGE) {
-                    globalExpressFee.toString()
+                    val pctDouble = globalExpressFee / 100.0
+                    if (pctDouble % 1.0 == 0.0) pctDouble.toInt().toString() else pctDouble.toString()
                 } else {
                     Amount(globalExpressFee, currency).value
                 }
@@ -363,27 +377,22 @@ fun OrderFormSheet(
                 expressFeeText
             }
 
-            val expressFeeLabel = if (expressFeeType == ExpressFeeType.PERCENTAGE && isGlobalMode && !isCustomized) {
+            val expressFeeLabel = if (expressFeeType == ExpressFeeType.PERCENTAGE) {
                 stringResource(Res.string.screen_Order_field_express_fee_percentage)
             } else {
                 stringResource(Res.string.screen_Order_field_express_fee, currency)
             }
 
-            val isPercentageInput = expressFeeType == ExpressFeeType.PERCENTAGE && isGlobalMode && !isCustomized
-
             SupernovaTextField(
                 label = expressFeeLabel,
                 value = displayValue,
                 onValueChange = { v, _ ->
-                    val regex = if (isPercentageInput) Regex("^\\d*$") else Regex("^\\d*\\.?\\d{0,2}$")
-                    if (v.isEmpty() || v.matches(regex)) {
+                    if (v.isEmpty() || v.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
                         expressFeeText = v
                     }
                 },
                 enabled = isFieldEnabled,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = if (isPercentageInput) KeyboardType.Number else KeyboardType.Decimal
-                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -397,7 +406,8 @@ fun OrderFormSheet(
                     onClick = {
                         isCustomized = true
                         expressFeeText = if (expressFeeType == ExpressFeeType.PERCENTAGE) {
-                            globalExpressFee.toString()
+                            val pctDouble = globalExpressFee / 100.0
+                            if (pctDouble % 1.0 == 0.0) pctDouble.toInt().toString() else pctDouble.toString()
                         } else {
                             Amount(globalExpressFee, currency).value
                         }
@@ -481,7 +491,8 @@ fun OrderFormSheet(
                     val (calculatedExpressFee, savedExpressFeeType, savedExpressFeePercentage) = if (deliveryOption == DeliveryOption.EXPRESS) {
                         if (expressFeeMode == ExpressFeeMode.GLOBAL && !isCustomized) {
                             if (expressFeeType == ExpressFeeType.PERCENTAGE) {
-                                val feeAmount = (itemsSubtotalRaw * globalExpressFee / 100)
+                                val pctDouble = globalExpressFee / 100.0
+                                val feeAmount = (itemsSubtotalRaw * pctDouble / 100.0).roundToLong()
                                 Triple(feeAmount, ExpressFeeType.PERCENTAGE, globalExpressFee)
                             } else {
                                 Triple(globalExpressFee, ExpressFeeType.FLAT_FEE, null)
@@ -489,12 +500,13 @@ fun OrderFormSheet(
                         } else {
                             val expressFeeInput = expressFeeText.toDoubleOrNull()
                             if (expressFeeType == ExpressFeeType.PERCENTAGE) {
-                                val percentage = expressFeeInput?.toLong() ?: globalExpressFee
-                                val feeAmount = (itemsSubtotalRaw * percentage / 100)
-                                Triple(feeAmount, ExpressFeeType.PERCENTAGE, percentage)
+                                val pctDouble = expressFeeInput ?: (globalExpressFee / 100.0)
+                                val rawPercentage = (pctDouble * 100.0).roundToLong()
+                                val feeAmount = (itemsSubtotalRaw * pctDouble / 100.0).roundToLong()
+                                Triple(feeAmount, ExpressFeeType.PERCENTAGE, rawPercentage)
                             } else {
                                 val feeAmount = if (expressFeeInput != null) {
-                                    (expressFeeInput * 100).toLong()
+                                    (expressFeeInput * 100.0).roundToLong()
                                 } else {
                                     globalExpressFee
                                 }

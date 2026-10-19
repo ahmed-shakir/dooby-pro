@@ -42,6 +42,7 @@ import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import se.supernovait.doobypro.domain.model.settings.order.OrderTagPrintMode
 import se.supernovait.doobypro.presentation.settings.SettingsState
 import se.supernovait.doobypro.presentation.settings.event.SettingsScreenEvent
+import kotlin.math.roundToLong
 
 @Composable
 fun OrderSettingsScreen(
@@ -69,7 +70,12 @@ fun OrderSettingsScreen(
 
     var expressFeeValueText by remember(uiState.settings.order.expressFeeValue, isExpressPercentage) {
         val text = if (isExpressPercentage) {
-            uiState.settings.order.expressFeeValue.toString()
+            val pctDouble = uiState.settings.order.expressFeeValue / 100.0
+            if (pctDouble % 1.0 == 0.0) {
+                pctDouble.toInt().toString()
+            } else {
+                pctDouble.toString()
+            }
         } else {
             Amount(uiState.settings.order.expressFeeValue, currency).value
         }
@@ -167,19 +173,14 @@ fun OrderSettingsScreen(
                 ),
                 value = expressFeeValueText,
                 onValueChange = { newValue, _ ->
-                    val regex = if (isExpressPercentage) Regex("^\\d*$") else Regex("^\\d*\\.?\\d{0,2}$")
-                    if (newValue.isEmpty() || newValue.matches(regex)) {
+                    if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
                         expressFeeValueText = newValue
-                        val rawValue = if (isExpressPercentage) {
-                            newValue.toLongOrNull() ?: 0L
-                        } else {
-                            ((newValue.toDoubleOrNull() ?: 0.0) * 100).toLong()
-                        }
+                        val rawValue = ((newValue.toDoubleOrNull() ?: 0.0) * 100).roundToLong()
                         onEvent(SettingsScreenEvent.UpdateExpressFeeValue(rawValue))
                     }
                 },
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = if (isExpressPercentage) KeyboardType.Number else KeyboardType.Decimal,
+                    keyboardType = KeyboardType.Decimal,
                 ),
             )
         }
