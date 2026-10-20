@@ -47,6 +47,7 @@ import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderServiceItem
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.Settings
+import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
@@ -213,6 +214,43 @@ class OrderDetailsViewModelTest : PlatformTestConfig() {
         val updatedOrder = fakeOrderRepo.savedOrders["o1"]
         assertEquals(OrderStatus.CANCELLED, updatedOrder?.status)
         assertEquals(OrderStatus.CANCELLED, viewModel.uiState.value.order?.status)
+    }
+
+    @Test
+    fun `SaveOrder preserves expressFeeType and updates order`() = runTest(testDispatcher) {
+        val flatFeeOrder = testOrder.copy(
+            expressFeeType = ExpressFeeType.FLAT_FEE,
+            expressFee = 1500L
+        )
+        viewModel.onEvent(OrderDetailsEvent.SaveOrder(flatFeeOrder))
+
+        val saved = fakeOrderRepo.savedOrders["o1"]
+        assertNotNull(saved)
+        assertEquals(ExpressFeeType.FLAT_FEE, saved.expressFeeType)
+        assertEquals(1500L, saved.expressFee)
+    }
+
+    @Test
+    fun `SaveOrder with modified fee value retains original expressFeeType`() = runTest(testDispatcher) {
+        val originalOrder = testOrder.copy(
+            expressFeeType = ExpressFeeType.PERCENTAGE,
+            expressFeePercentage = 1500L,
+            expressFee = 450L
+        )
+        fakeOrderRepo.savedOrders["o1"] = originalOrder
+
+        val modifiedOrder = originalOrder.copy(
+            expressFeePercentage = 2000L,
+            expressFee = 600L
+        )
+
+        viewModel.onEvent(OrderDetailsEvent.SaveOrder(modifiedOrder))
+
+        val saved = fakeOrderRepo.savedOrders["o1"]
+        assertNotNull(saved)
+        assertEquals(ExpressFeeType.PERCENTAGE, saved.expressFeeType)
+        assertEquals(2000L, saved.expressFeePercentage)
+        assertEquals(600L, saved.expressFee)
     }
 
     @Test

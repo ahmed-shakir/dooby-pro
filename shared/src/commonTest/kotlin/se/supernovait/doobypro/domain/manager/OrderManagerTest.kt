@@ -43,6 +43,7 @@ import se.supernovait.doobypro.domain.model.order.OrderServiceItem
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.Settings
 import se.supernovait.doobypro.domain.model.settings.notification.NotificationSettings
+import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
 import se.supernovait.doobypro.domain.repository.OrderRepository
 import se.supernovait.doobypro.domain.repository.ServiceRepository
@@ -251,6 +252,24 @@ class OrderManagerTest : PlatformTestConfig() {
         // Calling checkAndNotifyOrderAlerts again on the same day should skip duplicate
         manager.checkAndNotifyOrderAlerts()
         assertEquals(1, fakeNotificationRepo.savedNotifications.size)
+    }
+
+    @Test
+    fun `reissueOrder preserves express fee type and fee amounts from original order`() = runTest {
+        val manager = createOrderManager(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        val originalOrder = createOrder(id = "orig_1").copy(
+            deliveryOption = DeliveryOption.EXPRESS,
+            expressFeeType = ExpressFeeType.FLAT_FEE,
+            expressFee = 2500L,
+            deliveryFee = 500L
+        )
+
+        val reissued = manager.reissueOrder(originalOrder)
+
+        assertEquals(DeliveryOption.EXPRESS, reissued.deliveryOption)
+        assertEquals(ExpressFeeType.FLAT_FEE, reissued.expressFeeType)
+        assertEquals(2500L, reissued.expressFee)
+        assertEquals(500L, reissued.deliveryFee)
     }
 
     @Test
