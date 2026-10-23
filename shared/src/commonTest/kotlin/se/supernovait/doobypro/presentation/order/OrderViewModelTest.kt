@@ -73,7 +73,7 @@ class OrderViewModelTest : PlatformTestConfig() {
     private lateinit var orderQueryManager: OrderQueryManager
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    private val testUser = User(id = "u1", username = "u1", firstname = "F", lastname = "L", birthdate = LocalDate(1990, 1, 1), email = "")
+    private val testUser = User(id = "u1", username = "u1", firstname = "F", lastname = "L", birthdate = LocalDate(1990, 1, 1), email = "u1@example.com")
     private val testService = Service(id = "s1", title = "S1", description = "", price = Amount(0, "AED"))
     private val testStorage = StorageLocation(id = "l1", label = "L1", capacity = 10)
     private val testOrder = Order(

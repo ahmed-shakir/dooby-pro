@@ -414,6 +414,7 @@
     <string name="screen_Order_field_delivery_option">Priority</string>
     <string name="screen_Order_field_delivery_method">Delivery Method</string>
     <string name="screen_Order_field_delivery_date">Delivery Date</string>
+    <string name="screen_Order_field_delivery_address">Delivery Address</string>
     <string name="screen_Order_field_storage">Storage Location</string>
     <string name="screen_Order_field_express_fee">Express Fee (%1$s)</string>
     <string name="screen_Order_field_express_fee_percentage">Express Fee Percentage (%)</string>
@@ -439,6 +440,8 @@
     <string name="screen_Order_error_delete_failed">Failed to delete order</string>
     <string name="screen_Order_error_not_found">Order not found</string>
     <string name="screen_Order_error_customer_save_failed">Failed to save customer details</string>
+    <string name="screen_Order_warning_missing_customer_address">Customer location is not registered for home delivery</string>
+    <string name="screen_Order_badge_missing_address">No Address</string>
     <string name="screen_Order_empty_state">No orders yet. Create your first order to start tracking laundry progress.</string>
     <string name="screen_Order_search_hint">Search by ID or customer...</string>
     <string name="screen_Order_search_customer_title">Search Customer</string>

@@ -12,12 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_thunderbolt
+import doobypro.shared.generated.resources.ic_warning
 import doobypro.shared.generated.resources.label_late
+import doobypro.shared.generated.resources.screen_Order_badge_missing_address
 import doobypro.shared.generated.resources.screen_Order_label_new_order
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.component.text.SupernovaTag
 import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
@@ -43,44 +46,51 @@ fun OrderHeader(order: Order) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Metadata Row: Placed date and Status Tag
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = MaterialTheme.spacing.extraSmall)
-        ) {
-            SupernovaLabel(
-                text = "Placed on ${order.orderDatetime.toString().replace("T", " ")}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        // Metadata Row: Placed date
+        SupernovaLabel(
+            text = "Placed on ${order.orderDatetime.toString().replace("T", " ")}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.spacing.extraSmall)
+        )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
-            ) {
+        // Metadata Row: Status Badges
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+            modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.spacing.small)
+        ) {
+            SupernovaTag(
+                text = order.status.label,
+                containerColor = statusColor.copy(alpha = 0.1f),
+                contentColor = statusColor,
+                style = MaterialTheme.typography.labelSmall
+            )
+            if (order.deliveryOption == DeliveryOption.EXPRESS) {
                 SupernovaTag(
-                    text = order.status.label,
-                    containerColor = statusColor.copy(alpha = 0.1f),
-                    contentColor = statusColor
+                    text = order.deliveryOption.label,
+                    icon = Res.drawable.ic_thunderbolt,
+                    containerColor = MaterialTheme.statusColor.express.copy(alpha = 0.15f),
+                    contentColor = MaterialTheme.statusColor.express,
+                    style = MaterialTheme.typography.labelSmall
                 )
-                if (order.deliveryOption == DeliveryOption.EXPRESS) {
-                    SupernovaTag(
-                        text = order.deliveryOption.label,
-                        icon = Res.drawable.ic_thunderbolt,
-                        containerColor = MaterialTheme.statusColor.express.copy(alpha = 0.15f),
-                        contentColor = MaterialTheme.statusColor.express
-                    )
-                }
-                if (order.isOverdue()) {
-                    SupernovaTag(
-                        text = Res.string.label_late,
-                        containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
-                        contentColor = MaterialTheme.colorScheme.error
-                    )
-                }
+            }
+            if (order.isOverdue()) {
+                SupernovaTag(
+                    text = Res.string.label_late,
+                    containerColor = MaterialTheme.statusColor.error.copy(alpha = 0.16f),
+                    contentColor = MaterialTheme.statusColor.error,
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+            if (order.deliveryMethod == DeliveryMethod.HOME_DELIVERY && !order.customer.hasRegisteredAddress) {
+                SupernovaTag(
+                    text = Res.string.screen_Order_badge_missing_address,
+                    icon = Res.drawable.ic_warning,
+                    containerColor = MaterialTheme.statusColor.error.copy(alpha = 0.12f),
+                    contentColor = MaterialTheme.statusColor.error,
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
     }

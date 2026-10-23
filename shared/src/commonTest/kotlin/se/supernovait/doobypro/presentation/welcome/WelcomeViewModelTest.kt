@@ -82,7 +82,7 @@ class WelcomeViewModelTest {
     @Test
     fun `SignIn with valid username successfully updates state and sends event`() = runTest {
         val username = "testuser"
-        authRepository.signUp(User(username = username, firstname = "", lastname = "", email = "", birthdate = null))
+        authRepository.signUp(User(username = username, firstname = "Test", lastname = "User", email = "testuser@example.com", birthdate = null))
         
         viewModel.onEvent(WelcomeScreenEvent.SignIn(username))
         

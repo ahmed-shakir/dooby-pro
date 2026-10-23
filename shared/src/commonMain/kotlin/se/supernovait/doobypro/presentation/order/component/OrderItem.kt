@@ -2,6 +2,7 @@ package se.supernovait.doobypro.presentation.order.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -17,13 +18,16 @@ import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.ic_edit_square
 import doobypro.shared.generated.resources.ic_refresh
 import doobypro.shared.generated.resources.ic_thunderbolt
+import doobypro.shared.generated.resources.ic_warning
 import doobypro.shared.generated.resources.label_edit
 import doobypro.shared.generated.resources.label_late
 import doobypro.shared.generated.resources.screen_Order_action_reissue_order
+import doobypro.shared.generated.resources.screen_Order_badge_missing_address
 import se.supernovait.app.core.ui.component.action.SupernovaIconButton
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.component.text.SupernovaTag
 import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
@@ -58,20 +62,18 @@ fun OrderItem(
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
             .padding(vertical = MaterialTheme.spacing.medium)
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.align(Alignment.CenterStart)) {
             // Badges Row
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-                modifier = Modifier.padding(bottom = MaterialTheme.spacing.small)
+                modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.spacing.small)
             ) {
                 SupernovaTag(
                     text = order.status.label,
@@ -79,6 +81,7 @@ fun OrderItem(
                     contentColor = statusColor,
                     style = MaterialTheme.typography.labelSmall
                 )
+
                 if (order.deliveryOption == DeliveryOption.EXPRESS) {
                     SupernovaTag(
                         text = order.deliveryOption.label,
@@ -91,8 +94,17 @@ fun OrderItem(
                 if (order.isOverdue()) {
                     SupernovaTag(
                         text = Res.string.label_late,
-                        containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
-                        contentColor = MaterialTheme.colorScheme.error,
+                        containerColor = MaterialTheme.statusColor.error.copy(alpha = 0.16f),
+                        contentColor = MaterialTheme.statusColor.error,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+                if (order.deliveryMethod == DeliveryMethod.HOME_DELIVERY && !order.customer.hasRegisteredAddress) {
+                    SupernovaTag(
+                        text = Res.string.screen_Order_badge_missing_address,
+                        icon = Res.drawable.ic_warning,
+                        containerColor = MaterialTheme.statusColor.error.copy(alpha = 0.12f),
+                        contentColor = MaterialTheme.statusColor.error,
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
@@ -135,21 +147,23 @@ fun OrderItem(
             }
         }
 
-        // Action Buttons
-        if (onReissue != null) {
-            SupernovaIconButton(
-                icon = Res.drawable.ic_refresh,
-                contentDescription = Res.string.screen_Order_action_reissue_order,
-                onClick = onReissue
-            )
-        }
+        Row(modifier = Modifier.align(Alignment.CenterEnd)) {
+            // Action Buttons
+            if (onReissue != null) {
+                SupernovaIconButton(
+                    icon = Res.drawable.ic_refresh,
+                    contentDescription = Res.string.screen_Order_action_reissue_order,
+                    onClick = onReissue
+                )
+            }
 
-        if (!order.status.isTerminal()) {
-            SupernovaIconButton(
-                icon = Res.drawable.ic_edit_square,
-                contentDescription = Res.string.label_edit,
-                onClick = onEdit
-            )
+            if (!order.status.isTerminal()) {
+                SupernovaIconButton(
+                    icon = Res.drawable.ic_edit_square,
+                    contentDescription = Res.string.label_edit,
+                    onClick = onEdit
+                )
+            }
         }
     }
 }

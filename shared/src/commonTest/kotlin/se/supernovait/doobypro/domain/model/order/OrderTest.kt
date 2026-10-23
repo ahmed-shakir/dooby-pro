@@ -9,6 +9,7 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.extension.now
+import se.supernovait.app.core.domain.location.Address
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
@@ -212,5 +213,20 @@ class OrderTest {
         assertFalse(readyHomeFuture.isNotDelivered())
         assertFalse(readyPickup25h.isNotDelivered())
         assertFalse(deliveredHome25h.isNotDelivered())
+    }
+
+    @Test
+    fun `hasRegisteredAddress - returns false when address is null and true when address is present`() {
+        val userNoAddress = testUser.copy(address = null)
+        assertFalse(userNoAddress.hasRegisteredAddress)
+
+        val userValidAddress = testUser.copy(
+            address = Address(
+                street = "123 Main St",
+                city = "Dubai",
+                country = "UAE"
+            )
+        )
+        assertTrue(userValidAddress.hasRegisteredAddress)
     }
 }

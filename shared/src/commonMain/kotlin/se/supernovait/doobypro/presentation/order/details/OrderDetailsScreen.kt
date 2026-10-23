@@ -1,6 +1,5 @@
 package se.supernovait.doobypro.presentation.order.details
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,10 +12,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.ic_warning
 import doobypro.shared.generated.resources.label_cancel
 import doobypro.shared.generated.resources.label_delete
 import doobypro.shared.generated.resources.label_late
@@ -28,18 +27,24 @@ import doobypro.shared.generated.resources.screen_Order_dialog_cancel_message
 import doobypro.shared.generated.resources.screen_Order_dialog_cancel_title
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_message
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_title
+import doobypro.shared.generated.resources.screen_Order_error_not_found
 import doobypro.shared.generated.resources.screen_Order_field_customer
+import doobypro.shared.generated.resources.screen_Order_field_delivery_address
 import doobypro.shared.generated.resources.screen_Order_field_delivery_date
 import doobypro.shared.generated.resources.screen_Order_field_delivery_method
 import doobypro.shared.generated.resources.screen_Order_field_delivery_option
 import doobypro.shared.generated.resources.screen_Order_field_notes
 import doobypro.shared.generated.resources.screen_Order_field_payment_status
 import doobypro.shared.generated.resources.screen_Order_field_storage
+import doobypro.shared.generated.resources.screen_Order_warning_missing_customer_address
 import org.jetbrains.compose.resources.stringResource
-import se.supernovait.app.core.ui.component.loading.SupernovaLoadingIndicator
+import se.supernovait.app.core.ui.component.SupernovaEmptyState
+import se.supernovait.app.core.ui.component.loading.SupernovaLoadingScreen
+import se.supernovait.app.core.ui.component.message.NoticeVariant
+import se.supernovait.app.core.ui.component.message.SupernovaNotice
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
-import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.presentation.app.theme.statusColor
 import se.supernovait.doobypro.presentation.order.component.DetailSection
@@ -62,17 +67,16 @@ fun OrderDetailsScreen(
     onEvent: (OrderDetailsEvent) -> Unit
 ) {
     if (uiState.isLoading) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            SupernovaLoadingIndicator()
-        }
+        SupernovaLoadingScreen()
         return
     }
 
     val order = uiState.order
     if (order == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            SupernovaLabel(text = uiState.error?.let { stringResource(it) } ?: "")
-        }
+        SupernovaEmptyState(
+            title = uiState.error ?: Res.string.screen_Order_error_not_found,
+            icon = Res.drawable.ic_warning
+        )
         return
     }
 
@@ -94,9 +98,17 @@ fun OrderDetailsScreen(
             .padding(MaterialTheme.spacing.medium)
     ) {
         OrderHeader(order)
-        
+
         Spacer(Modifier.height(MaterialTheme.spacing.large))
-        
+
+        if (!order.customer.hasRegisteredAddress && order.deliveryMethod == DeliveryMethod.HOME_DELIVERY) {
+            SupernovaNotice(
+                textResource = Res.string.screen_Order_warning_missing_customer_address,
+                variant = NoticeVariant.Error
+            )
+            Spacer(Modifier.height(MaterialTheme.spacing.extraSmall))
+        }
+
         DetailSection(
             label = stringResource(Res.string.screen_Order_field_customer),
             value = "${order.customer.firstname} ${order.customer.lastname}"
@@ -146,8 +158,24 @@ fun OrderDetailsScreen(
             label = stringResource(Res.string.screen_Order_field_delivery_date),
             value = order.deliveryDatetime.toString().replace("T", " "),
             status = if (order.isLate()) stringResource(Res.string.label_late) else null,
-            valueColor = if (order.isLate()) MaterialTheme.colorScheme.error else Color.Unspecified
+            valueColor = if (order.isLate()) MaterialTheme.statusColor.error else Color.Unspecified
         )
+
+        if (order.customer.hasRegisteredAddress) {
+            order.customer.address?.let { addr ->
+                val addressString = listOfNotNull(
+                    addr.street.ifBlank { null },
+                    addr.city.ifBlank { null },
+                    addr.country.ifBlank { null }
+                ).joinToString(", ")
+                if (addressString.isNotBlank()) {
+                    DetailSection(
+                        label = stringResource(Res.string.screen_Order_field_delivery_address),
+                        value = addressString
+                    )
+                }
+            }
+        }
         
         if (!order.notes.isNullOrBlank()) {
             DetailSection(

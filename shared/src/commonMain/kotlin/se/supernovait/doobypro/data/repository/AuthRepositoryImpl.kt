@@ -130,7 +130,7 @@ class AuthRepositoryImpl(
                     return@traceAsync Result.Failure(AuthError.ACCOUNT_DEACTIVATED)
                 }
 
-                if (user.canLogin()) {
+                if (user.canLogin) {
                     sessionRepository.setCurrentUserId(user.id!!)
                     crashReporter.setUserId(user.id)
                     crashReporter.setCustomKey("username", username)

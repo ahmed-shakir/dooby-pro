@@ -53,6 +53,7 @@ import doobypro.shared.generated.resources.screen_Order_field_storage
 import doobypro.shared.generated.resources.screen_Order_header_item
 import doobypro.shared.generated.resources.screen_Order_header_price
 import doobypro.shared.generated.resources.screen_Order_header_subtotal
+import doobypro.shared.generated.resources.screen_Order_warning_missing_customer_address
 import doobypro.shared.generated.resources.screen_Service_action_add_service
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.auth.User
@@ -63,6 +64,8 @@ import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.component.action.SupernovaTextAction
 import se.supernovait.app.core.ui.component.input.SupernovaDatetimeField
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
+import se.supernovait.app.core.ui.component.message.NoticeVariant
+import se.supernovait.app.core.ui.component.message.SupernovaNotice
 import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
@@ -474,6 +477,17 @@ fun OrderFormSheet(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+            // If customer has no registered location, show attention warning message
+            if (!selectedCustomer.hasRegisteredAddress) {
+                Spacer(Modifier.height(MaterialTheme.spacing.small))
+                SupernovaNotice(
+                    textResource = Res.string.screen_Order_warning_missing_customer_address,
+                    variant = NoticeVariant.Error
+                )
+            }
         }
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))

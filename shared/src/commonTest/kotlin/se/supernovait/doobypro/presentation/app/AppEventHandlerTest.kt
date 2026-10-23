@@ -63,9 +63,9 @@ class AppEventHandlerTest {
         val user = User(
             id = "user-1",
             username = "test",
-            firstname = "",
-            lastname = "",
-            email = "",
+            firstname = "Test",
+            lastname = "User",
+            email = "test@example.com",
             birthdate = null
         )
         authRepository.signUp(user)

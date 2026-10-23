@@ -66,14 +66,11 @@ import se.supernovait.doobypro.presentation.welcome.account_setup.AccountSetupWi
 expect val platformModule: Module
 
 val sharedModule = module {
-    includes(coreModule)
-
-    includes(
-        sharingModule(
-            config = ShareConfiguration.https("doobypro.supernovait.se"),
-            extraConfigurations = listOf(ShareConfiguration.custom("doobypro"))
-        )
-    )
+    includes(coreModule(
+        appId = "dooby_pro",
+        shareConfig = ShareConfiguration.https("doobypro.supernovait.se"),
+        extraShareConfigurations = listOf(ShareConfiguration.custom("doobypro"))
+    ))
 
     includes(
         remoteConfigModule(
