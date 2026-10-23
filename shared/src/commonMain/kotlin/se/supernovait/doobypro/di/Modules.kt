@@ -5,13 +5,11 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import se.supernovait.app.core.data.persistence.DatabaseFactory
 import se.supernovait.app.core.data.persistence.dao.LicenseDao
 import se.supernovait.app.core.data.persistence.dao.NotificationDao
 import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.di.coreModule
 import se.supernovait.app.core.di.remoteConfigModule
-import se.supernovait.app.core.di.sharingModule
 import se.supernovait.app.core.domain.auth.AuthRepository
 import se.supernovait.app.core.domain.initialization.AppInitializationHook
 import se.supernovait.app.core.domain.initialization.InitializableDatabase
@@ -120,10 +118,6 @@ val sharedModule = module {
     viewModelOf(::StorageViewModel)
 
     single<FileStorage> { FileStorage() }
-
-    single<AppDatabase> {
-        DatabaseFactory.create(get())
-    }
 
     single<InitializableDatabase> {
         get<AppDatabase>()
