@@ -335,7 +335,7 @@ class OrderManager(
     suspend fun checkAndNotifyOrderAlerts() {
         performanceMonitor.traceAsync("OrderManager.checkAndNotifyOrderAlerts") {
             logger.debug("Checking and processing order alerts", tag = LogTags.ORDER_MANAGER)
-            if (!shouldSendPlatformNotification()) return@traceAsync
+            val shouldSendPlatform = shouldSendPlatformNotification()
 
             val settings = settingsRepository.settings.first()
             val orders = orderRepository.getOrders().first()
@@ -354,7 +354,7 @@ class OrderManager(
                             title = title,
                             message = message,
                             type = NotificationType.WARNING,
-                            showNativeAlert = true,
+                            showNativeAlert = shouldSendPlatform,
                             deepLink = deepLink
                         )
                     }
@@ -367,7 +367,7 @@ class OrderManager(
                             title = title,
                             message = message,
                             type = NotificationType.WARNING,
-                            showNativeAlert = true,
+                            showNativeAlert = shouldSendPlatform,
                             deepLink = deepLink
                         )
                     }
@@ -380,7 +380,7 @@ class OrderManager(
                             title = title,
                             message = message,
                             type = NotificationType.WARNING,
-                            showNativeAlert = true,
+                            showNativeAlert = shouldSendPlatform,
                             deepLink = deepLink
                         )
                     }
