@@ -6,13 +6,11 @@ import se.supernovait.app.core.data.persistence.DatabaseFactory
 import se.supernovait.app.core.data.persistence.DatabaseMigrationCallback
 import se.supernovait.app.core.data.persistence.IosDatabaseManager
 import se.supernovait.app.core.data.persistence.backup.DatabaseBackupConfig
-import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.data.local.AppDatabase
 import se.supernovait.doobypro.domain.util.IosPdfGenerator
 import se.supernovait.doobypro.domain.util.PdfGenerator
 
 actual val platformModule = module {
-    single<ShareConfiguration> { ShareConfiguration.custom("doobypro") }
     single<PdfGenerator> { IosPdfGenerator() }
 
     single<String>(named("databasePath")) {

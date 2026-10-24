@@ -6,14 +6,12 @@ import se.supernovait.app.core.data.persistence.AndroidDatabaseManager
 import se.supernovait.app.core.data.persistence.DatabaseFactory
 import se.supernovait.app.core.data.persistence.DatabaseMigrationCallback
 import se.supernovait.app.core.data.persistence.backup.DatabaseBackupConfig
-import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.data.local.AppDatabase
 import se.supernovait.doobypro.domain.util.AndroidPdfGenerator
 import se.supernovait.doobypro.domain.util.PdfGenerator
 import se.supernovait.doobypro.domain.util.applicationContext
 
 actual val platformModule = module {
-    single<ShareConfiguration> { ShareConfiguration.https(host = "doobypro.supernovait.se") }
     single<PdfGenerator> { AndroidPdfGenerator() }
 
     single<String>(named("databasePath")) {

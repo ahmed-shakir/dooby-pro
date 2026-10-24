@@ -65,9 +65,12 @@ expect val platformModule: Module
 
 val sharedModule = module {
     includes(coreModule(
-        appId = "dooby_pro",
-        shareConfig = ShareConfiguration.https("doobypro.supernovait.se"),
-        extraShareConfigurations = listOf(ShareConfiguration.custom("doobypro"))
+        appId = "doobypro",
+        websiteUrl = AppConfig.WEBSITE_URL,
+        extraShareConfigurations = listOf(
+            ShareConfiguration.custom("doobypro"),
+            ShareConfiguration.https("doobypro.supernovait.se")
+        )
     ))
 
     includes(
