@@ -2,6 +2,7 @@ package se.supernovait.doobypro.domain.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import se.supernovait.app.core.domain.util.applicationContext
 import java.io.File
 
 class AndroidFileStorage : FileStorage {

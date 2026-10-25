@@ -89,6 +89,7 @@ fun AccountSetupWizardScreen(
             WizardBottomBar(
                 currentStep = uiState.currentStep,
                 isCreatingAccount = uiState.isCreatingAccount,
+                isCurrentStepValid = uiState.isCurrentStepValid,
                 onBack = { onEvent(AccountSetupWizardEvent.OnBackClick) },
                 onNext = { onEvent(AccountSetupWizardEvent.OnNextClick) }
             )
@@ -143,6 +144,7 @@ private fun WizardProgress(currentStep: Int) {
 private fun WizardBottomBar(
     currentStep: Int,
     isCreatingAccount: Boolean,
+    isCurrentStepValid: Boolean,
     onBack: () -> Unit,
     onNext: () -> Unit
 ) {
@@ -166,7 +168,7 @@ private fun WizardBottomBar(
             textStyle = MaterialTheme.typography.bodyMedium,
             shape = MaterialTheme.shapes.extraSmall,
             onClick = onNext,
-            enabled = !isCreatingAccount,
+            enabled = isCurrentStepValid && !isCreatingAccount,
             loading = isCreatingAccount,
             modifier = Modifier.weight(1f)
         )

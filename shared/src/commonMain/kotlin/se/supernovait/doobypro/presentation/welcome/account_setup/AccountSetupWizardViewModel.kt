@@ -70,6 +70,10 @@ class AccountSetupWizardViewModel(
     }
 
     private fun onNextStep() {
+        if (!_uiState.value.isCurrentStepValid) {
+            logger.warn("Cannot advance wizard step; obligatory data missing from step ${_uiState.value.currentStep}", tag = LogTags.ACCOUNT_SETUP_VM)
+            return
+        }
         if (_uiState.value.currentStep < 4) {
             logger.debug("Advancing to next wizard step from step ${_uiState.value.currentStep}", tag = LogTags.ACCOUNT_SETUP_VM)
             analyticsTracker.trackEvent("wizard_step_advanced", mapOf("wizard_step" to _uiState.value.currentStep))

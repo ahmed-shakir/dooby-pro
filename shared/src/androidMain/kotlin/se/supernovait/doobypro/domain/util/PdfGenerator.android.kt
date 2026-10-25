@@ -14,6 +14,7 @@ import doobypro.shared.generated.resources.Res
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import se.supernovait.app.core.domain.util.applicationContext
 import java.io.File
 import java.io.FileOutputStream
 

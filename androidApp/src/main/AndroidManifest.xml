@@ -46,7 +46,7 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="se.supernovait.doobypro.domain.util.ContextProvider"
+                android:name="se.supernovait.app.core.domain.util.ContextProvider"
                 android:value="androidx.startup" />
         </provider>
     </application>

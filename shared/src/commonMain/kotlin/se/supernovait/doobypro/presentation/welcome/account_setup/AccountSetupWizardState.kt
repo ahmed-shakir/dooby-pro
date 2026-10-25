@@ -11,7 +11,6 @@ import se.supernovait.doobypro.domain.model.AppDefaults
  * @property lastName User's last name.
  * @property username User's unique identifier.
  * @property birthDate Parsed [LocalDate] of the user's birthdate.
- * @property birthDateString Raw string input for the birthdate.
  * @property email User's personal email address.
  * @property phoneNumber User's personal phone number.
  * @property companyLegalName Official registered name of the business.
@@ -47,4 +46,22 @@ data class AccountSetupWizardState(
     val country: String = AppDefaults.COUNTRY,
     val notes: String = "",
     val isCreatingAccount: Boolean = false
-)
+) {
+    val isStep1Valid: Boolean
+        get() = firstName.isNotBlank() && lastName.isNotBlank() && username.isNotBlank() && email.isNotBlank()
+
+    val isStep2Valid: Boolean
+        get() = companyLegalName.isNotBlank() && companyDisplayName.isNotBlank() && companyEmail.isNotBlank()
+
+    val isStep3Valid: Boolean
+        get() = streetAddress.isNotBlank() && city.isNotBlank() && subdivision.isNotBlank()
+
+    val isCurrentStepValid: Boolean
+        get() = when (currentStep) {
+            1 -> isStep1Valid
+            2 -> isStep2Valid
+            3 -> isStep3Valid
+            4 -> isStep1Valid && isStep2Valid && isStep3Valid
+            else -> false
+        }
+}

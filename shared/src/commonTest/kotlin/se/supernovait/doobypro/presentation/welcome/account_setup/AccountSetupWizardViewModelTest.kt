@@ -56,20 +56,43 @@ class AccountSetupWizardViewModelTest {
     }
 
     @Test
-    fun `OnNextClick increments currentStep`() = runTest(testDispatcher) {
+    fun `OnNextClick does not increment currentStep when obligatory data is missing`() = runTest(testDispatcher) {
+        viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
+        assertEquals(1, viewModel.uiState.value.currentStep)
+    }
+
+    @Test
+    fun `OnNextClick increments currentStep with valid data`() = runTest(testDispatcher) {
+        // Step 1
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateFirstName("John"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateLastName("Doe"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateUsername("johndoe"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateEmail("john@example.com"))
         viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
         assertEquals(2, viewModel.uiState.value.currentStep)
 
+        // Step 2
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateCompanyLegalName("Legal Name"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateCompanyDisplayName("Display Name"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateCompanyEmail("company@example.com"))
         viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
         assertEquals(3, viewModel.uiState.value.currentStep)
 
+        // Step 3
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateStreetAddress("Main St"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateCity("Dubai"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateSubdivision("DUBAI"))
         viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
         assertEquals(4, viewModel.uiState.value.currentStep)
     }
 
     @Test
     fun `OnBackClick decrements currentStep`() = runTest(testDispatcher) {
-        // Go to step 2 first
+        // Go to step 2 first with valid data
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateFirstName("John"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateLastName("Doe"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateUsername("johndoe"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateEmail("john@example.com"))
         viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
         assertEquals(2, viewModel.uiState.value.currentStep)
 
@@ -93,6 +116,12 @@ class AccountSetupWizardViewModelTest {
 
     @Test
     fun `UpdatePhoneNumber formats number on next step`() = runTest(testDispatcher) {
+        // Ensure step 1 is valid
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateFirstName("John"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateLastName("Doe"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateUsername("johndoe"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateEmail("john@example.com"))
+
         val rawNumber = "501234567"
         viewModel.onEvent(AccountSetupWizardEvent.UpdatePhoneNumber(rawNumber))
         // Not formatted yet
@@ -126,10 +155,19 @@ class AccountSetupWizardViewModelTest {
 
     @Test
     fun `UpdateCompanyPhone formats number on next step`() = runTest(testDispatcher) {
-        val rawNumber = "41234567"
-        // Move to step 2 where company phone is
+        // Move to step 2 with valid step 1 data
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateFirstName("John"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateLastName("Doe"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateUsername("johndoe"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateEmail("john@example.com"))
         viewModel.onEvent(AccountSetupWizardEvent.OnNextClick)
-        
+
+        // Ensure step 2 has valid obligatory data (legalName, displayName, email)
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateCompanyLegalName("Legal Name"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateCompanyDisplayName("Display Name"))
+        viewModel.onEvent(AccountSetupWizardEvent.UpdateCompanyEmail("company@example.com"))
+
+        val rawNumber = "41234567"
         viewModel.onEvent(AccountSetupWizardEvent.UpdateCompanyPhone(rawNumber))
         // Not formatted yet
         assertEquals(rawNumber, viewModel.uiState.value.companyPhone)

@@ -5,6 +5,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import se.supernovait.app.core.domain.util.applicationContext
 
 /**
  * Android implementation of the image picker.
