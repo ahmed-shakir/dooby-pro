@@ -23,9 +23,9 @@ class AgreementEntityTest {
             equipmentModel = "M1",
             title = "Title",
             description = "Desc",
-            fee = AmountEntity(100, "AED"),
+            fee = AmountEntity(100, 2, "AED"),
             billingFrequency = BillingFrequency.Monthly,
-            deposit = AmountEntity(500, "AED"),
+            deposit = AmountEntity(500, 2, "AED"),
             issueDate = LocalDate(2026, 8, 15),
             cancellationDate = null
         )

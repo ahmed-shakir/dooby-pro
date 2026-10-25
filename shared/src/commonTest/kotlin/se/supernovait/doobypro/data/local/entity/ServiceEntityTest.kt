@@ -15,7 +15,7 @@ class ServiceEntityTest {
         val entity = ServiceEntity(
             title = "Test",
             description = "Test",
-            price = AmountEntity(100, "AED")
+            price = AmountEntity(100, 2, "AED")
         )
 
         assertTrue(entity.id.startsWith(IdType.SERVICE.prefix), "ID should start with ${IdType.SERVICE.prefix}")

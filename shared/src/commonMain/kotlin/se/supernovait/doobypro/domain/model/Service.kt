@@ -18,7 +18,7 @@ data class Service(
     val id: String? = null,
     val title: String = "",
     val description: String = "",
-    val price: Amount = Amount(0, "AED"),
+    val price: Amount = Amount(0, AppDefaults.CURRENCY),
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 )

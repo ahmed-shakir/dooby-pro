@@ -260,16 +260,16 @@ class OrderManagerTest : PlatformTestConfig() {
         val originalOrder = createOrder(id = "orig_1").copy(
             deliveryOption = DeliveryOption.EXPRESS,
             expressFeeType = ExpressFeeType.FLAT_FEE,
-            expressFee = 2500L,
-            deliveryFee = 500L
+            expressFee = Amount(2500, "AED"),
+            deliveryFee = Amount(500, "AED")
         )
 
         val reissued = manager.reissueOrder(originalOrder)
 
         assertEquals(DeliveryOption.EXPRESS, reissued.deliveryOption)
         assertEquals(ExpressFeeType.FLAT_FEE, reissued.expressFeeType)
-        assertEquals(2500L, reissued.expressFee)
-        assertEquals(500L, reissued.deliveryFee)
+        assertEquals(Amount(2500, "AED"), reissued.expressFee)
+        assertEquals(Amount(500, "AED"), reissued.deliveryFee)
     }
 
     @Test

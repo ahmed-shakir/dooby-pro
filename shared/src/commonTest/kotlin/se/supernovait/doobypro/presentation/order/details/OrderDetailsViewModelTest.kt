@@ -26,6 +26,7 @@ import se.supernovait.app.core.domain.common.Result
 import se.supernovait.app.core.domain.error.DataError
 import se.supernovait.app.core.domain.event.AppEvent
 import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.domain.model.decimal.Percentage
 import se.supernovait.app.core.domain.model.notification.Notification
 import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.notification.NotificationRepository
@@ -88,8 +89,8 @@ class OrderDetailsViewModelTest : PlatformTestConfig() {
         deliveryOption = DeliveryOption.EXPRESS,
         deliveryMethod = DeliveryMethod.HOME_DELIVERY,
         isPaymentDone = false,
-        expressFee = 500L,
-        deliveryFee = 1000L,
+        expressFee = Amount(500, "AED"),
+        deliveryFee = Amount(1000, "AED"),
         notes = "Handle with care",
         createdAt = LocalDateTime(2026, 1, 1, 0, 0),
         updatedAt = LocalDateTime(2026, 1, 1, 0, 0),
@@ -220,28 +221,28 @@ class OrderDetailsViewModelTest : PlatformTestConfig() {
     fun `SaveOrder preserves expressFeeType and updates order`() = runTest(testDispatcher) {
         val flatFeeOrder = testOrder.copy(
             expressFeeType = ExpressFeeType.FLAT_FEE,
-            expressFee = 1500L
+            expressFee = Amount(1500, "AED")
         )
         viewModel.onEvent(OrderDetailsEvent.SaveOrder(flatFeeOrder))
 
         val saved = fakeOrderRepo.savedOrders["o1"]
         assertNotNull(saved)
         assertEquals(ExpressFeeType.FLAT_FEE, saved.expressFeeType)
-        assertEquals(1500L, saved.expressFee)
+        assertEquals(Amount(1500, "AED"), saved.expressFee)
     }
 
     @Test
     fun `SaveOrder with modified fee value retains original expressFeeType`() = runTest(testDispatcher) {
         val originalOrder = testOrder.copy(
             expressFeeType = ExpressFeeType.PERCENTAGE,
-            expressFeePercentage = 1500L,
-            expressFee = 450L
+            expressFeePercentage = Percentage(1500),
+            expressFee = Amount(450, "AED")
         )
         fakeOrderRepo.savedOrders["o1"] = originalOrder
 
         val modifiedOrder = originalOrder.copy(
-            expressFeePercentage = 2000L,
-            expressFee = 600L
+            expressFeePercentage = Percentage(2000),
+            expressFee = Amount(600, "AED")
         )
 
         viewModel.onEvent(OrderDetailsEvent.SaveOrder(modifiedOrder))
@@ -249,8 +250,8 @@ class OrderDetailsViewModelTest : PlatformTestConfig() {
         val saved = fakeOrderRepo.savedOrders["o1"]
         assertNotNull(saved)
         assertEquals(ExpressFeeType.PERCENTAGE, saved.expressFeeType)
-        assertEquals(2000L, saved.expressFeePercentage)
-        assertEquals(600L, saved.expressFee)
+        assertEquals(Percentage(2000), saved.expressFeePercentage)
+        assertEquals(Amount(600, "AED"), saved.expressFee)
     }
 
     @Test

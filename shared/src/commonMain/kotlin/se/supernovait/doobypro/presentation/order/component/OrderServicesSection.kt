@@ -22,12 +22,12 @@ import doobypro.shared.generated.resources.screen_Order_label_subtotal
 import doobypro.shared.generated.resources.screen_Order_label_total_price
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.domain.model.decimal.Percentage
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
-import kotlin.math.roundToLong
 
 /**
  * Renders the services section of an order in a clean, receipt/invoice layout.
@@ -52,8 +52,8 @@ fun OrderServicesSection(
     val items = order.items
     val currency = items.firstOrNull()?.service?.price?.currency ?: AppDefaults.CURRENCY
     val itemsSubtotal = Amount(items.sumOf { it.subtotal.raw }, currency)
-    val expressFeeAmount = order.expressFee?.takeIf { it > 0 }?.let { Amount(it, currency) }
-    val deliveryFeeAmount = order.deliveryFee?.takeIf { it > 0 }?.let { Amount(it, currency) }
+    val expressFeeAmount = order.expressFee?.takeIf { it.raw > 0 }
+    val deliveryFeeAmount = order.deliveryFee?.takeIf { it.raw > 0 }
     val hasFees = (expressFeeAmount != null) || (deliveryFeeAmount != null)
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -158,14 +158,12 @@ fun OrderServicesSection(
                         val activeExpressFeeType = order.expressFeeType ?: expressFeeType
                         val expressFeeLabel = if (activeExpressFeeType == ExpressFeeType.PERCENTAGE) {
                             val pctText = if (order.expressFeePercentage != null) {
-                                val pctDouble = order.expressFeePercentage / 100.0
-                                if (pctDouble % 1.0 == 0.0) "${pctDouble.toInt()}%" else "$pctDouble%"
+                                order.expressFeePercentage.formatted
                             } else if (itemsSubtotal.raw > 0) {
                                 val calcPct = (expressFeeAmount.raw.toDouble() * 100.0) / itemsSubtotal.raw.toDouble()
-                                if (calcPct % 1.0 == 0.0) "${calcPct.toInt()}%" else "${(calcPct * 100).roundToLong() / 100.0}%"
+                                Percentage.fromPercent(calcPct).formatted
                             } else {
-                                val pctDouble = expressFeeValue / 100.0
-                                if (pctDouble % 1.0 == 0.0) "${pctDouble.toInt()}%" else "$pctDouble%"
+                                Percentage.fromPercent(expressFeeValue.toDouble()).formatted
                             }
 
                             stringResource(Res.string.screen_Order_label_express_fee_with_percentage, pctText)

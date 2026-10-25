@@ -38,6 +38,9 @@ import se.supernovait.app.core.domain.extension.isAlreadyNotifiedToday
 import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.extension.toUrl
 import se.supernovait.app.core.domain.extension.truncateToMinutes
+import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.domain.model.decimal.Decimal
+import se.supernovait.app.core.domain.model.decimal.Percentage
 import se.supernovait.app.core.domain.model.notification.NotificationType
 import se.supernovait.app.core.domain.notification.NotificationManager
 import se.supernovait.app.core.domain.observability.crash.CrashReporter
@@ -45,6 +48,7 @@ import se.supernovait.app.core.domain.observability.logging.Logger
 import se.supernovait.app.core.domain.observability.performance.PerformanceMonitor
 import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
+import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
@@ -63,7 +67,6 @@ import se.supernovait.doobypro.domain.repository.SettingsRepository
 import se.supernovait.doobypro.domain.repository.StorageLocationRepository
 import se.supernovait.doobypro.domain.util.LogTags
 import se.supernovait.doobypro.presentation.navigation.Route
-import kotlin.math.roundToLong
 import kotlin.time.Clock
 
 /**
@@ -147,26 +150,26 @@ class OrderManager(
 
             val isExpress = orderSettings.defaultDeliveryOption == DeliveryOption.EXPRESS
             val isGlobalExpress = orderSettings.expressFeeMode == ExpressFeeMode.GLOBAL
-            val itemsSubtotalRaw = initialItems.sumOf { it.subtotal.raw }
+            val itemsSubtotal = initialItems.fold(Decimal.ZERO) { acc, item -> acc + item.subtotal.decimal }
+            val currency = initialItems.firstOrNull()?.service?.price?.currency ?: AppDefaults.CURRENCY
 
             val expressFeeType = if (isExpress) orderSettings.expressFeeType else null
             val expressFeePercentage = if (isExpress && isGlobalExpress && expressFeeType == ExpressFeeType.PERCENTAGE) {
-                orderSettings.expressFeeValue
+                Percentage.fromBasisPoints(orderSettings.expressFeeValue.toInt())
             } else null
 
             val expressFee = if (isExpress && isGlobalExpress) {
                 if (expressFeeType == ExpressFeeType.PERCENTAGE) {
-                    val pctDouble = orderSettings.expressFeeValue / 100.0
-                    (itemsSubtotalRaw * pctDouble / 100.0).roundToLong()
+                    Amount(itemsSubtotal, currency) * (expressFeePercentage ?: Percentage.ZERO)
                 } else {
-                    orderSettings.expressFeeValue
+                    Amount(orderSettings.expressFeeValue, currency)
                 }
             } else {
                 null
             }
 
             val deliveryFee = if (orderSettings.defaultDeliveryMethod == DeliveryMethod.HOME_DELIVERY) {
-                orderSettings.deliveryFeeValue
+                Amount(orderSettings.deliveryFeeValue, currency)
             } else {
                 null
             }

@@ -3,6 +3,8 @@ package se.supernovait.doobypro.data.local.mapper
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import se.supernovait.app.core.data.persistence.mapper.toDomain
+import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.data.local.entity.OrderEntity
@@ -36,9 +38,9 @@ fun OrderEntity.toDomain(
     deliveryOption = deliveryOption,
     deliveryMethod = deliveryMethod,
     expressFeeType = expressFeeType,
-    expressFeePercentage = expressFeePercentage,
-    expressFee = expressFee,
-    deliveryFee = deliveryFee,
+    expressFeePercentage = expressFeePercentage?.toDomain(),
+    expressFee = expressFee?.toDomain(),
+    deliveryFee = deliveryFee?.toDomain(),
     notes = notes,
     createdAt = createdAt.toLocalDateTime(TimeZone.currentSystemDefault()),
     updatedAt = updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -61,9 +63,9 @@ fun Order.toEntity() = OrderEntity(
     deliveryOption = deliveryOption,
     deliveryMethod = deliveryMethod,
     expressFeeType = expressFeeType,
-    expressFeePercentage = expressFeePercentage,
-    expressFee = expressFee,
-    deliveryFee = deliveryFee,
+    expressFeePercentage = expressFeePercentage?.toEntity(),
+    expressFee = expressFee?.toEntity(),
+    deliveryFee = deliveryFee?.toEntity(),
     notes = notes,
     createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()),
     updatedAt = Clock.System.now()

@@ -25,7 +25,8 @@ class ServiceMapperTest {
     private val testInstant = testDateTime.toInstant(TimeZone.currentSystemDefault())
 
     private val testAmountEntity = AmountEntity(
-        raw = 1000,
+        unscaled = 1000,
+        scale = 2,
         currency = "AED"
     )
 
@@ -83,7 +84,8 @@ class ServiceMapperTest {
     fun `Amount_toEntity should correctly transform Amount model to AmountEntity`() {
         val result = testAmount.toEntity()
 
-        assertEquals(testAmountEntity.raw, result.raw)
+        assertEquals(testAmountEntity.unscaled, result.unscaled)
+        assertEquals(testAmountEntity.scale, result.scale)
         assertEquals(testAmountEntity.currency, result.currency)
     }
 }

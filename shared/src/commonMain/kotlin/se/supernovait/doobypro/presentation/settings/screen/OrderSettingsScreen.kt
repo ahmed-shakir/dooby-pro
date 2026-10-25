@@ -28,6 +28,7 @@ import doobypro.shared.generated.resources.screen_Settings_order_handling_time_l
 import doobypro.shared.generated.resources.screen_Settings_order_tag_print_mode_label
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.domain.model.decimal.Percentage
 import se.supernovait.app.core.ui.component.container.SupernovaListGroup
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
@@ -70,12 +71,7 @@ fun OrderSettingsScreen(
 
     var expressFeeValueText by remember(uiState.settings.order.expressFeeValue, isExpressPercentage) {
         val text = if (isExpressPercentage) {
-            val pctDouble = uiState.settings.order.expressFeeValue / 100.0
-            if (pctDouble % 1.0 == 0.0) {
-                pctDouble.toInt().toString()
-            } else {
-                pctDouble.toString()
-            }
+            Percentage(uiState.settings.order.expressFeeValue.toInt()).percentString
         } else {
             Amount(uiState.settings.order.expressFeeValue, currency).value
         }

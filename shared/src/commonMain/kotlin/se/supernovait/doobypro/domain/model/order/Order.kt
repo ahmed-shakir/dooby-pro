@@ -9,6 +9,8 @@ import kotlinx.datetime.toLocalDateTime
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.domain.model.decimal.Decimal
+import se.supernovait.app.core.domain.model.decimal.Percentage
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
@@ -51,9 +53,9 @@ data class Order(
     val deliveryOption: DeliveryOption = DeliveryOption.STANDARD,
     val deliveryMethod: DeliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
     val expressFeeType: ExpressFeeType? = null,
-    val expressFeePercentage: Long? = null,
-    val expressFee: Long? = null,
-    val deliveryFee: Long? = null,
+    val expressFeePercentage: Percentage? = null,
+    val expressFee: Amount? = null,
+    val deliveryFee: Amount? = null,
     val notes: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
@@ -64,8 +66,10 @@ data class Order(
     val totalPrice: Amount
         get() {
             val currency = items.firstOrNull()?.service?.price?.currency ?: AppDefaults.CURRENCY
-            val totalRaw = items.sumOf { it.subtotal.raw } + (expressFee ?: 0L) + (deliveryFee ?: 0L)
-            return Amount(totalRaw, currency)
+            val totalDecimal = items.fold(Decimal.ZERO) { acc, item -> acc + item.subtotal.decimal } +
+                (expressFee?.decimal ?: Decimal.ZERO) +
+                (deliveryFee?.decimal ?: Decimal.ZERO)
+            return Amount(totalDecimal, currency)
         }
 
     /**

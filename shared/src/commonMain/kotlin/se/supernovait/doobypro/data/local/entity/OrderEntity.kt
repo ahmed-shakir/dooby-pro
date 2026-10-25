@@ -1,9 +1,12 @@
 package se.supernovait.doobypro.data.local.entity
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.datetime.LocalDateTime
+import se.supernovait.app.core.data.persistence.entity.AmountEntity
+import se.supernovait.app.core.data.persistence.entity.PercentageEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
@@ -56,9 +59,12 @@ data class OrderEntity(
     val deliveryOption: DeliveryOption,
     val deliveryMethod: DeliveryMethod,
     val expressFeeType: ExpressFeeType? = null,
-    val expressFeePercentage: Long? = null,
-    val expressFee: Long? = null,
-    val deliveryFee: Long? = null,
+    @Embedded(prefix = "express_pct_")
+    val expressFeePercentage: PercentageEntity? = null,
+    @Embedded(prefix = "express_fee_")
+    val expressFee: AmountEntity? = null,
+    @Embedded(prefix = "delivery_fee_")
+    val deliveryFee: AmountEntity? = null,
     val notes: String? = null,
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now()

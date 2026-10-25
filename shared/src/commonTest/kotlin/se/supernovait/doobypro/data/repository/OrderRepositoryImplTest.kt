@@ -90,7 +90,7 @@ class OrderRepositoryImplTest {
         id = serviceId,
         title = "Test Service",
         description = "Description",
-        price = AmountEntity(1000, "AED")
+        price = AmountEntity(1000, 2, "AED")
     )
 
     private val testStorage = StorageLocation(
