@@ -1,6 +1,8 @@
 package se.supernovait.doobypro.presentation.welcome
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,9 +16,11 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.app_action_close_label
 import doobypro.shared.generated.resources.sheet_SignIn_action_sign_in
 import doobypro.shared.generated.resources.sheet_SignIn_error_empty_username
 import doobypro.shared.generated.resources.sheet_SignIn_field_username
@@ -26,6 +30,7 @@ import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.error.AuthError
 import se.supernovait.app.core.domain.extension.error.asString
 import se.supernovait.app.core.ui.component.action.SupernovaButton
+import se.supernovait.app.core.ui.component.action.SupernovaTextAction
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
@@ -80,6 +85,7 @@ private fun SignInForm(
 ) {
     var username by remember { mutableStateOf("") }
     val emptyUsernameMessage = stringResource(Res.string.sheet_SignIn_error_empty_username)
+    val bottomSheetState = LocalBottomSheetState.current
 
     val errorText by produceState<String?>(initialValue = null, signInError, isUsernameEmpty) {
         value = when {
@@ -95,11 +101,23 @@ private fun SignInForm(
             .padding(horizontal = MaterialTheme.spacing.large)
             .padding(bottom = MaterialTheme.spacing.x3Large)
     ) {
-        SupernovaTitle(
-            text = stringResource(Res.string.sheet_SignIn_title),
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleLarge
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SupernovaTitle(
+                text = stringResource(Res.string.sheet_SignIn_title),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleLarge
+            )
+            SupernovaTextAction(
+                label = Res.string.app_action_close_label,
+                textStyle = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                onClick = { bottomSheetState.hide() }
+            )
+        }
         SupernovaSubtitle(
             text = stringResource(Res.string.sheet_SignIn_subtitle),
             color = MaterialTheme.colorScheme.primary,

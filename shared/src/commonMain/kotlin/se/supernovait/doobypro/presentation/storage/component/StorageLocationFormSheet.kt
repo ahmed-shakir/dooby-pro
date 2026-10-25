@@ -15,9 +15,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.app_action_close_label
 import doobypro.shared.generated.resources.label_delete
 import doobypro.shared.generated.resources.label_edit
 import doobypro.shared.generated.resources.label_save
@@ -27,7 +29,9 @@ import doobypro.shared.generated.resources.screen_Storage_field_label
 import doobypro.shared.generated.resources.screen_Storage_field_type
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
+import se.supernovait.app.core.ui.component.action.SupernovaTextAction
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
+import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
@@ -41,11 +45,15 @@ fun StorageLocationFormSheet(
     onSave: (String, StorageType, Int) -> Unit,
     onDelete: (() -> Unit)? = null
 ) {
+    val bottomSheetState = LocalBottomSheetState.current
+
+    val isNew = location.id == null
+    val showDelete = onDelete != null && !isNew
+
     var label by remember { mutableStateOf(location.label) }
     var type by remember { mutableStateOf(location.type) }
     var capacity by remember { mutableStateOf(location.capacity.toString()) }
 
-    val isNew = location.id == null
     val typeLabels = StorageType.entries.associateWith { stringResource(it.label) }
 
     Column(
@@ -53,11 +61,23 @@ fun StorageLocationFormSheet(
             .fillMaxWidth()
             .padding(MaterialTheme.spacing.medium)
     ) {
-        SupernovaTitle(
-            text = if (isNew) stringResource(Res.string.screen_Storage_action_add_location) else stringResource(Res.string.label_edit),
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleLarge
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SupernovaTitle(
+                text = if (isNew) stringResource(Res.string.screen_Storage_action_add_location) else stringResource(Res.string.label_edit),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleLarge
+            )
+            SupernovaTextAction(
+                label = Res.string.app_action_close_label,
+                textStyle = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                onClick = { bottomSheetState.hide() }
+            )
+        }
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
         SupernovaTextField(
@@ -94,7 +114,7 @@ fun StorageLocationFormSheet(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
-            if (onDelete != null && !location.isDefault) {
+            if (showDelete) {
                 SupernovaOutlinedButton(
                     label = Res.string.label_delete,
                     onClick = onDelete,
@@ -102,8 +122,6 @@ fun StorageLocationFormSheet(
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.statusColor.error),
                     modifier = Modifier.weight(1f)
                 )
-            } else {
-                Spacer(Modifier.weight(1f))
             }
 
             SupernovaOutlinedButton(
@@ -111,7 +129,7 @@ fun StorageLocationFormSheet(
                 onClick = { onSave(label, type, capacity.toIntOrNull() ?: 0) },
                 enabled = label.isNotBlank() && (location.isDefault || (capacity.toIntOrNull() ?: 0) > 0),
                 shape = MaterialTheme.shapes.extraSmall,
-                modifier = Modifier.weight(1f)
+                modifier = if (showDelete) Modifier.weight(1f) else Modifier.fillMaxWidth()
             )
         }
     }

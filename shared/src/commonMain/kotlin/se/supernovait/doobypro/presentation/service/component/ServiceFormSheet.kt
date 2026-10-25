@@ -15,9 +15,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.app_action_close_label
 import doobypro.shared.generated.resources.label_delete
 import doobypro.shared.generated.resources.label_edit
 import doobypro.shared.generated.resources.label_save
@@ -27,7 +29,9 @@ import doobypro.shared.generated.resources.screen_Service_field_price
 import doobypro.shared.generated.resources.screen_Service_field_title
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
+import se.supernovait.app.core.ui.component.action.SupernovaTextAction
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
+import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.Service
@@ -40,22 +44,37 @@ fun ServiceFormSheet(
     onSave: (String, String, Long) -> Unit,
     onDelete: (() -> Unit)? = null
 ) {
+    val bottomSheetState = LocalBottomSheetState.current
+
+    val isNew = service.id == null
+    val showDelete = onDelete != null && !isNew
+
     var title by remember { mutableStateOf(service.title) }
     var description by remember { mutableStateOf(service.description) }
     var priceValue by remember { mutableStateOf(service.price.value) }
-
-    val isNew = service.id == null
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(MaterialTheme.spacing.medium)
     ) {
-        SupernovaTitle(
-            text = if (isNew) stringResource(Res.string.screen_Service_action_add_service) else stringResource(Res.string.label_edit),
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleLarge
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SupernovaTitle(
+                text = if (isNew) stringResource(Res.string.screen_Service_action_add_service) else stringResource(Res.string.label_edit),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleLarge
+            )
+            SupernovaTextAction(
+                label = Res.string.app_action_close_label,
+                textStyle = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                onClick = { bottomSheetState.hide() }
+            )
+        }
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
         SupernovaTextField(
@@ -96,7 +115,7 @@ fun ServiceFormSheet(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
-            if (onDelete != null && !isNew) {
+            if (showDelete) {
                 SupernovaOutlinedButton(
                     label = Res.string.label_delete,
                     onClick = onDelete,
@@ -104,8 +123,6 @@ fun ServiceFormSheet(
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.statusColor.error),
                     modifier = Modifier.weight(1f)
                 )
-            } else {
-                Spacer(Modifier.weight(1f))
             }
 
             SupernovaOutlinedButton(
@@ -116,7 +133,7 @@ fun ServiceFormSheet(
                 },
                 enabled = title.isNotBlank() && description.isNotBlank() && priceValue.isNotBlank(),
                 shape = MaterialTheme.shapes.extraSmall,
-                modifier = Modifier.weight(1f)
+                modifier = if (showDelete) Modifier.weight(1f) else Modifier.fillMaxWidth()
             )
         }
     }

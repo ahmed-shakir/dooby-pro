@@ -19,6 +19,7 @@ import se.supernovait.app.core.ui.component.action.SupernovaButton
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.manager.OrderManager
+import se.supernovait.doobypro.presentation.app.AppEventHandler
 import se.supernovait.doobypro.presentation.order.CancelledOrdersScreen
 import se.supernovait.doobypro.presentation.order.OrderEvent
 import se.supernovait.doobypro.presentation.order.OrderManagementScreen
@@ -93,6 +94,8 @@ fun NavGraphBuilder.mainGraph(
         val viewModel = koinViewModel<OrderDetailsViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val orderManager = koinInject<OrderManager>()
+
+        AppEventHandler(events = viewModel.events, navController = navController)
 
         OrderDetailsScreen(
             uiState = uiState, 

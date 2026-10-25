@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import doobypro.shared.generated.resources.Res
+import doobypro.shared.generated.resources.app_action_close_label
 import doobypro.shared.generated.resources.ic_add
 import doobypro.shared.generated.resources.label_cancel
 import doobypro.shared.generated.resources.screen_Order_label_add_new_customer
@@ -24,6 +25,7 @@ import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.ui.component.action.SupernovaIconButton
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
+import se.supernovait.app.core.ui.component.action.SupernovaTextAction
 import se.supernovait.app.core.ui.component.input.SupernovaSearchField
 import se.supernovait.app.core.ui.component.list.SupernovaListItem
 import se.supernovait.app.core.ui.component.text.SupernovaTitle
@@ -53,12 +55,23 @@ fun CustomerSearchSheet(
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleLarge
             )
-            SupernovaIconButton(
-                icon = Res.drawable.ic_add,
-                contentDescription = stringResource(Res.string.screen_Order_label_add_new_customer),
-                tint = MaterialTheme.colorScheme.onSurface,
-                onClick = onAddClick
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SupernovaIconButton(
+                    icon = Res.drawable.ic_add,
+                    contentDescription = stringResource(Res.string.screen_Order_label_add_new_customer),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    onClick = onAddClick
+                )
+                SupernovaTextAction(
+                    label = Res.string.app_action_close_label,
+                    textStyle = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    onClick = onCancel
+                )
+            }
         }
         
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
@@ -90,11 +103,12 @@ fun CustomerSearchSheet(
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             SupernovaOutlinedButton(
                 label = Res.string.label_cancel,
                 onClick = onCancel,
-                shape = MaterialTheme.shapes.extraSmall
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

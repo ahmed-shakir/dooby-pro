@@ -192,6 +192,7 @@ fun OrderFormSheet(
             SupernovaTextAction(
                 label = Res.string.app_action_close_label,
                 textStyle = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface,
                 onClick = { bottomSheetState.hide() }
             )
         }
