@@ -10,4 +10,7 @@ object AppConfig {
     const val TERMS_OF_SERVICE_URL = "https://www.supernovait.se/dooby/pro/dooby-pro-terms-of-service.pdf"
     const val LICENSE_URL = "https://www.supernovait.se/license/SUPERNOVA_LICENSE_V1.txt"
     const val SUPPORT_EMAIL = "support@supernovait.se"
+    val DEBUG_MODE: Boolean get() = platformDebugMode
 }
+
+expect val platformDebugMode: Boolean

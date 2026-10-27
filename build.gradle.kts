@@ -64,7 +64,10 @@ tasks.register("generateAppVersionConfig") {
                 const val TERMS_OF_SERVICE_URL = "$termsOfServiceUrl"
                 const val LICENSE_URL = "$licenseUrl"
                 const val SUPPORT_EMAIL = "$supportEmail"
+                val DEBUG_MODE: Boolean get() = platformDebugMode
             }
+
+            expect val platformDebugMode: Boolean
             """.trimIndent() + "\n"
         )
     }

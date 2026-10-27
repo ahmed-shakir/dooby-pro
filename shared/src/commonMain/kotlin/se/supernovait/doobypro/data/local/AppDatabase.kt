@@ -14,7 +14,9 @@ import se.supernovait.app.core.data.persistence.dao.UserDao
 import se.supernovait.app.core.data.persistence.entity.LicenseEntity
 import se.supernovait.app.core.data.persistence.entity.NotificationEntity
 import se.supernovait.app.core.data.persistence.entity.UserEntity
+import se.supernovait.app.core.data.persistence.mapper.toEntity
 import se.supernovait.app.core.domain.initialization.InitializableDatabase
+import se.supernovait.doobypro.AppConfig
 import se.supernovait.doobypro.data.local.dao.AccountDao
 import se.supernovait.doobypro.data.local.dao.AgreementDao
 import se.supernovait.doobypro.data.local.dao.BusinessHoursDao
@@ -29,8 +31,11 @@ import se.supernovait.doobypro.data.local.entity.CompanyEntity
 import se.supernovait.doobypro.data.local.entity.OrderEntity
 import se.supernovait.doobypro.data.local.entity.ServiceEntity
 import se.supernovait.doobypro.data.local.entity.StorageLocationEntity
+import se.supernovait.doobypro.data.local.mapper.toEntity
 import se.supernovait.doobypro.domain.model.AppDefaults.DEFAULT_STORAGE_LOCATION_ID
 import se.supernovait.doobypro.domain.model.AppDefaults.DEFAULT_STORAGE_LOCATION_LABEL
+import se.supernovait.doobypro.domain.model.TestAccount
+import se.supernovait.doobypro.domain.model.TestUser
 import se.supernovait.doobypro.domain.model.storage.StorageType
 
 @Database(
@@ -64,6 +69,7 @@ abstract class AppDatabase : RoomDatabase(), InitializableDatabase {
     override suspend fun verify() {
         userDao().getCount()
         ensureDefaultStorageLocation()
+        initTestUsers()
     }
 
     private suspend fun ensureDefaultStorageLocation() {
@@ -79,6 +85,27 @@ abstract class AppDatabase : RoomDatabase(), InitializableDatabase {
                     isActive = true
                 )
             )
+        }
+    }
+
+    private suspend fun initTestUsers() {
+        if (AppConfig.DEBUG_MODE) {
+            val userDao = userDao()
+            val user = userDao.getByUsername(TestUser.andy.username)
+            if (user == null) {
+                val companyDao = companyDao()
+                val licenseDao = licenseDao()
+                val accountDao = accountDao()
+
+                val andyBusinessAccount = TestAccount.andyBusinessAccount
+
+                userDao.upsert(andyBusinessAccount.user.toEntity())
+                companyDao.upsert(andyBusinessAccount.company.toEntity())
+                andyBusinessAccount.license?.let {
+                    licenseDao.upsert(it.toEntity())
+                }
+                accountDao.upsert(andyBusinessAccount.toEntity())
+            }
         }
     }
 
