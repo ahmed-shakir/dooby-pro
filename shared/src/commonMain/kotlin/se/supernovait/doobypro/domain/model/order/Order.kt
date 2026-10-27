@@ -12,6 +12,7 @@ import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.decimal.Decimal
 import se.supernovait.app.core.domain.model.decimal.Percentage
 import se.supernovait.doobypro.domain.model.AppDefaults
+import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
@@ -32,10 +33,12 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
  * @property orderDatetime The date and time the order was placed.
  * @property deliveryDatetime The scheduled completion or delivery date and time.
  * @property deliveryOption The chosen delivery priority (e.g., Express, Standard).
- * @property deliveryMethod The chosen delivery method (e.g., Home Delivery, Pickup).
+ * @property deliveryMethod The chosen delivery method (e.g., Home Delivery, In-Store Pickup).
+ * @property collectionMethod The chosen collection/drop-off method (e.g., In-Store Drop-off, Home Pickup).
  * @property expressFeeType The [ExpressFeeType] calculation mode (percentage or flat fee) used when the express fee was set.
  * @property expressFeePercentage The percentage markup value if express fee was percentage-based.
  * @property expressFee The express fee applied when [deliveryOption] is [DeliveryOption.EXPRESS].
+ * @property pickupFee The fixed pickup fee applied when [collectionMethod] is [CollectionMethod.HOME_PICKUP].
  * @property deliveryFee The fixed delivery fee applied when [deliveryMethod] is [DeliveryMethod.HOME_DELIVERY].
  * @property subunitRounding The subunit rounding amount applied to the order.
  * @property notes Optional internal or customer-provided notes.
@@ -53,9 +56,11 @@ data class Order(
     val deliveryDatetime: LocalDateTime = LocalDateTime.now(),
     val deliveryOption: DeliveryOption = DeliveryOption.STANDARD,
     val deliveryMethod: DeliveryMethod = DeliveryMethod.IN_STORE_PICKUP,
+    val collectionMethod: CollectionMethod = CollectionMethod.IN_STORE_DROP_OFF,
     val expressFeeType: ExpressFeeType? = null,
     val expressFeePercentage: Percentage? = null,
     val expressFee: Amount? = null,
+    val pickupFee: Amount? = null,
     val deliveryFee: Amount? = null,
     val subunitRounding: Amount? = null,
     val notes: String? = null,
@@ -71,6 +76,7 @@ data class Order(
             val totalDecimal = items.fold(Decimal.ZERO) { acc, item -> acc + item.subtotal.decimal } +
                 (expressFee?.decimal ?: Decimal.ZERO) +
                 (deliveryFee?.decimal ?: Decimal.ZERO) +
+                (pickupFee?.decimal ?: Decimal.ZERO) +
                 (subunitRounding?.decimal ?: Decimal.ZERO)
             return Amount(totalDecimal, currency)
         }

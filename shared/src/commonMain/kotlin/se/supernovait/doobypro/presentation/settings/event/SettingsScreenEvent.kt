@@ -1,5 +1,6 @@
 package se.supernovait.doobypro.presentation.settings.event
 
+import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.settings.common.Currency
@@ -29,6 +30,7 @@ sealed interface SettingsScreenEvent {
     data class UpdateDefaultServiceId(val serviceId: String?) : SettingsScreenEvent
     data class UpdateDefaultDeliveryOption(val option: DeliveryOption) : SettingsScreenEvent
     data class UpdateDefaultDeliveryMethod(val method: DeliveryMethod) : SettingsScreenEvent
+    data class UpdateDefaultCollectionMethod(val method: CollectionMethod) : SettingsScreenEvent
     data class UpdateDefaultDeliveryDaysOffset(val days: Int) : SettingsScreenEvent
     data class UpdateAutoPrintReceipts(val enabled: Boolean) : SettingsScreenEvent
     data class UpdateAutoPrintOrderTag(val enabled: Boolean) : SettingsScreenEvent
@@ -36,6 +38,7 @@ sealed interface SettingsScreenEvent {
     data class UpdateExpressFeeMode(val mode: ExpressFeeMode) : SettingsScreenEvent
     data class UpdateExpressFeeType(val type: ExpressFeeType) : SettingsScreenEvent
     data class UpdateExpressFeeValue(val value: Long) : SettingsScreenEvent
+    data class UpdatePickupFeeValue(val value: Long) : SettingsScreenEvent
     data class UpdateDeliveryFeeValue(val value: Long) : SettingsScreenEvent
     data class UpdateSubunitRoundingEnabled(val enabled: Boolean) : SettingsScreenEvent
     data class UpdateSubunitRoundingValue(val value: Long) : SettingsScreenEvent

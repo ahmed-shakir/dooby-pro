@@ -80,6 +80,7 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateDefaultServiceId -> updateSettings { it.copy(order = it.order.copy(defaultServiceId = event.serviceId)) }
             is SettingsScreenEvent.UpdateDefaultDeliveryOption -> updateSettings { it.copy(order = it.order.copy(defaultDeliveryOption = event.option)) }
             is SettingsScreenEvent.UpdateDefaultDeliveryMethod -> updateSettings { it.copy(order = it.order.copy(defaultDeliveryMethod = event.method)) }
+            is SettingsScreenEvent.UpdateDefaultCollectionMethod -> updateSettings { it.copy(order = it.order.copy(defaultCollectionMethod = event.method)) }
             is SettingsScreenEvent.UpdateDefaultDeliveryDaysOffset -> updateSettings { it.copy(order = it.order.copy(defaultDeliveryDaysOffset = event.days)) }
             is SettingsScreenEvent.UpdateAutoPrintReceipts -> updateSettings { it.copy(order = it.order.copy(autoPrintReceipts = event.enabled)) }
             is SettingsScreenEvent.UpdateAutoPrintOrderTag -> updateSettings { it.copy(order = it.order.copy(autoPrintOrderTag = event.enabled)) }
@@ -87,6 +88,7 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateExpressFeeMode -> updateSettings { it.copy(order = it.order.copy(expressFeeMode = event.mode)) }
             is SettingsScreenEvent.UpdateExpressFeeType -> updateSettings { it.copy(order = it.order.copy(expressFeeType = event.type)) }
             is SettingsScreenEvent.UpdateExpressFeeValue -> updateSettings { it.copy(order = it.order.copy(expressFeeValue = event.value)) }
+            is SettingsScreenEvent.UpdatePickupFeeValue -> updateSettings { it.copy(order = it.order.copy(pickupFeeValue = event.value)) }
             is SettingsScreenEvent.UpdateDeliveryFeeValue -> updateSettings { it.copy(order = it.order.copy(deliveryFeeValue = event.value)) }
             is SettingsScreenEvent.UpdateSubunitRoundingEnabled -> updateSettings { it.copy(order = it.order.copy(subunitRoundingEnabled = event.enabled)) }
             is SettingsScreenEvent.UpdateSubunitRoundingValue -> updateSettings { it.copy(order = it.order.copy(subunitRoundingValue = event.value)) }

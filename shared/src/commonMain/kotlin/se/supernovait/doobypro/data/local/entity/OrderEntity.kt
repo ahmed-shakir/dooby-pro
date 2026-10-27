@@ -9,6 +9,7 @@ import se.supernovait.app.core.data.persistence.entity.AmountEntity
 import se.supernovait.app.core.data.persistence.entity.PercentageEntity
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator
 import se.supernovait.doobypro.domain.model.IdType
+import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.OrderStatus
@@ -29,11 +30,13 @@ import kotlin.time.Instant
  * @property deliveryDatetime The scheduled date and time for delivery.
  * @property deliveryOption The chosen delivery priority (e.g., [DeliveryOption.EXPRESS], [DeliveryOption.STANDARD]).
  * @property deliveryMethod The chosen delivery method (e.g., [DeliveryMethod.HOME_DELIVERY], [DeliveryMethod.IN_STORE_PICKUP]).
+ * @property collectionMethod The chosen collection/drop-off method (e.g., [CollectionMethod.IN_STORE_DROP_OFF], [CollectionMethod.HOME_PICKUP]).
  * @property expressFeeType The calculation type (percentage or flat fee) used when express fee was created.
  * @property expressFeePercentage The percentage value if express fee was percentage-based.
  * @property expressFee The express fee associated with the order.
+ * @property pickupFee The pickup fee associated with the order.
  * @property deliveryFee The delivery fee associated with the order.
- * @property notes Optional notes provided by the customer.
+ * @property subunitRounding The subunit rounding amount associated with the order.
  * @property createdAt The timestamp when the order was first created.
  * @property updatedAt The timestamp when the order was last modified.
  */
@@ -58,11 +61,14 @@ data class OrderEntity(
     val deliveryDatetime: LocalDateTime,
     val deliveryOption: DeliveryOption,
     val deliveryMethod: DeliveryMethod,
+    val collectionMethod: CollectionMethod = CollectionMethod.IN_STORE_DROP_OFF,
     val expressFeeType: ExpressFeeType? = null,
     @Embedded(prefix = "express_pct_")
     val expressFeePercentage: PercentageEntity? = null,
     @Embedded(prefix = "express_fee_")
     val expressFee: AmountEntity? = null,
+    @Embedded(prefix = "pickup_fee_")
+    val pickupFee: AmountEntity? = null,
     @Embedded(prefix = "delivery_fee_")
     val deliveryFee: AmountEntity? = null,
     @Embedded(prefix = "subunit_rounding_")

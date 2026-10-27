@@ -61,6 +61,8 @@
     <string name="delivery_option_standard">Standard</string>
     <string name="delivery_method_home_delivery">Home delivery</string>
     <string name="delivery_method_in_store_pickup">In-store pickup</string>
+    <string name="collection_method_in_store_drop_off">In-store drop-off</string>
+    <string name="collection_method_home_pickup">Home pickup</string>
 
     <!-- Currency -->
     <string name="currency_aed">AED (United Arab Emirates)</string>
@@ -238,9 +240,11 @@
     <string name="screen_Settings_order_default_service_label">Default Service</string>
     <string name="screen_Settings_order_delivery_option_label">Default Delivery Option</string>
     <string name="screen_Settings_order_delivery_method_label">Default Delivery Method</string>
+    <string name="screen_Settings_order_collection_method_label">Default Collection Method</string>
     <string name="screen_Settings_order_handling_time_label">Default Handling Time (days)</string>
     <string name="screen_Settings_order_fees_label">Order Fees</string>
     <string name="screen_Settings_order_delivery_fee_value_label">Global Delivery Fee (%1$s)</string>
+    <string name="screen_Settings_order_pickup_fee_value_label">Global Pickup Fee (%1$s)</string>
     <string name="screen_Settings_order_express_fee_mode_label">Express Fee Mode</string>
     <string name="screen_Settings_order_express_fee_type_label">Express Fee Type</string>
     <string name="screen_Settings_order_express_fee_value_label">Global Express Fee (%1$s)</string>
@@ -418,12 +422,14 @@
     <string name="screen_Order_field_service">Services</string>
     <string name="screen_Order_field_delivery_option">Priority</string>
     <string name="screen_Order_field_delivery_method">Delivery Method</string>
+    <string name="screen_Order_field_collection_method">Collection Method</string>
     <string name="screen_Order_field_delivery_date">Delivery Date</string>
     <string name="screen_Order_field_delivery_address">Delivery Address</string>
     <string name="screen_Order_field_storage">Storage Location</string>
     <string name="screen_Order_field_express_fee">Express Fee (%1$s)</string>
     <string name="screen_Order_field_express_fee_percentage">Express Fee Percentage (%)</string>
     <string name="screen_Order_field_delivery_fee">Delivery Fee (%1$s)</string>
+    <string name="screen_Order_field_pickup_fee">Pickup Fee (%1$s)</string>
     <string name="screen_Order_field_payment_status">Payment Done</string>
     <string name="screen_Order_field_notes">Notes</string>
     <string name="screen_Order_dialog_delete_title">Delete Order</string>

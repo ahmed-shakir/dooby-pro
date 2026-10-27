@@ -50,6 +50,7 @@ import se.supernovait.app.core.domain.observability.performance.traceAsync
 import se.supernovait.app.core.domain.sharing.ShareConfiguration
 import se.supernovait.doobypro.domain.model.AppDefaults
 import se.supernovait.doobypro.domain.model.company.Company
+import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
@@ -168,6 +169,12 @@ class OrderManager(
                 null
             }
 
+            val pickupFee = if (orderSettings.defaultCollectionMethod == CollectionMethod.HOME_PICKUP) {
+                Amount(orderSettings.pickupFeeValue, currency)
+            } else {
+                null
+            }
+
             val deliveryFee = if (orderSettings.defaultDeliveryMethod == DeliveryMethod.HOME_DELIVERY) {
                 Amount(orderSettings.deliveryFeeValue, currency)
             } else {
@@ -175,7 +182,7 @@ class OrderManager(
             }
 
             val itemsSubtotalRaw = Amount(itemsSubtotal, currency).raw
-            val baseTotalRaw = itemsSubtotalRaw + (expressFee?.raw ?: 0L) + (deliveryFee?.raw ?: 0L)
+            val baseTotalRaw = itemsSubtotalRaw + (expressFee?.raw ?: 0L) + (pickupFee?.raw ?: 0L) + (deliveryFee?.raw ?: 0L)
             val subunitRounding = if (orderSettings.subunitRoundingEnabled && orderSettings.subunitRoundingValue > 0L) {
                 val step = orderSettings.subunitRoundingValue
                 val remainder = baseTotalRaw % step
@@ -200,9 +207,11 @@ class OrderManager(
                 deliveryDatetime = deliveryDatetime,
                 deliveryOption = orderSettings.defaultDeliveryOption,
                 deliveryMethod = orderSettings.defaultDeliveryMethod,
+                collectionMethod = orderSettings.defaultCollectionMethod,
                 expressFeeType = expressFeeType,
                 expressFeePercentage = expressFeePercentage,
                 expressFee = expressFee,
+                pickupFee = pickupFee,
                 deliveryFee = deliveryFee,
                 subunitRounding = subunitRounding,
                 notes = null
@@ -221,9 +230,11 @@ class OrderManager(
                 items = originalOrder.items,
                 deliveryOption = originalOrder.deliveryOption,
                 deliveryMethod = originalOrder.deliveryMethod,
+                collectionMethod = originalOrder.collectionMethod,
                 expressFeeType = originalOrder.expressFeeType,
                 expressFeePercentage = originalOrder.expressFeePercentage,
                 expressFee = originalOrder.expressFee,
+                pickupFee = originalOrder.pickupFee,
                 deliveryFee = originalOrder.deliveryFee,
                 subunitRounding = originalOrder.subunitRounding,
                 notes = originalOrder.notes

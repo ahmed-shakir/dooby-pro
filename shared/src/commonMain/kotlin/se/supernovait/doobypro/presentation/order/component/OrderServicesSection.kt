@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.screen_Order_empty_services
+import doobypro.shared.generated.resources.screen_Order_field_pickup_fee
 import doobypro.shared.generated.resources.screen_Order_field_service
 import doobypro.shared.generated.resources.screen_Order_label_delivery_fee
 import doobypro.shared.generated.resources.screen_Order_label_express_fee
@@ -54,9 +55,10 @@ fun OrderServicesSection(
     val currency = items.firstOrNull()?.service?.price?.currency ?: AppDefaults.CURRENCY
     val itemsSubtotal = Amount(items.sumOf { it.subtotal.raw }, currency)
     val expressFeeAmount = order.expressFee?.takeIf { it.raw > 0 }
+    val pickupFeeAmount = order.pickupFee?.takeIf { it.raw > 0 }
     val deliveryFeeAmount = order.deliveryFee?.takeIf { it.raw > 0 }
     val subunitRoundingAmount = order.subunitRounding?.takeIf { it.raw != 0L }
-    val hasExtras = (expressFeeAmount != null) || (deliveryFeeAmount != null) || (subunitRoundingAmount != null)
+    val hasExtras = (expressFeeAmount != null) || (pickupFeeAmount != null) || (deliveryFeeAmount != null) || (subunitRoundingAmount != null)
 
     Column(modifier = modifier.fillMaxWidth()) {
         SupernovaLabel(
@@ -187,6 +189,29 @@ fun OrderServicesSection(
                             )
                             SupernovaLabel(
                                 text = expressFeeAmount.formatted,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    }
+
+                    // Pickup Fee Row
+                    if (pickupFeeAmount != null) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = MaterialTheme.spacing.extraSmall),
+                        ) {
+                            SupernovaLabel(
+                                text = stringResource(Res.string.screen_Order_field_pickup_fee, currency),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            SupernovaLabel(
+                                text = pickupFeeAmount.formatted,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Medium,

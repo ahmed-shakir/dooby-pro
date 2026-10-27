@@ -39,6 +39,7 @@ import doobypro.shared.generated.resources.label_save
 import doobypro.shared.generated.resources.screen_Order_action_add_order
 import doobypro.shared.generated.resources.screen_Order_action_create_order
 import doobypro.shared.generated.resources.screen_Order_empty_services
+import doobypro.shared.generated.resources.screen_Order_field_collection_method
 import doobypro.shared.generated.resources.screen_Order_field_customer
 import doobypro.shared.generated.resources.screen_Order_field_delivery_date
 import doobypro.shared.generated.resources.screen_Order_field_delivery_fee
@@ -48,6 +49,7 @@ import doobypro.shared.generated.resources.screen_Order_field_express_fee
 import doobypro.shared.generated.resources.screen_Order_field_express_fee_percentage
 import doobypro.shared.generated.resources.screen_Order_field_notes
 import doobypro.shared.generated.resources.screen_Order_field_payment_status
+import doobypro.shared.generated.resources.screen_Order_field_pickup_fee
 import doobypro.shared.generated.resources.screen_Order_field_service
 import doobypro.shared.generated.resources.screen_Order_field_storage
 import doobypro.shared.generated.resources.screen_Order_header_item
@@ -78,6 +80,7 @@ import se.supernovait.app.core.ui.component.text.SupernovaTitle
 import se.supernovait.app.core.ui.theme.sizing
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.Service
+import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.order.Order
@@ -114,6 +117,7 @@ fun OrderFormSheet(
     expressFeeType: ExpressFeeType,
     globalExpressFee: Long,
     globalDeliveryFee: Long,
+    globalPickupFee: Long,
     subunitRoundingEnabled: Boolean,
     subunitRoundingValue: Long,
     currency: String,
@@ -132,6 +136,7 @@ fun OrderFormSheet(
     var deliveryDatetime by remember { mutableStateOf(order.deliveryDatetime) }
     var deliveryOption by remember { mutableStateOf(order.deliveryOption) }
     var deliveryMethod by remember { mutableStateOf(order.deliveryMethod) }
+    var collectionMethod by remember { mutableStateOf(order.collectionMethod) }
     var isPaymentDone by remember { mutableStateOf(order.isPaymentDone) }
 
     val activeExpressFeeType = if (!isNew) (order.expressFeeType ?: expressFeeType) else expressFeeType
@@ -174,6 +179,7 @@ fun OrderFormSheet(
 
     val deliveryOptionLabels = DeliveryOption.entries.associateWith { stringResource(it.label) }
     val deliveryMethodLabels = DeliveryMethod.entries.associateWith { stringResource(it.label) }
+    val collectionMethodLabels = CollectionMethod.entries.associateWith { stringResource(it.label) }
 
     Column(
         modifier = Modifier
@@ -453,7 +459,31 @@ fun OrderFormSheet(
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-        // 6. deliveryMethod
+        // 6. collectionMethod
+        SupernovaSelectField(
+            label = Res.string.screen_Order_field_collection_method,
+            options = CollectionMethod.entries,
+            selectedOption = collectionMethod,
+            onOptionSelected = { method -> collectionMethod = method },
+            optionLabel = { method -> collectionMethodLabels[method] ?: method.name }
+        )
+
+        if (collectionMethod == CollectionMethod.HOME_PICKUP) {
+            Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+            SupernovaTextField(
+                label = stringResource(Res.string.screen_Order_field_pickup_fee, currency),
+                value = Amount(globalPickupFee, currency).value,
+                onValueChange = { _, _ -> },
+                enabled = false,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        // 7. deliveryMethod
         SupernovaSelectField(
             label = Res.string.screen_Order_field_delivery_method,
             options = DeliveryMethod.entries,
@@ -474,17 +504,17 @@ fun OrderFormSheet(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
+        }
 
-            Spacer(Modifier.height(MaterialTheme.spacing.medium))
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-            // If customer has no registered location, show attention warning message
-            if (!selectedCustomer.hasRegisteredAddress) {
-                Spacer(Modifier.height(MaterialTheme.spacing.small))
-                SupernovaNotice(
-                    textResource = Res.string.screen_Order_warning_missing_customer_address,
-                    variant = NoticeVariant.Error
-                )
-            }
+        // If customer has no registered location, show attention warning message if either home service is selected
+        if ((collectionMethod == CollectionMethod.HOME_PICKUP || deliveryMethod == DeliveryMethod.HOME_DELIVERY) && !selectedCustomer.hasRegisteredAddress) {
+            Spacer(Modifier.height(MaterialTheme.spacing.small))
+            SupernovaNotice(
+                textResource = Res.string.screen_Order_warning_missing_customer_address,
+                variant = NoticeVariant.Error
+            )
         }
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
@@ -592,6 +622,16 @@ fun OrderFormSheet(
                         Triple<Amount?, ExpressFeeType?, Percentage?>(null, null, null)
                     }
 
+                    val calculatedPickupFee = if (collectionMethod == CollectionMethod.HOME_PICKUP) {
+                        if (!isNew && order.pickupFee != null) {
+                            order.pickupFee
+                        } else {
+                            Amount(globalPickupFee, currency)
+                        }
+                    } else {
+                        null
+                    }
+
                     val calculatedDeliveryFee = if (deliveryMethod == DeliveryMethod.HOME_DELIVERY) {
                         if (!isNew && order.deliveryFee != null) {
                             order.deliveryFee
@@ -603,7 +643,7 @@ fun OrderFormSheet(
                     }
 
                     val itemsSubtotalRaw = Amount(itemsSubtotal, currency).raw
-                    val baseTotalRaw = itemsSubtotalRaw + (calculatedExpressFee?.raw ?: 0L) + (calculatedDeliveryFee?.raw ?: 0L)
+                    val baseTotalRaw = itemsSubtotalRaw + (calculatedExpressFee?.raw ?: 0L) + (calculatedDeliveryFee?.raw ?: 0L) + (calculatedPickupFee?.raw ?: 0L)
                     val calculatedSubunitRounding = if (subunitRoundingEnabled && subunitRoundingValue > 0L) {
                         val remainder = baseTotalRaw % subunitRoundingValue
                         val roundedRaw = when {
@@ -625,10 +665,12 @@ fun OrderFormSheet(
                         deliveryDatetime = deliveryDatetime,
                         deliveryOption = deliveryOption,
                         deliveryMethod = deliveryMethod,
+                        collectionMethod = collectionMethod,
                         expressFeeType = savedExpressFeeType,
                         expressFeePercentage = savedExpressFeePercentage,
                         expressFee = calculatedExpressFee,
                         deliveryFee = calculatedDeliveryFee,
+                        pickupFee = calculatedPickupFee,
                         subunitRounding = calculatedSubunitRounding,
                         notes = notes.ifBlank { null }
                     )) 

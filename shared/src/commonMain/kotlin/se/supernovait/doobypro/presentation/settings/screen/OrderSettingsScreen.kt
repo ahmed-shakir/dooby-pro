@@ -23,6 +23,7 @@ import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.screen_Settings_order_auto_print_order_tag_label
 import doobypro.shared.generated.resources.screen_Settings_order_auto_print_receipts_label
 import doobypro.shared.generated.resources.screen_Settings_order_behavior_label
+import doobypro.shared.generated.resources.screen_Settings_order_collection_method_label
 import doobypro.shared.generated.resources.screen_Settings_order_default_label
 import doobypro.shared.generated.resources.screen_Settings_order_default_service_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_fee_value_label
@@ -33,6 +34,7 @@ import doobypro.shared.generated.resources.screen_Settings_order_express_fee_typ
 import doobypro.shared.generated.resources.screen_Settings_order_express_fee_value_label
 import doobypro.shared.generated.resources.screen_Settings_order_fees_label
 import doobypro.shared.generated.resources.screen_Settings_order_handling_time_label
+import doobypro.shared.generated.resources.screen_Settings_order_pickup_fee_value_label
 import doobypro.shared.generated.resources.screen_Settings_order_subunit_rounding_enabled_label
 import doobypro.shared.generated.resources.screen_Settings_order_subunit_rounding_label
 import doobypro.shared.generated.resources.screen_Settings_order_subunit_rounding_value_label
@@ -48,6 +50,7 @@ import se.supernovait.app.core.ui.component.selection.SupernovaSelectionGroup
 import se.supernovait.app.core.ui.component.selection.SupernovaToggle
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeMode
@@ -65,6 +68,7 @@ fun OrderSettingsScreen(
     val selectedService = uiState.services.find { it.id == uiState.settings.order.defaultServiceId }
     val deliveryOptionLabels = DeliveryOption.entries.associateWith { stringResource(it.label) }
     val deliveryMethodLabels = DeliveryMethod.entries.associateWith { stringResource(it.label) }
+    val collectionMethodLabels = CollectionMethod.entries.associateWith { stringResource(it.label) }
     val orderTagPrintModeLabels = OrderTagPrintMode.entries.associateWith { stringResource(it.label) }
     val expressFeeModeLabels = ExpressFeeMode.entries.associateWith { stringResource(it.label) }
     val currency = uiState.settings.common.currency.symbol
@@ -88,6 +92,10 @@ fun OrderSettingsScreen(
             Amount(uiState.settings.order.expressFeeValue, currency).value
         }
         mutableStateOf(text)
+    }
+
+    var pickupFeeValueText by remember(uiState.settings.order.pickupFeeValue) {
+        mutableStateOf(Amount(uiState.settings.order.pickupFeeValue, currency).value)
     }
 
     var deliveryFeeValueText by remember(uiState.settings.order.deliveryFeeValue) {
@@ -129,6 +137,15 @@ fun OrderSettingsScreen(
         )
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
+        SupernovaSelectField(
+            label = Res.string.screen_Settings_order_collection_method_label,
+            options = CollectionMethod.entries,
+            selectedOption = uiState.settings.order.defaultCollectionMethod,
+            onOptionSelected = { method -> onEvent(SettingsScreenEvent.UpdateDefaultCollectionMethod(method)) },
+            optionLabel = { method -> collectionMethodLabels[method] ?: "" }
+        )
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
         SupernovaTextField(
             label = stringResource(Res.string.screen_Settings_order_handling_time_label),
             value = deliveryDaysText,
@@ -156,6 +173,21 @@ fun OrderSettingsScreen(
                     deliveryFeeValueText = newValue
                     val rawValue = ((newValue.toDoubleOrNull() ?: 0.0) * 100).toLong()
                     onEvent(SettingsScreenEvent.UpdateDeliveryFeeValue(rawValue))
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+        )
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        SupernovaTextField(
+            label = stringResource(Res.string.screen_Settings_order_pickup_fee_value_label, currency),
+            value = pickupFeeValueText,
+            onValueChange = { newValue, _ ->
+                if (newValue.isEmpty() || newValue.matches(Regex(ValidationPattern.DECIMAL.pattern))) {
+                    pickupFeeValueText = newValue
+                    val rawValue = ((newValue.toDoubleOrNull() ?: 0.0) * 100).toLong()
+                    onEvent(SettingsScreenEvent.UpdatePickupFeeValue(rawValue))
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
