@@ -41,6 +41,7 @@ fun OrderEntity.toDomain(
     expressFeePercentage = expressFeePercentage?.toDomain(),
     expressFee = expressFee?.toDomain(),
     deliveryFee = deliveryFee?.toDomain(),
+    subunitRounding = subunitRounding?.toDomain(),
     notes = notes,
     createdAt = createdAt.toLocalDateTime(TimeZone.currentSystemDefault()),
     updatedAt = updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -66,6 +67,7 @@ fun Order.toEntity() = OrderEntity(
     expressFeePercentage = expressFeePercentage?.toEntity(),
     expressFee = expressFee?.toEntity(),
     deliveryFee = deliveryFee?.toEntity(),
+    subunitRounding = subunitRounding?.toEntity(),
     notes = notes,
     createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()),
     updatedAt = Clock.System.now()

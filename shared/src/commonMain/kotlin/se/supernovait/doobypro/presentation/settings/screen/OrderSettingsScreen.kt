@@ -1,22 +1,29 @@
 package se.supernovait.doobypro.presentation.settings.screen
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import doobypro.shared.generated.resources.Res
 import doobypro.shared.generated.resources.screen_Settings_order_auto_print_order_tag_label
 import doobypro.shared.generated.resources.screen_Settings_order_auto_print_receipts_label
 import doobypro.shared.generated.resources.screen_Settings_order_behavior_label
+import doobypro.shared.generated.resources.screen_Settings_order_default_label
 import doobypro.shared.generated.resources.screen_Settings_order_default_service_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_fee_value_label
 import doobypro.shared.generated.resources.screen_Settings_order_delivery_method_label
@@ -24,11 +31,16 @@ import doobypro.shared.generated.resources.screen_Settings_order_delivery_option
 import doobypro.shared.generated.resources.screen_Settings_order_express_fee_mode_label
 import doobypro.shared.generated.resources.screen_Settings_order_express_fee_type_label
 import doobypro.shared.generated.resources.screen_Settings_order_express_fee_value_label
+import doobypro.shared.generated.resources.screen_Settings_order_fees_label
 import doobypro.shared.generated.resources.screen_Settings_order_handling_time_label
+import doobypro.shared.generated.resources.screen_Settings_order_subunit_rounding_enabled_label
+import doobypro.shared.generated.resources.screen_Settings_order_subunit_rounding_label
+import doobypro.shared.generated.resources.screen_Settings_order_subunit_rounding_value_label
 import doobypro.shared.generated.resources.screen_Settings_order_tag_print_mode_label
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.decimal.Percentage
+import se.supernovait.app.core.domain.model.validation.ValidationPattern
 import se.supernovait.app.core.ui.component.container.SupernovaListGroup
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
 import se.supernovait.app.core.ui.component.selection.SupernovaSelectField
@@ -83,7 +95,12 @@ fun OrderSettingsScreen(
     }
 
     SettingsScreen {
-        Spacer(Modifier.height(MaterialTheme.spacing.small))
+        SupernovaLabel(
+            text = Res.string.screen_Settings_order_default_label,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(top = MaterialTheme.spacing.small, bottom = MaterialTheme.spacing.small)
+        )
 
         SupernovaSelectField(
             label = Res.string.screen_Settings_order_default_service_label,
@@ -124,13 +141,18 @@ fun OrderSettingsScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
-        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+        SupernovaLabel(
+            text = Res.string.screen_Settings_order_fees_label,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(top = MaterialTheme.spacing.large, bottom = MaterialTheme.spacing.small)
+        )
 
         SupernovaTextField(
             label = stringResource(Res.string.screen_Settings_order_delivery_fee_value_label, currency),
             value = deliveryFeeValueText,
             onValueChange = { newValue, _ ->
-                if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
+                if (newValue.isEmpty() || newValue.matches(Regex(ValidationPattern.DECIMAL.pattern))) {
                     deliveryFeeValueText = newValue
                     val rawValue = ((newValue.toDoubleOrNull() ?: 0.0) * 100).toLong()
                     onEvent(SettingsScreenEvent.UpdateDeliveryFeeValue(rawValue))
@@ -169,7 +191,7 @@ fun OrderSettingsScreen(
                 ),
                 value = expressFeeValueText,
                 onValueChange = { newValue, _ ->
-                    if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
+                    if (newValue.isEmpty() || newValue.matches(Regex(ValidationPattern.DECIMAL.pattern))) {
                         expressFeeValueText = newValue
                         val rawValue = ((newValue.toDoubleOrNull() ?: 0.0) * 100).roundToLong()
                         onEvent(SettingsScreenEvent.UpdateExpressFeeValue(rawValue))
@@ -179,6 +201,57 @@ fun OrderSettingsScreen(
                     keyboardType = KeyboardType.Decimal,
                 ),
             )
+        }
+
+        SupernovaLabel(
+            text = Res.string.screen_Settings_order_subunit_rounding_label,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(top = MaterialTheme.spacing.large, bottom = MaterialTheme.spacing.small)
+        )
+        SupernovaListGroup {
+            val roundingValueFloat = (uiState.settings.order.subunitRoundingValue / 100.0).toFloat()
+
+            item {
+                SupernovaToggle(
+                    label = Res.string.screen_Settings_order_subunit_rounding_enabled_label,
+                    checked = uiState.settings.order.subunitRoundingEnabled,
+                    onCheckedChange = { onEvent(SettingsScreenEvent.UpdateSubunitRoundingEnabled(it)) }
+                )
+            }
+            item {
+                if (uiState.settings.order.subunitRoundingEnabled) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.extraSmall)) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            SupernovaLabel(
+                                text = stringResource(Res.string.screen_Settings_order_subunit_rounding_value_label, currency),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            SupernovaLabel(
+                                text = Amount(uiState.settings.order.subunitRoundingValue, currency).formatted,
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(Modifier.height(MaterialTheme.spacing.extraSmall))
+                        Slider(
+                            value = roundingValueFloat.coerceIn(0.01f, 0.99f),
+                            onValueChange = { newValue ->
+                                val rawValue = ((newValue * 100.0).roundToLong()).coerceIn(1L, 99L)
+                                onEvent(SettingsScreenEvent.UpdateSubunitRoundingValue(rawValue))
+                            },
+                            valueRange = 0.01f..0.99f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
         }
 
         SupernovaLabel(

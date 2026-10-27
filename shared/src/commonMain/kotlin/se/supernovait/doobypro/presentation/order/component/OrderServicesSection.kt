@@ -19,6 +19,7 @@ import doobypro.shared.generated.resources.screen_Order_label_delivery_fee
 import doobypro.shared.generated.resources.screen_Order_label_express_fee
 import doobypro.shared.generated.resources.screen_Order_label_express_fee_with_percentage
 import doobypro.shared.generated.resources.screen_Order_label_subtotal
+import doobypro.shared.generated.resources.screen_Order_label_subunit_rounding
 import doobypro.shared.generated.resources.screen_Order_label_total_price
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.model.billing.Amount
@@ -54,7 +55,8 @@ fun OrderServicesSection(
     val itemsSubtotal = Amount(items.sumOf { it.subtotal.raw }, currency)
     val expressFeeAmount = order.expressFee?.takeIf { it.raw > 0 }
     val deliveryFeeAmount = order.deliveryFee?.takeIf { it.raw > 0 }
-    val hasFees = (expressFeeAmount != null) || (deliveryFeeAmount != null)
+    val subunitRoundingAmount = order.subunitRounding?.takeIf { it.raw != 0L }
+    val hasExtras = (expressFeeAmount != null) || (deliveryFeeAmount != null) || (subunitRoundingAmount != null)
 
     Column(modifier = modifier.fillMaxWidth()) {
         SupernovaLabel(
@@ -131,8 +133,8 @@ fun OrderServicesSection(
                     modifier = Modifier.padding(top = MaterialTheme.spacing.small, bottom = MaterialTheme.spacing.small),
                 )
 
-                // Subtotal & Fee Rows (only if there are fees)
-                if (hasFees) {
+                // Subtotal & Fee Rows (only if there are fees or rounding)
+                if (hasExtras) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -208,6 +210,29 @@ fun OrderServicesSection(
                             )
                             SupernovaLabel(
                                 text = deliveryFeeAmount.formatted,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    }
+
+                    // Subunit Rounding Row
+                    if (subunitRoundingAmount != null) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = MaterialTheme.spacing.extraSmall),
+                        ) {
+                            SupernovaLabel(
+                                text = stringResource(Res.string.screen_Order_label_subunit_rounding),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            SupernovaLabel(
+                                text = subunitRoundingAmount.formatted,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Medium,

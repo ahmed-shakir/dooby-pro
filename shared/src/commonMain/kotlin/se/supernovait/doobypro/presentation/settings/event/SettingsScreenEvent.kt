@@ -37,6 +37,8 @@ sealed interface SettingsScreenEvent {
     data class UpdateExpressFeeType(val type: ExpressFeeType) : SettingsScreenEvent
     data class UpdateExpressFeeValue(val value: Long) : SettingsScreenEvent
     data class UpdateDeliveryFeeValue(val value: Long) : SettingsScreenEvent
+    data class UpdateSubunitRoundingEnabled(val enabled: Boolean) : SettingsScreenEvent
+    data class UpdateSubunitRoundingValue(val value: Long) : SettingsScreenEvent
     // Storage settings
     data class UpdateStorageAllocationMode(val mode: StorageAllocationMode) : SettingsScreenEvent
     data class UpdateDefaultStorageLocationId(val id: String) : SettingsScreenEvent

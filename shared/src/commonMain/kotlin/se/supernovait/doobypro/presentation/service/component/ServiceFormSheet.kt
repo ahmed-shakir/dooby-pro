@@ -28,6 +28,7 @@ import doobypro.shared.generated.resources.screen_Service_field_description
 import doobypro.shared.generated.resources.screen_Service_field_price
 import doobypro.shared.generated.resources.screen_Service_field_title
 import org.jetbrains.compose.resources.stringResource
+import se.supernovait.app.core.domain.model.validation.ValidationPattern
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.component.action.SupernovaTextAction
 import se.supernovait.app.core.ui.component.input.SupernovaTextField
@@ -101,7 +102,7 @@ fun ServiceFormSheet(
             value = priceValue,
             onValueChange = { v, _ -> 
                 // Basic validation for decimal input
-                if (v.isEmpty() || v.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
+                if (v.isEmpty() || v.matches(Regex(ValidationPattern.DECIMAL.pattern))) {
                     priceValue = v
                 }
             },

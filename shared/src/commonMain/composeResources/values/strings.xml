@@ -234,18 +234,23 @@
     <string name="screen_Settings_common_theme_label">Theme</string>
 
     <!-- Order settings -->
+    <string name="screen_Settings_order_default_label">Order Defaults</string>
     <string name="screen_Settings_order_default_service_label">Default Service</string>
     <string name="screen_Settings_order_delivery_option_label">Default Delivery Option</string>
     <string name="screen_Settings_order_delivery_method_label">Default Delivery Method</string>
     <string name="screen_Settings_order_handling_time_label">Default Handling Time (days)</string>
+    <string name="screen_Settings_order_fees_label">Order Fees</string>
+    <string name="screen_Settings_order_delivery_fee_value_label">Global Delivery Fee (%1$s)</string>
+    <string name="screen_Settings_order_express_fee_mode_label">Express Fee Mode</string>
+    <string name="screen_Settings_order_express_fee_type_label">Express Fee Type</string>
+    <string name="screen_Settings_order_express_fee_value_label">Global Express Fee (%1$s)</string>
+    <string name="screen_Settings_order_subunit_rounding_label">Subunit Rounding</string>
+    <string name="screen_Settings_order_subunit_rounding_enabled_label">Enable Subunit Rounding</string>
+    <string name="screen_Settings_order_subunit_rounding_value_label">Subunit Rounding Amount (%1$s)</string>
     <string name="screen_Settings_order_behavior_label">Order Behavior</string>
     <string name="screen_Settings_order_auto_print_receipts_label">Auto-print receipts</string>
     <string name="screen_Settings_order_auto_print_order_tag_label">Auto-print order tag</string>
     <string name="screen_Settings_order_tag_print_mode_label">Order tag print mode</string>
-    <string name="screen_Settings_order_express_fee_mode_label">Express Fee Mode</string>
-    <string name="screen_Settings_order_express_fee_type_label">Express Fee Type</string>
-    <string name="screen_Settings_order_express_fee_value_label">Global Express Fee (%1$s)</string>
-    <string name="screen_Settings_order_delivery_fee_value_label">Global Delivery Fee (%1$s)</string>
 
     <!-- Order settings -->
     <string name="screen_Settings_storage_allocation_mode_label">Storage allocation mode</string>
@@ -463,6 +468,7 @@
     <string name="screen_Order_label_express_fee">Express Fee</string>
     <string name="screen_Order_label_express_fee_with_percentage">Express Fee (%1$s)</string>
     <string name="screen_Order_label_delivery_fee">Delivery Fee</string>
+    <string name="screen_Order_label_subunit_rounding">Rounding</string>
     <string name="screen_Order_label_total_price">Total</string>
 
     <!-- Order Quantity Control -->

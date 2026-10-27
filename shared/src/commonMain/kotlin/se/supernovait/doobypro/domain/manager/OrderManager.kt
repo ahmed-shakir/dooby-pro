@@ -174,6 +174,22 @@ class OrderManager(
                 null
             }
 
+            val itemsSubtotalRaw = Amount(itemsSubtotal, currency).raw
+            val baseTotalRaw = itemsSubtotalRaw + (expressFee?.raw ?: 0L) + (deliveryFee?.raw ?: 0L)
+            val subunitRounding = if (orderSettings.subunitRoundingEnabled && orderSettings.subunitRoundingValue > 0L) {
+                val step = orderSettings.subunitRoundingValue
+                val remainder = baseTotalRaw % step
+                val roundedRaw = when {
+                    remainder == 0L -> baseTotalRaw
+                    remainder <= step / 2.0 -> baseTotalRaw - remainder
+                    else -> baseTotalRaw + (step - remainder)
+                }
+                val roundingDiff = roundedRaw - baseTotalRaw
+                if (roundingDiff != 0L) Amount(roundingDiff, currency) else null
+            } else {
+                null
+            }
+
             Order(
                 customer = customer,
                 items = initialItems,
@@ -188,6 +204,7 @@ class OrderManager(
                 expressFeePercentage = expressFeePercentage,
                 expressFee = expressFee,
                 deliveryFee = deliveryFee,
+                subunitRounding = subunitRounding,
                 notes = null
             )
         }
@@ -208,6 +225,7 @@ class OrderManager(
                 expressFeePercentage = originalOrder.expressFeePercentage,
                 expressFee = originalOrder.expressFee,
                 deliveryFee = originalOrder.deliveryFee,
+                subunitRounding = originalOrder.subunitRounding,
                 notes = originalOrder.notes
             )
         }

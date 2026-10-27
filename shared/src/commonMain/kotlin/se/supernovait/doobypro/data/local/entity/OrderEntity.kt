@@ -65,6 +65,8 @@ data class OrderEntity(
     val expressFee: AmountEntity? = null,
     @Embedded(prefix = "delivery_fee_")
     val deliveryFee: AmountEntity? = null,
+    @Embedded(prefix = "subunit_rounding_")
+    val subunitRounding: AmountEntity? = null,
     val notes: String? = null,
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now()

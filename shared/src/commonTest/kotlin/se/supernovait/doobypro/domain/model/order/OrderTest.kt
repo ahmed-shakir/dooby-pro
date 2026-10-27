@@ -229,4 +229,21 @@ class OrderTest {
         )
         assertTrue(userValidAddress.hasRegisteredAddress)
     }
+
+    @Test
+    fun `totalPrice includes subunitRounding correctly`() {
+        val order = createOrder().copy(
+            subunitRounding = Amount(27, "AED")
+        )
+        assertEquals(Amount(1027, "AED"), order.totalPrice)
+    }
+
+    @Test
+    fun `totalPrice includes negative and positive subunitRounding correctly`() {
+        val orderPositive = createOrder().copy(subunitRounding = Amount(12, "AED"))
+        assertEquals(Amount(1012, "AED"), orderPositive.totalPrice)
+
+        val orderNegative = createOrder().copy(subunitRounding = Amount(-12, "AED"))
+        assertEquals(Amount(988, "AED"), orderNegative.totalPrice)
+    }
 }

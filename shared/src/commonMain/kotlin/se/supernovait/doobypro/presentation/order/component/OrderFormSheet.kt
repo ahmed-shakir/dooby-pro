@@ -60,6 +60,7 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.decimal.Decimal
 import se.supernovait.app.core.domain.model.decimal.Percentage
+import se.supernovait.app.core.domain.model.validation.ValidationPattern
 import se.supernovait.app.core.ui.component.action.QuantityControl
 import se.supernovait.app.core.ui.component.action.SupernovaIconButton
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
@@ -113,6 +114,8 @@ fun OrderFormSheet(
     expressFeeType: ExpressFeeType,
     globalExpressFee: Long,
     globalDeliveryFee: Long,
+    subunitRoundingEnabled: Boolean,
+    subunitRoundingValue: Long,
     currency: String,
     onSave: (Order) -> Unit,
     onDelete: (() -> Unit)? = null
@@ -419,7 +422,7 @@ fun OrderFormSheet(
                 label = expressFeeLabel,
                 value = displayValue,
                 onValueChange = { v, _ ->
-                    if (v.isEmpty() || v.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
+                    if (v.isEmpty() || v.matches(Regex(ValidationPattern.DECIMAL.pattern))) {
                         expressFeeText = v
                     }
                 },
@@ -599,6 +602,21 @@ fun OrderFormSheet(
                         null
                     }
 
+                    val itemsSubtotalRaw = Amount(itemsSubtotal, currency).raw
+                    val baseTotalRaw = itemsSubtotalRaw + (calculatedExpressFee?.raw ?: 0L) + (calculatedDeliveryFee?.raw ?: 0L)
+                    val calculatedSubunitRounding = if (subunitRoundingEnabled && subunitRoundingValue > 0L) {
+                        val remainder = baseTotalRaw % subunitRoundingValue
+                        val roundedRaw = when {
+                            remainder == 0L -> baseTotalRaw
+                            remainder <= subunitRoundingValue / 2.0 -> baseTotalRaw - remainder
+                            else -> baseTotalRaw + (subunitRoundingValue - remainder)
+                        }
+                        val roundingDiff = roundedRaw - baseTotalRaw
+                        if (roundingDiff != 0L) Amount(roundingDiff, currency) else null
+                    } else {
+                        if (!isNew) order.subunitRounding else null
+                    }
+
                     onSave(order.copy(
                         customer = selectedCustomer,
                         items = orderItems,
@@ -611,6 +629,7 @@ fun OrderFormSheet(
                         expressFeePercentage = savedExpressFeePercentage,
                         expressFee = calculatedExpressFee,
                         deliveryFee = calculatedDeliveryFee,
+                        subunitRounding = calculatedSubunitRounding,
                         notes = notes.ifBlank { null }
                     )) 
                 },

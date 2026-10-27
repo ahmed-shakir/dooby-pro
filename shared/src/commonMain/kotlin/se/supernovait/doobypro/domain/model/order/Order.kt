@@ -37,6 +37,7 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
  * @property expressFeePercentage The percentage markup value if express fee was percentage-based.
  * @property expressFee The express fee applied when [deliveryOption] is [DeliveryOption.EXPRESS].
  * @property deliveryFee The fixed delivery fee applied when [deliveryMethod] is [DeliveryMethod.HOME_DELIVERY].
+ * @property subunitRounding The subunit rounding amount applied to the order.
  * @property notes Optional internal or customer-provided notes.
  * @property createdAt The timestamp when the order was first created.
  * @property updatedAt The timestamp when the order was last modified.
@@ -56,6 +57,7 @@ data class Order(
     val expressFeePercentage: Percentage? = null,
     val expressFee: Amount? = null,
     val deliveryFee: Amount? = null,
+    val subunitRounding: Amount? = null,
     val notes: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
@@ -68,7 +70,8 @@ data class Order(
             val currency = items.firstOrNull()?.service?.price?.currency ?: AppDefaults.CURRENCY
             val totalDecimal = items.fold(Decimal.ZERO) { acc, item -> acc + item.subtotal.decimal } +
                 (expressFee?.decimal ?: Decimal.ZERO) +
-                (deliveryFee?.decimal ?: Decimal.ZERO)
+                (deliveryFee?.decimal ?: Decimal.ZERO) +
+                (subunitRounding?.decimal ?: Decimal.ZERO)
             return Amount(totalDecimal, currency)
         }
 

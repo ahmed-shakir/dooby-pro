@@ -18,6 +18,8 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
  * @property expressFeeType The type of express fee calculation (percentage markup or flat fee).
  * @property expressFeeValue The default express fee value (percentage or flat amount in minor units) when using global express fee settings.
  * @property deliveryFeeValue The fixed global delivery fee applied for home delivery orders (in minor units).
+ * @property subunitRoundingEnabled Whether subunit rounding is enabled for orders.
+ * @property subunitRoundingValue The target amount in minor units to round up to.
  */
 @Serializable
 data class OrderSettings(
@@ -32,4 +34,6 @@ data class OrderSettings(
     val expressFeeType: ExpressFeeType = ExpressFeeType.PERCENTAGE,
     val expressFeeValue: Long = 1500L,
     val deliveryFeeValue: Long = 2500L,
+    val subunitRoundingEnabled: Boolean = false,
+    val subunitRoundingValue: Long = 25L,
 )

@@ -135,6 +135,8 @@ fun OrderManagementScreen(
                     expressFeeType = state.settings.order.expressFeeType,
                     globalExpressFee = state.settings.order.expressFeeValue,
                     globalDeliveryFee = state.settings.order.deliveryFeeValue,
+                    subunitRoundingEnabled = state.settings.order.subunitRoundingEnabled,
+                    subunitRoundingValue = state.settings.order.subunitRoundingValue,
                     currency = state.settings.common.currency.symbol,
                     onSave = { 
                         onEvent(OrderEvent.SaveOrder(it))
@@ -207,6 +209,8 @@ fun OrderManagementScreen(
                         expressFeeType = state.settings.order.expressFeeType,
                         globalExpressFee = state.settings.order.expressFeeValue,
                         globalDeliveryFee = state.settings.order.deliveryFeeValue,
+                        subunitRoundingEnabled = state.settings.order.subunitRoundingEnabled,
+                        subunitRoundingValue = state.settings.order.subunitRoundingValue,
                         currency = state.settings.common.currency.symbol,
                         onSave = { 
                             onEvent(OrderEvent.SaveOrder(it))

@@ -1,5 +1,6 @@
 package se.supernovait.doobypro.presentation.app.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
@@ -33,9 +34,9 @@ val darkStatusColors = StatusColor(
     express = Color(0xFFB388FF) // Bright Electric Violet / Lavender
 )
 
-val LocalStatus = staticCompositionLocalOf { lightStatusColors }
+val LocalStatus = staticCompositionLocalOf<StatusColor?> { null }
 
 val MaterialTheme.statusColor: StatusColor
     @Composable
     @ReadOnlyComposable
-    get() = LocalStatus.current
+    get() = LocalStatus.current ?: if (isSystemInDarkTheme()) darkStatusColors else lightStatusColors
