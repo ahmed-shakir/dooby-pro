@@ -11,6 +11,7 @@ import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.location.Address
 import se.supernovait.app.core.domain.model.billing.Amount
+import se.supernovait.app.core.domain.model.decimal.Percentage
 import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
@@ -245,5 +246,35 @@ class OrderTest {
 
         val orderNegative = createOrder().copy(subunitRounding = Amount(-12, "AED"))
         assertEquals(Amount(988, "AED"), orderNegative.totalPrice)
+    }
+
+    @Test
+    fun `totalPrice applies flat discount correctly`() {
+        val order = createOrder().copy(
+            discountType = DiscountType.FLAT_AMOUNT,
+            discount = Amount(200, "AED")
+        )
+        assertEquals(Amount(800, "AED"), order.totalPrice)
+    }
+
+    @Test
+    fun `totalPrice applies percentage discount correctly`() {
+        val order = createOrder().copy(
+            discountType = DiscountType.PERCENTAGE,
+            discountPercentage = Percentage.fromPercent(10.0),
+            discount = Amount(100, "AED")
+        )
+        assertEquals(Amount(900, "AED"), order.totalPrice)
+    }
+
+    @Test
+    fun `totalPrice applies discount before subunit rounding`() {
+        val order = createOrder().copy(
+            discountType = DiscountType.FLAT_AMOUNT,
+            discount = Amount(200, "AED"),
+            subunitRounding = Amount(50, "AED")
+        )
+        // 1000 items - 200 discount + 50 rounding = 850
+        assertEquals(Amount(850, "AED"), order.totalPrice)
     }
 }

@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import se.supernovait.doobypro.domain.model.agreement.AgreementStatus
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.order.DiscountType
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import se.supernovait.doobypro.domain.model.storage.StorageType
 
@@ -74,4 +75,16 @@ object DbConverters {
      */
     @TypeConverter
     fun fromExpressFeeType(type: ExpressFeeType?): String? = type?.name
+
+    /**
+     * Converts a string to a [DiscountType].
+     */
+    @TypeConverter
+    fun toDiscountType(value: String?): DiscountType? = value?.let { DiscountType.valueOf(it) }
+
+    /**
+     * Converts a [DiscountType] to a string.
+     */
+    @TypeConverter
+    fun fromDiscountType(type: DiscountType?): String? = type?.name
 }

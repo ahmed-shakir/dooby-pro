@@ -63,6 +63,9 @@ data class Order(
     val pickupFee: Amount? = null,
     val deliveryFee: Amount? = null,
     val subunitRounding: Amount? = null,
+    val discountType: DiscountType = DiscountType.FLAT_AMOUNT,
+    val discountPercentage: Percentage? = null,
+    val discount: Amount? = null,
     val notes: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
@@ -76,9 +79,10 @@ data class Order(
             val totalDecimal = items.fold(Decimal.ZERO) { acc, item -> acc + item.subtotal.decimal } +
                 (expressFee?.decimal ?: Decimal.ZERO) +
                 (deliveryFee?.decimal ?: Decimal.ZERO) +
-                (pickupFee?.decimal ?: Decimal.ZERO) +
+                (pickupFee?.decimal ?: Decimal.ZERO) -
+                (discount?.decimal ?: Decimal.ZERO) +
                 (subunitRounding?.decimal ?: Decimal.ZERO)
-            return Amount(totalDecimal, currency)
+            return Amount(totalDecimal.coerceAtLeast(Decimal.ZERO), currency)
         }
 
     /**

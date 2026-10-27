@@ -53,6 +53,7 @@ import se.supernovait.doobypro.domain.model.company.Company
 import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.order.DiscountType
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderServiceItem
 import se.supernovait.doobypro.domain.model.order.OrderStatus
@@ -214,6 +215,9 @@ class OrderManager(
                 pickupFee = pickupFee,
                 deliveryFee = deliveryFee,
                 subunitRounding = subunitRounding,
+                discountType = DiscountType.FLAT_AMOUNT,
+                discountPercentage = null,
+                discount = null,
                 notes = null
             )
         }
@@ -237,6 +241,9 @@ class OrderManager(
                 pickupFee = originalOrder.pickupFee,
                 deliveryFee = originalOrder.deliveryFee,
                 subunitRounding = originalOrder.subunitRounding,
+                discountType = originalOrder.discountType,
+                discountPercentage = originalOrder.discountPercentage,
+                discount = originalOrder.discount,
                 notes = originalOrder.notes
             )
         }

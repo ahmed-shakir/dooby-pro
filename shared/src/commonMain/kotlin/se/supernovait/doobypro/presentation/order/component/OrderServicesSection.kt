@@ -17,6 +17,8 @@ import doobypro.shared.generated.resources.screen_Order_empty_services
 import doobypro.shared.generated.resources.screen_Order_field_pickup_fee
 import doobypro.shared.generated.resources.screen_Order_field_service
 import doobypro.shared.generated.resources.screen_Order_label_delivery_fee
+import doobypro.shared.generated.resources.screen_Order_label_discount
+import doobypro.shared.generated.resources.screen_Order_label_discount_with_percentage
 import doobypro.shared.generated.resources.screen_Order_label_express_fee
 import doobypro.shared.generated.resources.screen_Order_label_express_fee_with_percentage
 import doobypro.shared.generated.resources.screen_Order_label_subtotal
@@ -28,8 +30,10 @@ import se.supernovait.app.core.domain.model.decimal.Percentage
 import se.supernovait.app.core.ui.component.text.SupernovaLabel
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.AppDefaults
+import se.supernovait.doobypro.domain.model.order.DiscountType
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
+import se.supernovait.doobypro.presentation.app.theme.statusColor
 
 /**
  * Renders the services section of an order in a clean, receipt/invoice layout.
@@ -57,8 +61,9 @@ fun OrderServicesSection(
     val expressFeeAmount = order.expressFee?.takeIf { it.raw > 0 }
     val pickupFeeAmount = order.pickupFee?.takeIf { it.raw > 0 }
     val deliveryFeeAmount = order.deliveryFee?.takeIf { it.raw > 0 }
+    val discountAmount = order.discount?.takeIf { it.raw > 0 }
     val subunitRoundingAmount = order.subunitRounding?.takeIf { it.raw != 0L }
-    val hasExtras = (expressFeeAmount != null) || (pickupFeeAmount != null) || (deliveryFeeAmount != null) || (subunitRoundingAmount != null)
+    val hasExtras = (expressFeeAmount != null) || (pickupFeeAmount != null) || (deliveryFeeAmount != null) || (discountAmount != null) || (subunitRoundingAmount != null)
 
     Column(modifier = modifier.fillMaxWidth()) {
         SupernovaLabel(
@@ -236,6 +241,40 @@ fun OrderServicesSection(
                             SupernovaLabel(
                                 text = deliveryFeeAmount.formatted,
                                 color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    }
+
+                    // Discount Row
+                    if (discountAmount != null) {
+                        val discountLabel = if (order.discountType == DiscountType.PERCENTAGE) {
+                            val pctText = order.discountPercentage?.formatted ?: if (itemsSubtotal.raw > 0) {
+                                // TODO: update when Supernova Core v1.14.7 is used
+                                val calcPct = discountAmount / itemsSubtotal.decimal
+                                Percentage.fromPercent(calcPct.decimal.toDouble()).formatted
+                            } else ""
+                            stringResource(Res.string.screen_Order_label_discount_with_percentage, pctText)
+                        } else {
+                            stringResource(Res.string.screen_Order_label_discount)
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = MaterialTheme.spacing.extraSmall),
+                        ) {
+                            SupernovaLabel(
+                                text = discountLabel,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            SupernovaLabel(
+                                text = "-${discountAmount.formatted}",
+                                color = MaterialTheme.statusColor.error,
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Medium,
                             )

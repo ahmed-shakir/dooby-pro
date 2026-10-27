@@ -12,6 +12,7 @@ import se.supernovait.doobypro.domain.model.IdType
 import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.order.DiscountType
 import se.supernovait.doobypro.domain.model.order.OrderStatus
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
 import kotlin.time.Clock
@@ -73,6 +74,11 @@ data class OrderEntity(
     val deliveryFee: AmountEntity? = null,
     @Embedded(prefix = "subunit_rounding_")
     val subunitRounding: AmountEntity? = null,
+    val discountType: DiscountType = DiscountType.FLAT_AMOUNT,
+    @Embedded(prefix = "discount_pct_")
+    val discountPercentage: PercentageEntity? = null,
+    @Embedded(prefix = "discount_")
+    val discount: AmountEntity? = null,
     val notes: String? = null,
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now()

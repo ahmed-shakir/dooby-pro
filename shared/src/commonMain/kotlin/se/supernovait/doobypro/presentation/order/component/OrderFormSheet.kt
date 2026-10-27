@@ -45,6 +45,9 @@ import doobypro.shared.generated.resources.screen_Order_field_delivery_date
 import doobypro.shared.generated.resources.screen_Order_field_delivery_fee
 import doobypro.shared.generated.resources.screen_Order_field_delivery_method
 import doobypro.shared.generated.resources.screen_Order_field_delivery_option
+import doobypro.shared.generated.resources.screen_Order_field_discount_flat_amount
+import doobypro.shared.generated.resources.screen_Order_field_discount_percentage
+import doobypro.shared.generated.resources.screen_Order_field_discount_type
 import doobypro.shared.generated.resources.screen_Order_field_express_fee
 import doobypro.shared.generated.resources.screen_Order_field_express_fee_percentage
 import doobypro.shared.generated.resources.screen_Order_field_notes
@@ -83,6 +86,7 @@ import se.supernovait.doobypro.domain.model.Service
 import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
+import se.supernovait.doobypro.domain.model.order.DiscountType
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeMode
 import se.supernovait.doobypro.domain.model.settings.order.ExpressFeeType
@@ -138,6 +142,21 @@ fun OrderFormSheet(
     var deliveryMethod by remember { mutableStateOf(order.deliveryMethod) }
     var collectionMethod by remember { mutableStateOf(order.collectionMethod) }
     var isPaymentDone by remember { mutableStateOf(order.isPaymentDone) }
+
+    var discountType by remember { mutableStateOf(order.discountType) }
+    var discountText by remember {
+        val initialText = when (order.discountType) {
+            DiscountType.PERCENTAGE -> order.discountPercentage?.percentString ?: order.discount?.let { discount ->
+                val subtotal = order.items.fold(Decimal.ZERO) { acc, item -> acc + item.subtotal.decimal }
+                if (subtotal.toDouble() > 0) { // TODO: update when Supernova Core v1.14.7 is used
+                    val calcPct = discount / subtotal
+                    Percentage.fromPercent(calcPct.decimal.toDouble()).percentString
+                } else null
+            } ?: ""
+            DiscountType.FLAT_AMOUNT -> order.discount?.value ?: ""
+        }
+        mutableStateOf(initialText)
+    }
 
     val activeExpressFeeType = if (!isNew) (order.expressFeeType ?: expressFeeType) else expressFeeType
 
@@ -508,6 +527,38 @@ fun OrderFormSheet(
 
         Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
+        // Discount Section
+        val discountTypeLabels = DiscountType.entries.associateWith { stringResource(it.label) }
+        SupernovaSelectField(
+            label = Res.string.screen_Order_field_discount_type,
+            options = DiscountType.entries,
+            selectedOption = discountType,
+            onOptionSelected = { discountType = it },
+            optionLabel = { discountTypeLabels[it] ?: it.name }
+        )
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+        val discountLabel = if (discountType == DiscountType.PERCENTAGE) {
+            stringResource(Res.string.screen_Order_field_discount_percentage)
+        } else {
+            stringResource(Res.string.screen_Order_field_discount_flat_amount, currency)
+        }
+
+        SupernovaTextField(
+            label = discountLabel,
+            value = discountText,
+            onValueChange = { v, _ ->
+                if (v.isEmpty() || v.matches(Regex(ValidationPattern.DECIMAL.pattern))) {
+                    discountText = v
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
         // If customer has no registered location, show attention warning message if either home service is selected
         if ((collectionMethod == CollectionMethod.HOME_PICKUP || deliveryMethod == DeliveryMethod.HOME_DELIVERY) && !selectedCustomer.hasRegisteredAddress) {
             Spacer(Modifier.height(MaterialTheme.spacing.small))
@@ -642,17 +693,34 @@ fun OrderFormSheet(
                         null
                     }
 
-                    val itemsSubtotalRaw = Amount(itemsSubtotal, currency).raw
-                    val baseTotalRaw = itemsSubtotalRaw + (calculatedExpressFee?.raw ?: 0L) + (calculatedDeliveryFee?.raw ?: 0L) + (calculatedPickupFee?.raw ?: 0L)
-                    val calculatedSubunitRounding = if (subunitRoundingEnabled && subunitRoundingValue > 0L) {
-                        val remainder = baseTotalRaw % subunitRoundingValue
-                        val roundedRaw = when {
-                            remainder == 0L -> baseTotalRaw
-                            remainder <= subunitRoundingValue / 2.0 -> baseTotalRaw - remainder
-                            else -> baseTotalRaw + (subunitRoundingValue - remainder)
+                    val discountInput = discountText.toDoubleOrNull()
+                    val (calculatedDiscount, savedDiscountType, savedDiscountPercentage) = if (discountInput != null && discountInput > 0.0) {
+                        if (discountType == DiscountType.PERCENTAGE) {
+                            val percentage = Percentage.fromPercent(discountInput)
+                            val discountAmount = Amount(itemsSubtotal, currency) * percentage
+                            Triple(discountAmount, DiscountType.PERCENTAGE, percentage)
+                        } else {
+                            val discountRaw = (discountInput * 100.0).roundToLong()
+                            val discountAmount = Amount(discountRaw, currency)
+                            Triple(discountAmount, DiscountType.FLAT_AMOUNT, null)
                         }
-                        val roundingDiff = roundedRaw - baseTotalRaw
-                        if (roundingDiff != 0L) Amount(roundingDiff, currency) else null
+                    } else {
+                        Triple<Amount?, DiscountType, Percentage?>(null, DiscountType.FLAT_AMOUNT, null)
+                    }
+
+                    val discount = calculatedDiscount?.decimal ?: Decimal.ZERO
+                    val baseTotal = itemsSubtotal + (calculatedExpressFee?.decimal ?: Decimal.ZERO) + (calculatedDeliveryFee?.decimal ?: Decimal.ZERO) + (calculatedPickupFee?.decimal ?: Decimal.ZERO) - discount
+                    val calculatedSubunitRounding = if (subunitRoundingEnabled && subunitRoundingValue > 0L) {
+                        // TODO: update when Supernova Core v1.14.7 is used
+                        val remainder = baseTotal.unscaled % subunitRoundingValue
+                        val roundedRaw = when {
+                            remainder == 0L -> baseTotal.unscaled
+                            remainder <= subunitRoundingValue / 2.0 -> baseTotal.unscaled - remainder
+                            else -> baseTotal.unscaled + (subunitRoundingValue - remainder)
+                        }
+                        val rounded = Decimal(roundedRaw)
+                        val roundingDiff = rounded - baseTotal
+                        if (roundingDiff.toDouble() != 0.0) Amount(roundingDiff, currency) else null
                     } else {
                         if (!isNew) order.subunitRounding else null
                     }
@@ -672,6 +740,9 @@ fun OrderFormSheet(
                         deliveryFee = calculatedDeliveryFee,
                         pickupFee = calculatedPickupFee,
                         subunitRounding = calculatedSubunitRounding,
+                        discountType = savedDiscountType,
+                        discountPercentage = savedDiscountPercentage,
+                        discount = calculatedDiscount,
                         notes = notes.ifBlank { null }
                     )) 
                 },
