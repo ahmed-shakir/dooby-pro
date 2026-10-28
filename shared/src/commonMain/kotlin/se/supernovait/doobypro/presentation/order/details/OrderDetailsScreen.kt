@@ -28,6 +28,7 @@ import doobypro.shared.generated.resources.screen_Order_dialog_cancel_title
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_message
 import doobypro.shared.generated.resources.screen_Order_dialog_delete_title
 import doobypro.shared.generated.resources.screen_Order_error_not_found
+import doobypro.shared.generated.resources.screen_Order_field_collection_method
 import doobypro.shared.generated.resources.screen_Order_field_customer
 import doobypro.shared.generated.resources.screen_Order_field_delivery_address
 import doobypro.shared.generated.resources.screen_Order_field_delivery_date
@@ -148,18 +149,26 @@ fun OrderDetailsScreen(
                 modifier = Modifier.weight(1f)
             )
             DetailSection(
+                label = stringResource(Res.string.screen_Order_field_collection_method),
+                value = stringResource(order.collectionMethod.label),
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Row(modifier = Modifier.fillMaxWidth()) {
+            DetailSection(
+                label = stringResource(Res.string.screen_Order_field_delivery_date),
+                value = order.deliveryDatetime.toString().replace("T", " "),
+                status = if (order.isLate()) stringResource(Res.string.label_late) else null,
+                valueColor = if (order.isLate()) MaterialTheme.statusColor.error else Color.Unspecified,
+                modifier = Modifier.weight(1f)
+            )
+            DetailSection(
                 label = stringResource(Res.string.screen_Order_field_delivery_method),
                 value = stringResource(order.deliveryMethod.label),
                 modifier = Modifier.weight(1f)
             )
         }
-
-        DetailSection(
-            label = stringResource(Res.string.screen_Order_field_delivery_date),
-            value = order.deliveryDatetime.toString().replace("T", " "),
-            status = if (order.isLate()) stringResource(Res.string.label_late) else null,
-            valueColor = if (order.isLate()) MaterialTheme.statusColor.error else Color.Unspecified
-        )
 
         if (order.customer.hasRegisteredAddress) {
             order.customer.address?.let { addr ->
@@ -190,6 +199,7 @@ fun OrderDetailsScreen(
             order = order,
             onNextStatus = { onEvent(OrderDetailsEvent.TransitionToNextStatus) },
             onDeliveryFailed = { onEvent(OrderDetailsEvent.DeliveryFailed) },
+            onPickupFailed = { onEvent(OrderDetailsEvent.PickupFailed) },
             onCancel = {
                 dialogState.showConfirmation(
                     message = cancelMessage,

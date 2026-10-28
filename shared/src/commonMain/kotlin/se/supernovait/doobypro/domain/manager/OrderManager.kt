@@ -182,18 +182,18 @@ class OrderManager(
                 null
             }
 
-            val itemsSubtotalRaw = Amount(itemsSubtotal, currency).raw
-            val baseTotalRaw = itemsSubtotalRaw + (expressFee?.raw ?: 0L) + (pickupFee?.raw ?: 0L) + (deliveryFee?.raw ?: 0L)
+            val baseTotal = itemsSubtotal + (expressFee?.decimal ?: Decimal.ZERO) + (pickupFee?.decimal ?: Decimal.ZERO) + (deliveryFee?.decimal ?: Decimal.ZERO)
             val subunitRounding = if (orderSettings.subunitRoundingEnabled && orderSettings.subunitRoundingValue > 0L) {
+                // TODO: update when Supernova Core v1.14.8 is used
                 val step = orderSettings.subunitRoundingValue
-                val remainder = baseTotalRaw % step
-                val roundedRaw = when {
-                    remainder == 0L -> baseTotalRaw
-                    remainder <= step / 2.0 -> baseTotalRaw - remainder
-                    else -> baseTotalRaw + (step - remainder)
+                val remainder = baseTotal % Decimal(step)
+                val rounded = when {
+                    remainder == Decimal.ZERO -> baseTotal
+                    remainder.unscaled <= step / 2.0 -> baseTotal - remainder
+                    else -> baseTotal + (Decimal(step) - remainder)
                 }
-                val roundingDiff = roundedRaw - baseTotalRaw
-                if (roundingDiff != 0L) Amount(roundingDiff, currency) else null
+                val roundingDiff = rounded - baseTotal
+                if (roundingDiff != Decimal.ZERO) Amount(roundingDiff, currency) else null
             } else {
                 null
             }

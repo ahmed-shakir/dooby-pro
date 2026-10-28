@@ -251,9 +251,8 @@ fun OrderServicesSection(
                     if (discountAmount != null) {
                         val discountLabel = if (order.discountType == DiscountType.PERCENTAGE) {
                             val pctText = order.discountPercentage?.formatted ?: if (itemsSubtotal.raw > 0) {
-                                // TODO: update when Supernova Core v1.14.7 is used
                                 val calcPct = discountAmount / itemsSubtotal.decimal
-                                Percentage.fromPercent(calcPct.decimal.toDouble()).formatted
+                                calcPct.decimal.toPercentage().formatted
                             } else ""
                             stringResource(Res.string.screen_Order_label_discount_with_percentage, pctText)
                         } else {

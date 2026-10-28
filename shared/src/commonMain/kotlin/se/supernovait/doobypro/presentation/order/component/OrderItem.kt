@@ -55,9 +55,10 @@ fun OrderItem(
     modifier: Modifier = Modifier
 ) {
     val statusColor = when (order.status) {
-        OrderStatus.NEW -> MaterialTheme.statusColor.info
+        OrderStatus.NEW, OrderStatus.OUT_FOR_PICKUP -> MaterialTheme.statusColor.info
         OrderStatus.IN_PROGRESS -> MaterialTheme.statusColor.warning
         OrderStatus.READY -> MaterialTheme.statusColor.success
+        OrderStatus.OUT_FOR_DELIVERY -> MaterialTheme.statusColor.info
         OrderStatus.CANCELLED -> MaterialTheme.statusColor.error
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }

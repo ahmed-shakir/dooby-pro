@@ -58,6 +58,7 @@ class OrderDetailsViewModel(
         when (event) {
             OrderDetailsEvent.LoadOrder -> loadOrder()
             OrderDetailsEvent.TransitionToNextStatus -> transitionStatus()
+            OrderDetailsEvent.PickupFailed -> pickupFailed()
             OrderDetailsEvent.DeliveryFailed -> deliveryFailed()
             OrderDetailsEvent.CancelOrder -> cancelOrder()
             OrderDetailsEvent.DeleteOrder -> deleteOrder()
@@ -99,6 +100,19 @@ class OrderDetailsViewModel(
                 logger.info("Transitioning order with ID: $orderId from ${order.status} to next status", tag = LogTags.ORDER_DETAILS_VM)
                 analyticsTracker.trackEvent("order_status_transitioned", mapOf("order_id" to orderId))
                 orderManager.transitionToNextStatus(order)
+                loadOrder() // Refresh
+            }
+        }
+    }
+
+    private fun pickupFailed() {
+        viewModelScope.launch {
+            performanceMonitor.traceAsync("OrderDetailsViewModel.pickupFailed") {
+                val order = _uiState.value.order ?: return@traceAsync
+                val orderId = order.id ?: return@traceAsync
+                logger.warn("Pickup failed for order with ID: $orderId, updating status to NEW", tag = LogTags.ORDER_DETAILS_VM)
+                analyticsTracker.trackEvent("order_pickup_failed", mapOf("order_id" to orderId))
+                orderManager.updateOrderStatus(orderId, OrderStatus.NEW)
                 loadOrder() // Refresh
             }
         }

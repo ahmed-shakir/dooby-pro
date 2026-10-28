@@ -13,6 +13,7 @@ import se.supernovait.app.core.domain.location.Address
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.decimal.Percentage
 import se.supernovait.doobypro.domain.model.Service
+import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryOption
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
@@ -67,8 +68,20 @@ class OrderTest {
     )
 
     @Test
-    fun `lifecycle - transition from NEW to IN_PROGRESS`() {
-        val order = createOrder(status = OrderStatus.NEW)
+    fun `lifecycle - transition from NEW to IN_PROGRESS for in-store drop off orders`() {
+        val order = createOrder(status = OrderStatus.NEW).copy(collectionMethod = CollectionMethod.IN_STORE_DROP_OFF)
+        assertEquals(OrderStatus.IN_PROGRESS, order.getNextStatus())
+    }
+
+    @Test
+    fun `lifecycle - transition from NEW to OUT_FOR_PICKUP for home pickup orders`() {
+        val order = createOrder(status = OrderStatus.NEW).copy(collectionMethod = CollectionMethod.HOME_PICKUP)
+        assertEquals(OrderStatus.OUT_FOR_PICKUP, order.getNextStatus())
+    }
+
+    @Test
+    fun `lifecycle - transition from OUT_FOR_PICKUP to IN_PROGRESS`() {
+        val order = createOrder(status = OrderStatus.OUT_FOR_PICKUP)
         assertEquals(OrderStatus.IN_PROGRESS, order.getNextStatus())
     }
 

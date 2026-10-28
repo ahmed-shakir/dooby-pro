@@ -6,17 +6,26 @@ import doobypro.shared.generated.resources.order_status_delivered
 import doobypro.shared.generated.resources.order_status_in_progress
 import doobypro.shared.generated.resources.order_status_new
 import doobypro.shared.generated.resources.order_status_out_for_delivery
+import doobypro.shared.generated.resources.order_status_out_for_pickup
 import doobypro.shared.generated.resources.order_status_picked_up
 import doobypro.shared.generated.resources.order_status_ready
 import org.jetbrains.compose.resources.StringResource
+import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 
 /**
  * Represents the lifecycle stages of an order.
  *
  * Common Workflow:
- * [NEW] -> [IN_PROGRESS] or [CANCELLED]
+ * [NEW] -> [IN_PROGRESS] or [OUT_FOR_PICKUP] (depending on collection method) -> [CANCELLED]
+ * [OUT_FOR_PICKUP] -> [IN_PROGRESS] or [CANCELLED]
  * [IN_PROGRESS] -> [READY] or [CANCELLED]
+ *
+ * [CollectionMethod.HOME_PICKUP] specific:
+ * [NEW] -> [OUT_FOR_PICKUP] -> [IN_PROGRESS]
+ *
+ * [CollectionMethod.IN_STORE_DROP_OFF] specific:
+ * [NEW] -> [IN_PROGRESS]
  *
  * [DeliveryMethod.IN_STORE_PICKUP] specific:
  * [READY] -> [PICKED_UP] or [CANCELLED]
@@ -31,10 +40,16 @@ import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
  */
 enum class OrderStatus(val label: StringResource) {
     /**
-     * Order received and waiting to be processed.
+     * Order received and waiting to be processed or collected.
      * This is the only state where an order can be deleted.
      */
     NEW(Res.string.order_status_new),
+
+    /**
+     * Laundry is out for pickup from the customer's home.
+     * Specific to [CollectionMethod.HOME_PICKUP].
+     */
+    OUT_FOR_PICKUP(Res.string.order_status_out_for_pickup),
 
     /**
      * Laundry is being processed (washing, drying, ironing, etc.).
@@ -71,13 +86,21 @@ enum class OrderStatus(val label: StringResource) {
     CANCELLED(Res.string.order_status_cancelled);
 
     /**
-     * Determines the next logical status in the workflow based on the delivery method.
+     * Determines the next logical status in the workflow based on collection and delivery methods.
      *
-     * @param deliveryMethod The method chosen for order fulfillment.
+     * @param collectionMethod The method chosen for order collection.
+     * @param deliveryMethod The method chosen for order fulfillment/delivery.
      * @return The next [OrderStatus], or null if already in a terminal state.
      */
-    fun next(deliveryMethod: DeliveryMethod): OrderStatus? = when (this) {
-        NEW -> IN_PROGRESS
+    fun next(collectionMethod: CollectionMethod, deliveryMethod: DeliveryMethod): OrderStatus? = when (this) {
+        NEW -> {
+            if (collectionMethod == CollectionMethod.HOME_PICKUP) {
+                OUT_FOR_PICKUP
+            } else {
+                IN_PROGRESS
+            }
+        }
+        OUT_FOR_PICKUP -> IN_PROGRESS
         IN_PROGRESS -> READY
         READY -> {
             if (deliveryMethod == DeliveryMethod.IN_STORE_PICKUP) {

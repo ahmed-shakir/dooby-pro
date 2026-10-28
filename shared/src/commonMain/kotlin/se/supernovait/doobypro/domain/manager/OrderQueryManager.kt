@@ -25,7 +25,7 @@ class OrderQueryManager(
         logger.debug("Querying orders for tab: $tab", tag = LogTags.ORDER_QUERY_MANAGER)
         return orderRepository.getOrders().map { orders ->
             val tabOrders = when (tab) {
-                OrderTab.NEW -> orders.filter { it.status == OrderStatus.NEW }
+                OrderTab.NEW -> orders.filter { it.status == OrderStatus.NEW || it.status == OrderStatus.OUT_FOR_PICKUP }
                 OrderTab.IN_PROGRESS -> orders.filter { it.status == OrderStatus.IN_PROGRESS }
                 OrderTab.READY -> orders.filter { it.status == OrderStatus.READY || it.status == OrderStatus.OUT_FOR_DELIVERY }
                 OrderTab.COMPLETED -> orders.filter { it.status == OrderStatus.PICKED_UP || it.status == OrderStatus.DELIVERED }
@@ -54,7 +54,7 @@ class OrderQueryManager(
             OrderTab.entries.associateWith { tab ->
                 orders.filter { it.isOverdue() }.count { order ->
                     when (tab) {
-                        OrderTab.NEW -> order.status == OrderStatus.NEW
+                        OrderTab.NEW -> order.status == OrderStatus.NEW || order.status == OrderStatus.OUT_FOR_PICKUP
                         OrderTab.IN_PROGRESS -> order.status == OrderStatus.IN_PROGRESS
                         OrderTab.READY -> order.status == OrderStatus.READY || order.status == OrderStatus.OUT_FOR_DELIVERY
                         OrderTab.COMPLETED -> false

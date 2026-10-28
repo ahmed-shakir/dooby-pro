@@ -1,12 +1,8 @@
 package se.supernovait.doobypro.domain.model
 
-import doobypro.shared.generated.resources.Res
-import doobypro.shared.generated.resources.default_license_description
-import doobypro.shared.generated.resources.default_license_title
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
-import org.jetbrains.compose.resources.getString
 import se.supernovait.app.core.domain.auth.User
 import se.supernovait.app.core.domain.extension.now
 import se.supernovait.app.core.domain.id.SupernovaIdGenerator

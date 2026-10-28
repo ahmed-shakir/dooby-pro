@@ -102,9 +102,9 @@ private fun SignInForm(
             .padding(bottom = MaterialTheme.spacing.x3Large)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.spacing.small),
         ) {
             SupernovaTitle(
                 text = stringResource(Res.string.sheet_SignIn_title),
@@ -129,8 +129,7 @@ private fun SignInForm(
         SupernovaTextField(
             label = stringResource(Res.string.sheet_SignIn_field_username),
             value = username,
-            onValueChange = { value, _ -> username = value },
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = { value, _ -> username = value }
         )
 
         if (errorText != null) {

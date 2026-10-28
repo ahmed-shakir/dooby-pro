@@ -30,9 +30,10 @@ import se.supernovait.doobypro.presentation.app.theme.statusColor
 fun OrderHeader(order: Order) {
     val statusColors = MaterialTheme.statusColor
     val statusColor = when (order.status) {
-        OrderStatus.NEW -> statusColors.info
+        OrderStatus.NEW, OrderStatus.OUT_FOR_PICKUP -> statusColors.info
         OrderStatus.IN_PROGRESS -> statusColors.warning
         OrderStatus.READY -> statusColors.success
+        OrderStatus.OUT_FOR_DELIVERY -> statusColors.info
         OrderStatus.CANCELLED -> statusColors.error
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }

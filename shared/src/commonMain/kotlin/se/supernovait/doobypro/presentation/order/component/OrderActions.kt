@@ -15,13 +15,16 @@ import doobypro.shared.generated.resources.screen_Order_action_delivery_failed
 import doobypro.shared.generated.resources.screen_Order_action_next_status_in_progress
 import doobypro.shared.generated.resources.screen_Order_action_next_status_new
 import doobypro.shared.generated.resources.screen_Order_action_next_status_out_for_delivery
+import doobypro.shared.generated.resources.screen_Order_action_next_status_out_for_pickup
 import doobypro.shared.generated.resources.screen_Order_action_next_status_ready_delivery
 import doobypro.shared.generated.resources.screen_Order_action_next_status_ready_pickup
+import doobypro.shared.generated.resources.screen_Order_action_pickup_failed
 import doobypro.shared.generated.resources.screen_Order_action_reissue_order
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.ui.component.action.SupernovaButton
 import se.supernovait.app.core.ui.component.action.SupernovaOutlinedButton
 import se.supernovait.app.core.ui.theme.spacing
+import se.supernovait.doobypro.domain.model.delivery.CollectionMethod
 import se.supernovait.doobypro.domain.model.delivery.DeliveryMethod
 import se.supernovait.doobypro.domain.model.order.Order
 import se.supernovait.doobypro.domain.model.order.OrderStatus
@@ -31,13 +34,21 @@ import se.supernovait.doobypro.presentation.app.theme.statusColor
 fun OrderActions(
     order: Order,
     onNextStatus: () -> Unit,
+    onPickupFailed: () -> Unit = {},
     onDeliveryFailed: () -> Unit = {},
     onCancel: () -> Unit,
     onDelete: () -> Unit,
     onReissue: () -> Unit
 ) {
     val nextStatusLabel = when (order.status) {
-        OrderStatus.NEW -> Res.string.screen_Order_action_next_status_new
+        OrderStatus.NEW -> {
+            if (order.collectionMethod == CollectionMethod.HOME_PICKUP) {
+                Res.string.screen_Order_action_next_status_out_for_pickup
+            } else {
+                Res.string.screen_Order_action_next_status_new
+            }
+        }
+        OrderStatus.OUT_FOR_PICKUP -> Res.string.screen_Order_action_next_status_in_progress
         OrderStatus.IN_PROGRESS -> Res.string.screen_Order_action_next_status_in_progress
         OrderStatus.READY -> {
             if (order.deliveryMethod == DeliveryMethod.IN_STORE_PICKUP) {
@@ -55,6 +66,15 @@ fun OrderActions(
             SupernovaButton(
                 label = stringResource(nextStatusLabel),
                 onClick = onNextStatus,
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        if (order.status == OrderStatus.OUT_FOR_PICKUP) {
+            SupernovaOutlinedButton(
+                label = stringResource(Res.string.screen_Order_action_pickup_failed),
+                onClick = onPickupFailed,
                 shape = MaterialTheme.shapes.extraSmall,
                 modifier = Modifier.fillMaxWidth()
             )
