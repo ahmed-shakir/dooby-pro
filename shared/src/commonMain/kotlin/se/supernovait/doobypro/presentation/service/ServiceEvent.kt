@@ -9,24 +9,22 @@ sealed interface ServiceEvent {
     /** Re-fetches the list of all services. */
     data object LoadServices : ServiceEvent
 
-    /**
-     * Sets the service that is currently being created or updated.
-     * 
-     * @param service The service instance to load into the form.
-     */
+    /** Selects a service for details view or clears selection. */
+    data class SelectService(val service: Service?) : ServiceEvent
+
+    /** Sets whether the edit form sheet is active. */
+    data class SetEditing(val isEditing: Boolean) : ServiceEvent
+
+    /** Sets the service that is currently being created or updated. */
     data class EditService(val service: Service) : ServiceEvent
 
-    /**
-     * Saves a service to the database.
-     */
+    /** Saves a service to the database. */
     data class SaveService(
         val title: String,
         val description: String,
         val priceValue: Long
     ) : ServiceEvent
 
-    /**
-     * Permanently deletes a service.
-     */
+    /** Permanently deletes a service. */
     data class DeleteService(val service: Service) : ServiceEvent
 }

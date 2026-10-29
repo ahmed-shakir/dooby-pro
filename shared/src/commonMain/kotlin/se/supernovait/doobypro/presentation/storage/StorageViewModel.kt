@@ -41,8 +41,10 @@ class StorageViewModel(
         logger.debug("Handling event: $event", tag = LogTags.STORAGE_VM)
         when (event) {
             StorageEvent.LoadLocations -> loadLocations()
+            is StorageEvent.SelectLocation -> _uiState.update { it.copy(selectedLocation = event.location, isEditing = false) }
+            is StorageEvent.SetEditing -> _uiState.update { it.copy(isEditing = event.isEditing) }
+            is StorageEvent.EditLocation -> _uiState.update { it.copy(selectedLocation = event.location, isEditing = true) }
             is StorageEvent.SaveLocation -> saveLocation(event)
-            is StorageEvent.EditLocation -> _uiState.update { it.copy(editingLocation = event.location) }
             is StorageEvent.DeleteLocation -> deleteLocation(event.location)
         }
     }
@@ -68,7 +70,7 @@ class StorageViewModel(
             performanceMonitor.traceAsync("StorageViewModel.saveLocation") {
                 logger.info("Saving storage location '${event.label}'", tag = LogTags.STORAGE_VM)
                 _uiState.update { it.copy(isSaving = true) }
-                val currentLocation = _uiState.value.editingLocation
+                val currentLocation = _uiState.value.selectedLocation
                 val locationToSave = currentLocation?.copy(
                     label = event.label,
                     type = event.type,
@@ -84,7 +86,7 @@ class StorageViewModel(
                 if (result is Result.Success) {
                     logger.info("Storage location '${event.label}' saved successfully", tag = LogTags.STORAGE_VM)
                     analyticsTracker.trackEvent("storage_location_saved", mapOf("storage_location_label" to event.label))
-                    _uiState.update { it.copy(isSaving = false, editingLocation = null) }
+                    _uiState.update { it.copy(isSaving = false, selectedLocation = null, isEditing = false) }
                 } else {
                     logger.error("Failed to save storage location '${event.label}'", tag = LogTags.STORAGE_VM)
                     crashReporter.log("Failed to save storage location '${event.label}' in StorageViewModel")
@@ -103,7 +105,7 @@ class StorageViewModel(
                 if (result is Result.Success) {
                     logger.info("Storage location with ID: ${location.id} deleted successfully", tag = LogTags.STORAGE_VM)
                     analyticsTracker.trackEvent("storage_location_deleted", mapOf("location_id" to (location.id ?: "")))
-                    _uiState.update { it.copy(isSaving = false) }
+                    _uiState.update { it.copy(isSaving = false, selectedLocation = null, isEditing = false) }
                 } else {
                     logger.error("Failed to delete storage location with ID: ${location.id}", tag = LogTags.STORAGE_VM)
                     crashReporter.log("Failed to delete storage location with ID: ${location.id} in StorageViewModel")

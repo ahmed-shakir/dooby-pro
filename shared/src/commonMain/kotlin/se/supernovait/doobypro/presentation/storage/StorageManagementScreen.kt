@@ -27,6 +27,7 @@ import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.storage.StorageLocation
+import se.supernovait.doobypro.presentation.storage.component.StorageLocationDetailsSheet
 import se.supernovait.doobypro.presentation.storage.component.StorageLocationFormSheet
 import se.supernovait.doobypro.presentation.storage.component.StorageLocationItem
 
@@ -43,24 +44,57 @@ fun StorageManagementScreen(
     val deleteTitle = stringResource(Res.string.screen_Storage_dialog_delete_title)
     val deleteMessage = stringResource(Res.string.screen_Storage_dialog_delete_message)
 
+    fun showEditSheet(location: StorageLocation) {
+        onEvent(StorageEvent.EditLocation(location))
+        bottomSheetState.show {
+            StorageLocationFormSheet(
+                location = location,
+                onSave = { label, type, capacity ->
+                    onEvent(StorageEvent.SaveLocation(label, type, capacity))
+                    bottomSheetState.hide()
+                },
+                onDelete = if (location.id != null) {
+                    {
+                        dialogState.showConfirmation(
+                            title = deleteTitle,
+                            message = deleteMessage,
+                            confirmLabel = Res.string.label_delete,
+                            dismissLabel = Res.string.label_cancel,
+                            primaryActionColor = deleteColor,
+                            onConfirm = {
+                                onEvent(StorageEvent.DeleteLocation(location))
+                                bottomSheetState.hide()
+                                dialogState.hide()
+                            },
+                            onDismiss = { dialogState.hide() }
+                        )
+                    }
+                } else null
+            )
+        }
+    }
+
+    fun showDetailsSheet(location: StorageLocation) {
+        bottomSheetState.show {
+            StorageLocationDetailsSheet(
+                location = location,
+                onEdit = {
+                    bottomSheetState.hide()
+                    showEditSheet(location)
+                },
+                onDelete = {
+                    onEvent(StorageEvent.DeleteLocation(location))
+                    bottomSheetState.hide()
+                }
+            )
+        }
+    }
+
     LaunchedEffect(Unit) {
         fabState.set(
             icon = Res.drawable.ic_add,
             contentDescription = Res.string.screen_Storage_action_add_location,
-            onClick = {
-                val newLocation = StorageLocation()
-                onEvent(StorageEvent.EditLocation(newLocation))
-                bottomSheetState.show {
-                    StorageLocationFormSheet(
-                        location = newLocation,
-                        onSave = { label, type, capacity ->
-                            onEvent(StorageEvent.SaveLocation(label, type, capacity))
-                            bottomSheetState.hide()
-                        },
-                        onDelete = null
-                    )
-                }
-            }
+            onClick = { showEditSheet(StorageLocation()) }
         )
     }
 
@@ -74,33 +108,8 @@ fun StorageManagementScreen(
                 items(uiState.locations) { location ->
                     StorageLocationItem(
                         location = location,
-                        onEdit = {
-                            onEvent(StorageEvent.EditLocation(location))
-                            bottomSheetState.show {
-                                StorageLocationFormSheet(
-                                    location = location,
-                                    onSave = { label, type, capacity ->
-                                        onEvent(StorageEvent.SaveLocation(label, type, capacity))
-                                        bottomSheetState.hide()
-                                    },
-                                    onDelete = {
-                                        dialogState.showConfirmation(
-                                            title = deleteTitle,
-                                            message = deleteMessage,
-                                            confirmLabel = Res.string.label_delete,
-                                            dismissLabel = Res.string.label_cancel,
-                                            primaryActionColor = deleteColor,
-                                            onConfirm = {
-                                                onEvent(StorageEvent.DeleteLocation(location))
-                                                bottomSheetState.hide()
-                                                dialogState.hide()
-                                            },
-                                            onDismiss = { dialogState.hide() }
-                                        )
-                                    }
-                                )
-                            }
-                        }
+                        onClick = { showDetailsSheet(location) },
+                        onEdit = { showEditSheet(location) }
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }

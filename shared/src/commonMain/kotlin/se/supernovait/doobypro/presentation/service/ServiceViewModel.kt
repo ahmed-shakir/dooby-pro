@@ -45,7 +45,9 @@ class ServiceViewModel(
         logger.debug("Handling event: $event", tag = LogTags.SERVICE_VM)
         when (event) {
             ServiceEvent.LoadServices -> loadServices()
-            is ServiceEvent.EditService -> _uiState.update { it.copy(editingService = event.service) }
+            is ServiceEvent.SelectService -> _uiState.update { it.copy(selectedService = event.service, isEditing = false) }
+            is ServiceEvent.SetEditing -> _uiState.update { it.copy(isEditing = event.isEditing) }
+            is ServiceEvent.EditService -> _uiState.update { it.copy(selectedService = event.service, isEditing = true) }
             is ServiceEvent.SaveService -> saveService(event)
             is ServiceEvent.DeleteService -> deleteService(event.service)
         }
@@ -79,7 +81,7 @@ class ServiceViewModel(
                 logger.info("Saving service '${event.title}'", tag = LogTags.SERVICE_VM)
                 _uiState.update { it.copy(isSaving = true) }
                 val currency = _uiState.value.currency
-                val currentService = _uiState.value.editingService
+                val currentService = _uiState.value.selectedService
                 val serviceToSave = currentService?.copy(
                     title = event.title,
                     description = event.description,
@@ -95,7 +97,7 @@ class ServiceViewModel(
                 if (result is Result.Success) {
                     logger.info("Service '${event.title}' saved successfully", tag = LogTags.SERVICE_VM)
                     analyticsTracker.trackEvent("service_saved", mapOf("service_title" to event.title))
-                    _uiState.update { it.copy(isSaving = false, editingService = null) }
+                    _uiState.update { it.copy(isSaving = false, selectedService = null, isEditing = false) }
                 } else {
                     logger.error("Failed to save service '${event.title}'", tag = LogTags.SERVICE_VM)
                     crashReporter.log("Failed to save service '${event.title}' in ServiceViewModel")
@@ -114,7 +116,7 @@ class ServiceViewModel(
                 if (result is Result.Success) {
                     logger.info("Service with ID: ${service.id} deleted successfully", tag = LogTags.SERVICE_VM)
                     analyticsTracker.trackEvent("service_deleted", mapOf("service_id" to (service.id ?: "")))
-                    _uiState.update { it.copy(isSaving = false) }
+                    _uiState.update { it.copy(isSaving = false, selectedService = null, isEditing = false) }
                 } else {
                     logger.error("Failed to delete service with ID: ${service.id}", tag = LogTags.SERVICE_VM)
                     crashReporter.log("Failed to delete service with ID: ${service.id} in ServiceViewModel")

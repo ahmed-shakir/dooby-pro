@@ -27,6 +27,7 @@ import se.supernovait.app.core.ui.component.modal.LocalBottomSheetState
 import se.supernovait.app.core.ui.component.modal.dialog.LocalDialogState
 import se.supernovait.app.core.ui.theme.spacing
 import se.supernovait.doobypro.domain.model.Service
+import se.supernovait.doobypro.presentation.service.component.ServiceDetailsSheet
 import se.supernovait.doobypro.presentation.service.component.ServiceFormSheet
 import se.supernovait.doobypro.presentation.service.component.ServiceItem
 
@@ -43,25 +44,59 @@ fun ServiceManagementScreen(
     val deleteTitle = stringResource(Res.string.screen_Service_dialog_delete_title)
     val deleteMessage = stringResource(Res.string.screen_Service_dialog_delete_message)
 
+    fun showEditSheet(service: Service) {
+        onEvent(ServiceEvent.EditService(service))
+        bottomSheetState.show {
+            ServiceFormSheet(
+                service = service,
+                currency = uiState.currency,
+                onSave = { title, description, price ->
+                    onEvent(ServiceEvent.SaveService(title, description, price))
+                    bottomSheetState.hide()
+                },
+                onDelete = if (service.id != null) {
+                    {
+                        dialogState.showConfirmation(
+                            title = deleteTitle,
+                            message = deleteMessage,
+                            confirmLabel = Res.string.label_delete,
+                            dismissLabel = Res.string.label_cancel,
+                            primaryActionColor = deleteColor,
+                            onConfirm = {
+                                onEvent(ServiceEvent.DeleteService(service))
+                                bottomSheetState.hide()
+                                dialogState.hide()
+                            },
+                            onDismiss = { dialogState.hide() }
+                        )
+                    }
+                } else null
+            )
+        }
+    }
+
+    fun showDetailsSheet(service: Service) {
+        bottomSheetState.show {
+            ServiceDetailsSheet(
+                service = service,
+                currency = uiState.currency,
+                onEdit = {
+                    bottomSheetState.hide()
+                    showEditSheet(service)
+                },
+                onDelete = {
+                    onEvent(ServiceEvent.DeleteService(service))
+                    bottomSheetState.hide()
+                }
+            )
+        }
+    }
+
     LaunchedEffect(Unit) {
         fabState.set(
             icon = Res.drawable.ic_add,
             contentDescription = Res.string.screen_Service_action_add_service,
-            onClick = {
-                val newServiceTemplate = Service()
-                onEvent(ServiceEvent.EditService(newServiceTemplate))
-                bottomSheetState.show {
-                    ServiceFormSheet(
-                        service = newServiceTemplate,
-                        currency = uiState.currency,
-                        onSave = { title, description, price ->
-                            onEvent(ServiceEvent.SaveService(title, description, price))
-                            bottomSheetState.hide()
-                        },
-                        onDelete = null
-                    )
-                }
-            }
+            onClick = { showEditSheet(Service()) }
         )
     }
 
@@ -75,34 +110,8 @@ fun ServiceManagementScreen(
                 items(uiState.services) { service ->
                     ServiceItem(
                         service = service,
-                        onEdit = {
-                            onEvent(ServiceEvent.EditService(service))
-                            bottomSheetState.show {
-                                ServiceFormSheet(
-                                    service = service,
-                                    currency = uiState.currency,
-                                    onSave = { title, description, price ->
-                                        onEvent(ServiceEvent.SaveService(title, description, price))
-                                        bottomSheetState.hide()
-                                    },
-                                    onDelete = {
-                                        dialogState.showConfirmation(
-                                            title = deleteTitle,
-                                            message = deleteMessage,
-                                            confirmLabel = Res.string.label_delete,
-                                            dismissLabel = Res.string.label_cancel,
-                                            primaryActionColor = deleteColor,
-                                            onConfirm = {
-                                                onEvent(ServiceEvent.DeleteService(service))
-                                                bottomSheetState.hide()
-                                                dialogState.hide()
-                                            },
-                                            onDismiss = { dialogState.hide() }
-                                        )
-                                    }
-                                )
-                            }
-                        }
+                        onClick = { showDetailsSheet(service) },
+                        onEdit = { showEditSheet(service) }
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }

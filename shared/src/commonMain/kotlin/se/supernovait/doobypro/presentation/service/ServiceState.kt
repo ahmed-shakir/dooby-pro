@@ -7,8 +7,9 @@ import se.supernovait.doobypro.domain.model.Service
 data class ServiceState(
     val services: List<Service> = emptyList(),
     val currency: String = AppDefaults.CURRENCY,
-    val editingService: Service? = null,
+    val selectedService: Service? = null,
     val error: StringResource? = null,
     val isLoading: Boolean = false,
+    val isEditing: Boolean = false,
     val isSaving: Boolean = false
 )

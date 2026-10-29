@@ -33,13 +33,14 @@ import se.supernovait.doobypro.domain.model.storage.StorageLocation
 @Composable
 fun StorageLocationItem(
     location: StorageLocation,
+    onClick: () -> Unit,
     onEdit: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onEdit() }
+            .clickable { onClick() }
             .padding(vertical = MaterialTheme.spacing.medium)
     ) {
         Column(modifier = Modifier.weight(1f)) {
