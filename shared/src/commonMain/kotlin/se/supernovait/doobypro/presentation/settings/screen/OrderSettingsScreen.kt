@@ -39,6 +39,9 @@ import doobypro.shared.generated.resources.screen_Settings_order_subunit_roundin
 import doobypro.shared.generated.resources.screen_Settings_order_subunit_rounding_label
 import doobypro.shared.generated.resources.screen_Settings_order_subunit_rounding_value_label
 import doobypro.shared.generated.resources.screen_Settings_order_tag_print_mode_label
+import doobypro.shared.generated.resources.screen_Settings_order_tax_enabled_label
+import doobypro.shared.generated.resources.screen_Settings_order_tax_label
+import doobypro.shared.generated.resources.screen_Settings_order_tax_percentage_label
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.model.billing.Amount
 import se.supernovait.app.core.domain.model.decimal.Percentage
@@ -79,28 +82,36 @@ fun OrderSettingsScreen(
         }
     }
 
-    var deliveryDaysText by remember(uiState.settings.order.defaultDeliveryDaysOffset) {
-        mutableStateOf(uiState.settings.order.defaultDeliveryDaysOffset.toString())
+    val orderSettings = uiState.settings.order
+
+    var deliveryDaysText by remember(orderSettings.defaultDeliveryDaysOffset) {
+        mutableStateOf(orderSettings.defaultDeliveryDaysOffset.toString())
     }
 
-    val isExpressPercentage = uiState.settings.order.expressFeeType == ExpressFeeType.PERCENTAGE
+    val isExpressPercentage = orderSettings.expressFeeType == ExpressFeeType.PERCENTAGE
 
-    var expressFeeValueText by remember(uiState.settings.order.expressFeeValue, isExpressPercentage) {
+    var expressFeeValueText by remember(orderSettings.expressFeeValue, isExpressPercentage) {
         val text = if (isExpressPercentage) {
-            Percentage(uiState.settings.order.expressFeeValue.toInt()).percentString
+            Percentage(orderSettings.expressFeeValue.toInt()).percentString
         } else {
-            Amount(uiState.settings.order.expressFeeValue, currency).value
+            Amount(orderSettings.expressFeeValue, currency).value
         }
         mutableStateOf(text)
     }
 
-    var pickupFeeValueText by remember(uiState.settings.order.pickupFeeValue) {
-        mutableStateOf(Amount(uiState.settings.order.pickupFeeValue, currency).value)
+    var pickupFeeValueText by remember(orderSettings.pickupFeeValue) {
+        mutableStateOf(Amount(orderSettings.pickupFeeValue, currency).value)
     }
 
-    var deliveryFeeValueText by remember(uiState.settings.order.deliveryFeeValue) {
-        mutableStateOf(Amount(uiState.settings.order.deliveryFeeValue, currency).value)
+    var deliveryFeeValueText by remember(orderSettings.deliveryFeeValue) {
+        mutableStateOf(Amount(orderSettings.deliveryFeeValue, currency).value)
     }
+
+    var taxPercentageText by remember(orderSettings.taxPercentage) {
+        mutableStateOf(Percentage(orderSettings.taxPercentage.toInt()).percentString)
+    }
+
+    val roundingValueFloat = (orderSettings.subunitRoundingValue / 100.0).toFloat()
 
     SettingsScreen {
         SupernovaLabel(
@@ -122,7 +133,7 @@ fun OrderSettingsScreen(
         SupernovaSelectField(
             label = Res.string.screen_Settings_order_delivery_option_label,
             options = DeliveryOption.entries,
-            selectedOption = uiState.settings.order.defaultDeliveryOption,
+            selectedOption = orderSettings.defaultDeliveryOption,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateDefaultDeliveryOption(it)) },
             optionLabel = { deliveryOptionLabels[it] ?: "" }
         )
@@ -131,7 +142,7 @@ fun OrderSettingsScreen(
         SupernovaSelectField(
             label = Res.string.screen_Settings_order_delivery_method_label,
             options = DeliveryMethod.entries,
-            selectedOption = uiState.settings.order.defaultDeliveryMethod,
+            selectedOption = orderSettings.defaultDeliveryMethod,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateDefaultDeliveryMethod(it)) },
             optionLabel = { deliveryMethodLabels[it] ?: "" }
         )
@@ -140,7 +151,7 @@ fun OrderSettingsScreen(
         SupernovaSelectField(
             label = Res.string.screen_Settings_order_collection_method_label,
             options = CollectionMethod.entries,
-            selectedOption = uiState.settings.order.defaultCollectionMethod,
+            selectedOption = orderSettings.defaultCollectionMethod,
             onOptionSelected = { method -> onEvent(SettingsScreenEvent.UpdateDefaultCollectionMethod(method)) },
             optionLabel = { method -> collectionMethodLabels[method] ?: "" }
         )
@@ -198,18 +209,18 @@ fun OrderSettingsScreen(
         SupernovaSelectField(
             label = Res.string.screen_Settings_order_express_fee_mode_label,
             options = ExpressFeeMode.entries,
-            selectedOption = uiState.settings.order.expressFeeMode,
+            selectedOption = orderSettings.expressFeeMode,
             onOptionSelected = { onEvent(SettingsScreenEvent.UpdateExpressFeeMode(it)) },
             optionLabel = { expressFeeModeLabels[it] ?: "" },
         )
 
-        if (uiState.settings.order.expressFeeMode == ExpressFeeMode.GLOBAL) {
+        if (orderSettings.expressFeeMode == ExpressFeeMode.GLOBAL) {
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
             SupernovaSelectField(
                 label = Res.string.screen_Settings_order_express_fee_type_label,
                 options = ExpressFeeType.entries,
-                selectedOption = uiState.settings.order.expressFeeType,
+                selectedOption = orderSettings.expressFeeType,
                 onOptionSelected = { onEvent(SettingsScreenEvent.UpdateExpressFeeType(it)) },
                 optionLabel = { expressFeeTypeLabels[it] ?: "" },
             )
@@ -242,17 +253,15 @@ fun OrderSettingsScreen(
             modifier = Modifier.padding(top = MaterialTheme.spacing.large, bottom = MaterialTheme.spacing.small)
         )
         SupernovaListGroup {
-            val roundingValueFloat = (uiState.settings.order.subunitRoundingValue / 100.0).toFloat()
-
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_order_subunit_rounding_enabled_label,
-                    checked = uiState.settings.order.subunitRoundingEnabled,
+                    checked = orderSettings.subunitRoundingEnabled,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateSubunitRoundingEnabled(it)) }
                 )
             }
             item {
-                if (uiState.settings.order.subunitRoundingEnabled) {
+                if (orderSettings.subunitRoundingEnabled) {
                     Column(modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.extraSmall)) {
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -265,7 +274,7 @@ fun OrderSettingsScreen(
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             SupernovaLabel(
-                                text = Amount(uiState.settings.order.subunitRoundingValue, currency).formatted,
+                                text = Amount(orderSettings.subunitRoundingValue, currency).formatted,
                                 color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold
@@ -287,6 +296,41 @@ fun OrderSettingsScreen(
         }
 
         SupernovaLabel(
+            text = Res.string.screen_Settings_order_tax_label,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(top = MaterialTheme.spacing.large, bottom = MaterialTheme.spacing.small)
+        )
+        SupernovaListGroup {
+            item {
+                SupernovaToggle(
+                    label = Res.string.screen_Settings_order_tax_enabled_label,
+                    checked = orderSettings.taxEnabled,
+                    onCheckedChange = { onEvent(SettingsScreenEvent.UpdateTaxEnabled(it)) }
+                )
+            }
+            item {
+                if (orderSettings.taxEnabled) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.extraSmall)) {
+                        SupernovaTextField(
+                            label = stringResource(Res.string.screen_Settings_order_tax_percentage_label),
+                            value = taxPercentageText,
+                            onValueChange = { newValue, _ ->
+                                if (newValue.isEmpty() || newValue.matches(Regex(ValidationPattern.DECIMAL.pattern))) {
+                                    taxPercentageText = newValue
+                                    val rawValue = ((newValue.toDoubleOrNull() ?: 0.0) * 100).roundToLong()
+                                    onEvent(SettingsScreenEvent.UpdateTaxPercentage(rawValue))
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+        }
+
+        SupernovaLabel(
             text = Res.string.screen_Settings_order_behavior_label,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary,
@@ -296,20 +340,20 @@ fun OrderSettingsScreen(
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_order_auto_print_receipts_label,
-                    checked = uiState.settings.order.autoPrintReceipts,
+                    checked = orderSettings.autoPrintReceipts,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateAutoPrintReceipts(it)) }
                 )
             }
             item {
                 SupernovaToggle(
                     label = Res.string.screen_Settings_order_auto_print_order_tag_label,
-                    checked = uiState.settings.order.autoPrintOrderTag,
+                    checked = orderSettings.autoPrintOrderTag,
                     onCheckedChange = { onEvent(SettingsScreenEvent.UpdateAutoPrintOrderTag(it)) }
                 )
             }
         }
 
-        if (uiState.settings.order.autoPrintOrderTag) {
+        if (orderSettings.autoPrintOrderTag) {
             SupernovaLabel(
                 text = Res.string.screen_Settings_order_tag_print_mode_label,
                 style = MaterialTheme.typography.titleSmall,
@@ -318,7 +362,7 @@ fun OrderSettingsScreen(
             )
             SupernovaSelectionGroup(
                 options = OrderTagPrintMode.entries,
-                selectedOption = uiState.settings.order.orderTagPrintMode,
+                selectedOption = orderSettings.orderTagPrintMode,
                 onOptionSelected = { onEvent(SettingsScreenEvent.UpdateOrderTagPrintMode(it)) },
                 optionLabel = { orderTagPrintModeLabels[it] ?: "" },
                 modifier = Modifier.fillMaxWidth()

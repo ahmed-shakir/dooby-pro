@@ -41,4 +41,6 @@ data class OrderSettings(
     val deliveryFeeValue: Long = 0L,
     val subunitRoundingEnabled: Boolean = false,
     val subunitRoundingValue: Long = 25L,
+    val taxEnabled: Boolean = false,
+    val taxPercentage: Long = 0L,
 )

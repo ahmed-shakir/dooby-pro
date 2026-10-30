@@ -47,6 +47,8 @@ fun OrderEntity.toDomain(
     discountType = discountType,
     discountPercentage = discountPercentage?.toDomain(),
     discount = discount?.toDomain(),
+    taxPercentage = taxPercentage?.toDomain(),
+    tax = tax?.toDomain(),
     notes = notes,
     createdAt = createdAt.toLocalDateTime(TimeZone.currentSystemDefault()),
     updatedAt = updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -78,6 +80,8 @@ fun Order.toEntity() = OrderEntity(
     discountType = discountType,
     discountPercentage = discountPercentage?.toEntity(),
     discount = discount?.toEntity(),
+    taxPercentage = taxPercentage?.toEntity(),
+    tax = tax?.toEntity(),
     notes = notes,
     createdAt = createdAt.toInstant(TimeZone.currentSystemDefault()),
     updatedAt = Clock.System.now()

@@ -138,6 +138,8 @@ fun OrderManagementScreen(
                     globalPickupFee = state.settings.order.pickupFeeValue,
                     subunitRoundingEnabled = state.settings.order.subunitRoundingEnabled,
                     subunitRoundingValue = state.settings.order.subunitRoundingValue,
+                    taxEnabled = state.settings.order.taxEnabled,
+                    globalTaxPercentage = state.settings.order.taxPercentage,
                     currency = state.settings.common.currency.symbol,
                     onSave = { 
                         onEvent(OrderEvent.SaveOrder(it))
@@ -213,6 +215,8 @@ fun OrderManagementScreen(
                         globalPickupFee = state.settings.order.pickupFeeValue,
                         subunitRoundingEnabled = state.settings.order.subunitRoundingEnabled,
                         subunitRoundingValue = state.settings.order.subunitRoundingValue,
+                        taxEnabled = state.settings.order.taxEnabled,
+                        globalTaxPercentage = state.settings.order.taxPercentage,
                         currency = state.settings.common.currency.symbol,
                         onSave = { 
                             onEvent(OrderEvent.SaveOrder(it))

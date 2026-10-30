@@ -183,6 +183,16 @@ class OrderManager(
             }
 
             val baseTotal = itemsSubtotal + (expressFee?.decimal ?: Decimal.ZERO) + (pickupFee?.decimal ?: Decimal.ZERO) + (deliveryFee?.decimal ?: Decimal.ZERO)
+            val taxPercentage = if (orderSettings.taxEnabled && orderSettings.taxPercentage > 0L) {
+                Percentage.fromBasisPoints(orderSettings.taxPercentage.toInt())
+            } else null
+
+            val tax = if (orderSettings.taxEnabled) {
+                Amount(itemsSubtotal, currency) * (taxPercentage ?: Percentage.ZERO)
+            } else {
+                null
+            }
+
             val subunitRounding = if (orderSettings.subunitRoundingEnabled && orderSettings.subunitRoundingValue > 0L) {
                 // TODO: update when Supernova Core v1.14.8 is used
                 val step = orderSettings.subunitRoundingValue
@@ -218,6 +228,8 @@ class OrderManager(
                 discountType = DiscountType.FLAT_AMOUNT,
                 discountPercentage = null,
                 discount = null,
+                taxPercentage = taxPercentage,
+                tax = tax,
                 notes = null
             )
         }
@@ -244,6 +256,8 @@ class OrderManager(
                 discountType = originalOrder.discountType,
                 discountPercentage = originalOrder.discountPercentage,
                 discount = originalOrder.discount,
+                taxPercentage = originalOrder.taxPercentage,
+                tax = originalOrder.tax,
                 notes = originalOrder.notes
             )
         }

@@ -124,6 +124,8 @@ fun OrderFormSheet(
     globalPickupFee: Long,
     subunitRoundingEnabled: Boolean,
     subunitRoundingValue: Long,
+    taxEnabled: Boolean,
+    globalTaxPercentage: Long,
     currency: String,
     onSave: (Order) -> Unit,
     onDelete: (() -> Unit)? = null
@@ -720,7 +722,25 @@ fun OrderFormSheet(
                         }
 
                         val discount = calculatedDiscount?.decimal ?: Decimal.ZERO
-                        val baseTotal = itemsSubtotal + (calculatedExpressFee?.decimal ?: Decimal.ZERO) + (calculatedDeliveryFee?.decimal ?: Decimal.ZERO) + (calculatedPickupFee?.decimal ?: Decimal.ZERO) - discount
+                        val taxPercentageToUse = if (!isNew && order.taxPercentage != null) {
+                            order.taxPercentage
+                        } else if (taxEnabled && globalTaxPercentage > 0L) {
+                            Percentage.fromBasisPoints(globalTaxPercentage.toInt())
+                        } else {
+                            null
+                        }
+
+                        val calculatedTax = if (taxEnabled || (order.tax != null && order.tax.raw > 0L)) {
+                            if (taxPercentageToUse != null) {
+                                Amount(itemsSubtotal, currency) * taxPercentageToUse
+                            } else {
+                                order.tax
+                            }
+                        } else {
+                            null
+                        }
+
+                        val baseTotal = itemsSubtotal + (calculatedExpressFee?.decimal ?: Decimal.ZERO) + (calculatedDeliveryFee?.decimal ?: Decimal.ZERO) + (calculatedPickupFee?.decimal ?: Decimal.ZERO) - discount + (calculatedTax?.decimal ?: Decimal.ZERO)
                         val calculatedSubunitRounding = if (subunitRoundingEnabled && subunitRoundingValue > 0L) {
                             val subunitRounding = Decimal(subunitRoundingValue)
                             val remainder = baseTotal % subunitRounding
@@ -754,6 +774,8 @@ fun OrderFormSheet(
                             discountType = savedDiscountType,
                             discountPercentage = savedDiscountPercentage,
                             discount = calculatedDiscount,
+                            taxPercentage = taxPercentageToUse,
+                            tax = calculatedTax,
                             notes = notes.ifBlank { null }
                         ))
                     },

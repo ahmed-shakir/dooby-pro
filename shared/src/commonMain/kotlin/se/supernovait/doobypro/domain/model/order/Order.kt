@@ -66,6 +66,8 @@ data class Order(
     val discountType: DiscountType = DiscountType.FLAT_AMOUNT,
     val discountPercentage: Percentage? = null,
     val discount: Amount? = null,
+    val taxPercentage: Percentage? = null,
+    val tax: Amount? = null,
     val notes: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
@@ -81,6 +83,7 @@ data class Order(
                 (deliveryFee?.decimal ?: Decimal.ZERO) +
                 (pickupFee?.decimal ?: Decimal.ZERO) -
                 (discount?.decimal ?: Decimal.ZERO) +
+                (tax?.decimal ?: Decimal.ZERO) +
                 (subunitRounding?.decimal ?: Decimal.ZERO)
             return Amount(totalDecimal.coerceAtLeast(Decimal.ZERO), currency)
         }

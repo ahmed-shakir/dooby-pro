@@ -79,6 +79,10 @@ data class OrderEntity(
     val discountPercentage: PercentageEntity? = null,
     @Embedded(prefix = "discount_")
     val discount: AmountEntity? = null,
+    @Embedded(prefix = "tax_pct_")
+    val taxPercentage: PercentageEntity? = null,
+    @Embedded(prefix = "tax_")
+    val tax: AmountEntity? = null,
     val notes: String? = null,
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now()

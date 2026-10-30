@@ -92,6 +92,8 @@ class SettingsViewModel(
             is SettingsScreenEvent.UpdateDeliveryFeeValue -> updateSettings { it.copy(order = it.order.copy(deliveryFeeValue = event.value)) }
             is SettingsScreenEvent.UpdateSubunitRoundingEnabled -> updateSettings { it.copy(order = it.order.copy(subunitRoundingEnabled = event.enabled)) }
             is SettingsScreenEvent.UpdateSubunitRoundingValue -> updateSettings { it.copy(order = it.order.copy(subunitRoundingValue = event.value)) }
+            is SettingsScreenEvent.UpdateTaxEnabled -> updateSettings { it.copy(order = it.order.copy(taxEnabled = event.enabled)) }
+            is SettingsScreenEvent.UpdateTaxPercentage -> updateSettings { it.copy(order = it.order.copy(taxPercentage = event.value)) }
             // Storage settings
             is SettingsScreenEvent.UpdateStorageAllocationMode -> updateSettings { it.copy(storage = it.storage.copy(storageAllocationMode = event.mode)) }
             is SettingsScreenEvent.UpdateDefaultStorageLocationId -> updateSettings { it.copy(storage = it.storage.copy(defaultStorageLocationId = event.id)) }

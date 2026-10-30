@@ -259,6 +259,9 @@
     <string name="screen_Settings_order_auto_print_receipts_label">Auto-print receipts</string>
     <string name="screen_Settings_order_auto_print_order_tag_label">Auto-print order tag</string>
     <string name="screen_Settings_order_tag_print_mode_label">Order tag print mode</string>
+    <string name="screen_Settings_order_tax_label">Tax</string>
+    <string name="screen_Settings_order_tax_enabled_label">Enable Tax</string>
+    <string name="screen_Settings_order_tax_percentage_label">Tax Percentage (%)</string>
 
     <!-- Order settings -->
     <string name="screen_Settings_storage_allocation_mode_label">Storage allocation mode</string>
@@ -485,6 +488,8 @@
     <string name="screen_Order_label_delivery_fee">Delivery Fee</string>
     <string name="screen_Order_label_discount">Discount</string>
     <string name="screen_Order_label_discount_with_percentage">Discount (%1$s)</string>
+    <string name="screen_Order_label_tax">Tax</string>
+    <string name="screen_Order_label_tax_with_percentage">Tax (%1$s)</string>
     <string name="screen_Order_label_subunit_rounding">Rounding</string>
     <string name="screen_Order_label_total_price">Total</string>
 

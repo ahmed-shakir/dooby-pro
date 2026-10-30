@@ -23,6 +23,8 @@ import doobypro.shared.generated.resources.screen_Order_label_express_fee
 import doobypro.shared.generated.resources.screen_Order_label_express_fee_with_percentage
 import doobypro.shared.generated.resources.screen_Order_label_subtotal
 import doobypro.shared.generated.resources.screen_Order_label_subunit_rounding
+import doobypro.shared.generated.resources.screen_Order_label_tax
+import doobypro.shared.generated.resources.screen_Order_label_tax_with_percentage
 import doobypro.shared.generated.resources.screen_Order_label_total_price
 import org.jetbrains.compose.resources.stringResource
 import se.supernovait.app.core.domain.model.billing.Amount
@@ -62,8 +64,9 @@ fun OrderServicesSection(
     val pickupFeeAmount = order.pickupFee?.takeIf { it.raw > 0 }
     val deliveryFeeAmount = order.deliveryFee?.takeIf { it.raw > 0 }
     val discountAmount = order.discount?.takeIf { it.raw > 0 }
+    val taxAmount = order.tax?.takeIf { it.raw > 0L }
     val subunitRoundingAmount = order.subunitRounding?.takeIf { it.raw != 0L }
-    val hasExtras = (expressFeeAmount != null) || (pickupFeeAmount != null) || (deliveryFeeAmount != null) || (discountAmount != null) || (subunitRoundingAmount != null)
+    val hasExtras = (expressFeeAmount != null) || (pickupFeeAmount != null) || (deliveryFeeAmount != null) || (discountAmount != null) || (taxAmount != null) || (subunitRoundingAmount != null)
 
     Column(modifier = modifier.fillMaxWidth()) {
         SupernovaLabel(
@@ -274,6 +277,38 @@ fun OrderServicesSection(
                             SupernovaLabel(
                                 text = "-${discountAmount.formatted}",
                                 color = MaterialTheme.statusColor.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    }
+
+                    // Tax Row
+                    if (taxAmount != null) {
+                        val taxLabel = if (order.taxPercentage != null) {
+                            stringResource(Res.string.screen_Order_label_tax_with_percentage, order.taxPercentage.formatted)
+                        } else if (itemsSubtotal.raw > 0) {
+                            val calcPct = taxAmount / itemsSubtotal.decimal
+                            stringResource(Res.string.screen_Order_label_tax_with_percentage, calcPct.decimal.toPercentage().formatted)
+                        } else {
+                            stringResource(Res.string.screen_Order_label_tax)
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = MaterialTheme.spacing.extraSmall),
+                        ) {
+                            SupernovaLabel(
+                                text = taxLabel,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            SupernovaLabel(
+                                text = taxAmount.formatted,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Medium,
                             )

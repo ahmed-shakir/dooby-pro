@@ -290,4 +290,14 @@ class OrderTest {
         // 1000 items - 200 discount + 50 rounding = 850
         assertEquals(Amount(850, "AED"), order.totalPrice)
     }
+
+    @Test
+    fun `totalPrice applies tax correctly`() {
+        val order = createOrder().copy(
+            taxPercentage = Percentage.fromPercent(10.0),
+            tax = Amount(100, "AED")
+        )
+        // 1000 items + 100 tax = 1100
+        assertEquals(Amount(1100, "AED"), order.totalPrice)
+    }
 }
